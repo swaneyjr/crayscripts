@@ -6,14 +6,9 @@ from operator import itemgetter
 import sys
 import math
 import cmath
+from hotcell import vbranch
 
 Pixel = namedtuple('Pixel',['x','y','val','avg3','avg5'])
-
-def vbranch(t, bname, btype=float):
-    btype_name = {float: 'double', int: 'int'}[btype]
-    v = r.vector(btype_name)()
-    setattr(t, bname, v)
-    t.Branch(bname, v)
 
 # finds the furthest two pixels in a list of pixels (or one such pair)
 def find_endpoints(pixels):
