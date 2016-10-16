@@ -1,5 +1,10 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+from PIL import Image
+
 # uses an image to create a grid of background values
-def find_bg(images):
+def find_bg(images, out):
 
     def divisorGen(n):
         large_divisors = []
@@ -131,5 +136,17 @@ def find_bg(images):
     s_img.save(img_name)
     
     return s_grid.transpose(1,0,2)
- 
+
+if '__name__' == '__main__':
+    from argparse import ArgumentParser
+    parser = ArgumentParser(description='')
+    parser.add_argument('--in', metavar='infiles', n_args='+', help='Images used to set thresholds')
+    parser.add_argument('--out', default='bg.png', help='Output file name')
+    parser.add_argument('--show', action='store_true', help='Display resulting threshold image')
+    
+    infiles = map(args.in, +)
+    find_bg(infiles, args.out)
+    if args.show:
+        
+    
  
