@@ -8,15 +8,9 @@ import math
 from fractions import gcd
 import time
 from scipy.signal import convolve2d
+from hotcell import vbranch
 
 matplotlib.use('tkagg')
-
-# creates a vector-valued branch of a TTree
-def vbranch(t, bname, btype=float):
-    btype_name = {float: 'double', int: 'int'}[btype]
-    v = r.vector(btype_name)()
-    setattr(t, bname, v)
-    t.Branch(bname, v)
 
 # given an Image object and a threshold of pixels to keep, returns L2 values
 def set_thresh(im, thresh):
