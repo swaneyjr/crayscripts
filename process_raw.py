@@ -4,17 +4,11 @@ import matplotlib
 from matplotlib import pyplot as plt
 from time import clock
 import gzip
+from hotcell import vbranch
 
 matplotlib.use('tkagg')
 
 def convert_to_root(images, l1thresh, l2thresh):
-
-    # creates a vector-valued branch of a TTree
-    def vbranch(t, bname, btype=float):
-        btype_name = {float: 'double', int: 'int'}[btype]
-        v = r.vector(btype_name)()
-        setattr(t, bname, v)
-        t.Branch(bname, v)
     
     saved_pix = 0
     total_pix = 0
