@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import numpy as np
 from scipy.signal import convolve2d
+from bg_threshold import outlier_cutoff
 
 # enable X-forwarding
 matplotlib.use('tkagg')
@@ -26,7 +27,8 @@ def plotchannel(imarray, cval):
     elif args.div_bg:
         mx = 5
     else:
-        mx = 20
+        mx = outlier_cutoff(imarray)
+        mx += 5 - (mx%5)
     plt.imshow(imarray[:,:,cval], cmap='plasma', interpolation='nearest',vmin=0, vmax=mx)
     plt.colorbar()
     
