@@ -4,7 +4,7 @@ import math
 from PIL import Image
 
 # uses an image to create a grid of background values
-def find_bg(images, out, conv_len=0, bg_cutoff=False):
+def find_bg(images, out, conv_len=0, bg_cutoff=False, max_img=0):
 
     def divisorGen(n):
         large_divisors = []
@@ -130,7 +130,7 @@ def find_bg(images, out, conv_len=0, bg_cutoff=False):
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser(description='Calculates the background levels for a set of images')
-    parser.add_argument('--in', metavar='infiles', nargs='+', help='Images used to set thresholds')
+    parser.add_argument('--in', required=True, dest='infiles', nargs='+', help='Images used to set thresholds')
     parser.add_argument('--out', default='bg.png', help='Output file name')
     parser.add_argument("--conv_len", type=int, default=0, help='Distance to which pixels are included in averaging')
     parser.add_argument("--bg_cutoff", action='store_true', help='Removes tracks during sauto processing.')
