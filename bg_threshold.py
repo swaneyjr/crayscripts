@@ -5,6 +5,18 @@ from PIL import Image
 from fractions import gcd
 from scipy.signal import convolve2d
 
+def outlier_cutoff(imarray):
+    mean_vals = np.mean(np.mean(imarray, axis=0), axis=0)
+    empty_vals = [np.argwhere(np.bincount(imarray[:,:,cval].flatten())==0) for cval in xrange(n_bands)]
+    for cval,vals in enumerate(empty_vals):
+        above_mean = vals[vals>mean_vals[cval]]
+        if len(above_mean)>0:
+            cutoff_vals[cval] = min(above_mean)
+        else:
+            cutoff_vals[cval] = np.amax(np.amax(imarray[:,:,cval], axis=0), axis=0) + 1
+
+    return np.amax(cutoff_vals)
+
 # uses an image to create a grid of background values
 def find_bg(images, out, conv_len=0, bg_cutoff=False, max_img=0):
 
@@ -43,18 +55,7 @@ def find_bg(images, out, conv_len=0, bg_cutoff=False, max_img=0):
 
     # set cutoff for tracks
     if bg_cutoff:
-        imarray = np.array(im)
-        mean_vals = np.mean(np.mean(imarray, axis=0), axis=0)
-        empty_vals = [np.argwhere(np.bincount(imarray[:,:,cval].flatten())==0) for cval in xrange(n_bands)]
-        for cval,vals in enumerate(empty_vals):
-            above_mean = vals[vals>mean_vals[cval]]
-            if len(above_mean)>0:
-                cutoff_vals[cval] = min(above_mean)
-            else:
-                cutoff_vals[cval] = np.amax(np.amax(imarray[:,:,cval], axis=0), axis=0) + 1
-
-        max_cutoff = np.amax(cutoff_vals)
-
+        cutoff = outlier_cutoff(np.array(im))
     im.close()
             
 
@@ -96,13 +97,13 @@ def find_bg(images, out, conv_len=0, bg_cutoff=False, max_img=0):
 
     # remove hot pixels and tracks
     if bg_cutoff:
-        print "Removing thresholds above %d..." % max_cutoff
+        print "Removing thresholds above %d..." % cutoff
           
         mask_kernel = np.array([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]],dtype=float)/16.
         masked_grid = np.zeros((h, w, n_bands))
         for cval in xrange(n_bands):
             masked_grid[:,:,cval] = convolve2d(s_grid[:,:,cval], mask_kernel, mode='same', boundary='symm')
-        s_grid = np.where(s_grid <= max_cutoff, s_grid, masked_grid)
+        s_grid = np.where(s_grid <= cutoff, s_grid, masked_grid)
 
 
     print "Downsampling image..."
