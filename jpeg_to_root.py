@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import rawpy
 import math
-from fractions import gcd
 import time
 from scipy.signal import convolve2d
 from hotcell import vbranch
