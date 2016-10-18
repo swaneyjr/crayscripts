@@ -138,10 +138,10 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
 
         # determine relevant S thresholds
         l1s_satisfied = not (sauto or smanual)
-        if sauto or smanual:
-            grid_min = np.amin(np.amin(s_grid,axis=0),axis=0)
-            l1diff = np.repeat(l1thresh,3)-grid_min
-            l2diff = l2array-grid_min
+        
+        grid_min = np.amin(np.amin(s_grid,axis=0),axis=0)
+        l1diff = np.repeat(l1thresh,3)-grid_min
+        l2diff = l2array-grid_min
                 
                                 
         x_vectors = [r.vector('int')() for i in xrange(n_bands)]
