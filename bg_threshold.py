@@ -96,7 +96,7 @@ def find_bg(images, out, conv_len=0, bg_cutoff=False, max_img=0):
 
     # remove hot pixels and tracks
     if bg_cutoff:
-        print "Removing thresholds above %d..." % bg_cutoff
+        print "Removing thresholds above %d..." % max_cutoff
           
         mask_kernel = np.array([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]],dtype=float)/16.
         masked_grid = np.zeros((h, w, n_bands))
@@ -144,12 +144,10 @@ if __name__ == '__main__':
     bg = find_bg(list(args.infiles), args.out, args.conv_len, args.bg_cutoff)
     if args.show:
         plt.figure(1)
-        d = math.ceil(math.sqrt(n_bands))
-        for b in xrange(s_grid.shape[2]):
+        d = math.ceil(math.sqrt(bg.shape[2]))
+        for b in xrange(bg.shape[2]):
             plt.subplot(d,d,b+1)
-            bg = plt.imshow(s_grid[:,:,b].transpose(1,0), cmap='plasma',interpolation='nearest', vmin=0, vmax=20)
-            plt.colorbar()
-      
-        
-    
+            bg = plt.imshow(s_grid[:,:,b].transpose(1,0), cmap='plasma', interpolation='nearest', vmin=0, vmax=20)
+            plt.colorbar()      
+        plt.show()        
  
