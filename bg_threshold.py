@@ -6,8 +6,10 @@ from fractions import gcd
 from scipy.signal import convolve2d
 
 def outlier_cutoff(imarray):
+    n_bands = imarray.shape[2]
+    cutoff_vals = np.zeros(n_bands)
     mean_vals = np.mean(np.mean(imarray, axis=0), axis=0)
-    empty_vals = [np.argwhere(np.bincount(imarray[:,:,cval].flatten())==0) for cval in xrange(imarray.shape[2])]
+    empty_vals = [np.argwhere(np.bincount(imarray[:,:,cval].flatten())==0) for cval in xrange(n_bands)]
     for cval,vals in enumerate(empty_vals):
         above_mean = vals[vals>mean_vals[cval]]
         if len(above_mean)>0:
@@ -41,7 +43,6 @@ def find_bg(images, out, conv_len=0, bg_cutoff=False, max_img=0):
     #mean_grid = np.zeros((h, w, n_bands))
     #var_grid = np.zeros((h, w, n_bands))
     s_grid = np.zeros((h, w, n_bands),dtype=int)
-    cutoff_vals = np.zeros(n_bands)
 
     # determine sampling resolution
     full_block_len = gcd(h,w)
