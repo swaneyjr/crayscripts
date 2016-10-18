@@ -31,9 +31,9 @@ def plotchannel(imarray, cval):
     plt.colorbar()
     
 imarray = np.array(Image.open(args.img)).astype(int)
+sample_block = 8
 
 if args.minus_bg or args.div_bg:
-    sample_block = 8
     bg = np.median([imarray[x::sample_block,y::sample_block] for x,y in np.ndindex(sample_block,sample_block)], axis=0)
     bg = np.repeat(np.repeat(bg, sample_block, axis=0), sample_block, axis=1)
 if args.minus_bg:
