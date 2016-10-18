@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import math
 from PIL import Image
 from fractions import gcd
+from scipy.signal import convolve2d
 
 # uses an image to create a grid of background values
 def find_bg(images, out, conv_len=0, bg_cutoff=False, max_img=0):
