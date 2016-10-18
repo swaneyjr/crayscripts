@@ -145,11 +145,13 @@ if __name__ == '__main__':
     
     bg = find_bg(list(args.infiles), args.out, args.conv_len, args.bg_cutoff)
     if args.show:
+        mx = outlier_cutoff(bg)
+        mx += 5 - (mx%5)
         plt.figure(1)
         d = math.ceil(math.sqrt(bg.shape[2]))
         for b in xrange(bg.shape[2]):
             plt.subplot(d,d,b+1)
-            grid=plt.imshow(bg[:,:,b].transpose(1,0), cmap='plasma', interpolation='nearest', vmin=0, vmax=20)
+            grid=plt.imshow(bg[:,:,b].transpose(1,0), cmap='plasma', interpolation='nearest', vmin=0, vmax=mx)
             plt.colorbar()      
         plt.show()        
  
