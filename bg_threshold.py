@@ -4,7 +4,7 @@ import math
 from PIL import Image
 
 # uses an image to create a grid of background values
-def find_bg(images, out):
+def find_bg(images, out, conv_len=0, bg_cutoff=False):
 
     def divisorGen(n):
         large_divisors = []
@@ -17,8 +17,6 @@ def find_bg(images, out):
             yield divisor
 
     n_img_bg = len(images)
-    #std_devs = args.devs
-    side_length = args.conv_len
 
     # establish grid dimensions
     im = Image.open(images[0])
@@ -29,7 +27,7 @@ def find_bg(images, out):
     #mean_grid = np.zeros((h, w, n_bands))
     #var_grid = np.zeros((h, w, n_bands))
     s_grid = np.zeros((h, w, n_bands),dtype=int)
-    bg_cutoff = np.zeros(n_bands)
+    cutoff_vals = np.zeros(n_bands)
 
     # determine sampling resolution
     full_block_len = gcd(h,w)
@@ -42,18 +40,18 @@ def find_bg(images, out):
     sample_block = divisor_list[int(raw_input("Select [1]-[%d]: " % len(divisor_list)))-1]
 
     # set cutoff for tracks
-    if args.bg_cutoff:
+    if bg_cutoff:
         imarray = np.array(im)
         mean_vals = np.mean(np.mean(imarray, axis=0), axis=0)
         empty_vals = [np.argwhere(np.bincount(imarray[:,:,cval].flatten())==0) for cval in xrange(n_bands)]
         for cval,vals in enumerate(empty_vals):
             above_mean = vals[vals>mean_vals[cval]]
             if len(above_mean)>0:
-                bg_cutoff[cval] = min(above_mean)
+                cutoff_vals[cval] = min(above_mean)
             else:
-                bg_cutoff[cval] = np.amax(np.amax(imarray[:,:,cval], axis=0), axis=0) + 1
+                cutoff_vals[cval] = np.amax(np.amax(imarray[:,:,cval], axis=0), axis=0) + 1
 
-        bg_cutoff = np.amax(bg_cutoff)
+        max_cutoff = np.amax(cutoff_vals)
 
     im.close()
             
@@ -95,15 +93,14 @@ def find_bg(images, out):
         s_grid = np.maximum(np.array(Image.open(im)), s_grid)
 
     # remove hot pixels and tracks
-    if args.bg_cutoff:
+    if bg_cutoff:
         print "Removing thresholds above %d..." % bg_cutoff
           
         mask_kernel = np.array([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]],dtype=float)/16.
         masked_grid = np.zeros((h, w, n_bands))
         for cval in xrange(n_bands):
             masked_grid[:,:,cval] = convolve2d(s_grid[:,:,cval], mask_kernel, mode='same', boundary='symm')
-
-        s_grid = np.where(s_grid <= bg_cutoff, s_grid, masked_grid)
+        s_grid = np.where(s_grid <= max_cutoff, s_grid, masked_grid)
 
 
     print "Downsampling image..."
@@ -112,18 +109,11 @@ def find_bg(images, out):
     
     print "Applying convolution kernel..."
 
-    kernel_side = 2*side_length+1
+    kernel_side = 2*conv_len+1
     s_kernel = np.repeat(1, kernel_side**2).reshape((kernel_side,kernel_side))/float(kernel_side)**2
     convolved_grid = np.array([convolve2d(s_grid[:,:,cval], s_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]).transpose(1,2,0)
     s_grid = np.maximum(s_grid, convolved_grid)
-    if args.l2plus:
-        l2plus_array = np.repeat(max(args.l2plus), n_bands)
-        for i,v in enumerate(args.l2plus):
-            l2plus_array[i] = v
-    else:
-        l2plus_array = np.zeros(n_bands)
-
-    s_grid = np.ceil(s_grid+0.9+l2plus_array).astype(int)
+    s_grid = np.ceil(s_grid+0.9).astype(int)
 
     # resize
     s_grid = np.repeat(np.repeat(s_grid, sample_block, axis=0), sample_block, axis=1)
@@ -131,7 +121,7 @@ def find_bg(images, out):
     s_img = Image.fromarray(s_grid.astype(np.uint8), mode=img_mode)
 
     # save as png
-    img_name = args.out.split('.')[0]+"_bg.png"
+    img_name = out
     print "Saving background as %s" % img_name
     s_img.save(img_name)
     
@@ -142,11 +132,22 @@ if '__name__' == '__main__':
     parser = ArgumentParser(description='')
     parser.add_argument('--in', metavar='infiles', n_args='+', help='Images used to set thresholds')
     parser.add_argument('--out', default='bg.png', help='Output file name')
+    parser.add_argument("--conv_len", type=int, default=0, help='Distance to which pixels are included in averaging')
+    parser.add_argument("--bg_cutoff", action='store_true', help='Removes tracks during sauto processing.')
     parser.add_argument('--show', action='store_true', help='Display resulting threshold image')
     
-    infiles = map(args.in, +)
-    find_bg(infiles, args.out)
+    
+    args = parser.parse_args()
+    
+    bg = find_bg(list(args.infiles), args.out, args.conv_len, args.bg_cutoff)
     if args.show:
+        plt.figure(1)
+        for cval in n_bands:
+            plt.subplot(2,2,cval)
+            plt.imshow(bg[:,:,cval], cmap='plasma', interpolation='nearest')
+            plt.colorbar()
+        plt.show()
+      
         
     
  
