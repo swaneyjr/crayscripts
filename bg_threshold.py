@@ -142,11 +142,11 @@ if '__name__' == '__main__':
     bg = find_bg(list(args.infiles), args.out, args.conv_len, args.bg_cutoff)
     if args.show:
         plt.figure(1)
-        for cval in n_bands:
-            plt.subplot(2,2,cval)
-            plt.imshow(bg[:,:,cval], cmap='plasma', interpolation='nearest')
+        d = math.ceil(math.sqrt(n_bands))
+        for b in xrange(s_grid.shape[2]):
+            plt.subplot(d,d,b+1)
+            bg = plt.imshow(s_grid[:,:,b].transpose(1,0), cmap='plasma',interpolation='nearest', vmin=0, vmax=20)
             plt.colorbar()
-        plt.show()
       
         
     
