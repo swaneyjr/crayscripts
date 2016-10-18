@@ -9,6 +9,7 @@ from fractions import gcd
 import time
 from scipy.signal import convolve2d
 from hotcell import vbranch
+from bg_threshold import find_bg
 
 matplotlib.use('tkagg')
 
@@ -29,7 +30,8 @@ def set_thresh(im, thresh):
 
     return thresh_array
 
-def convert_to_root(images, l1thresh, l2auto, l2manual, l2plus, sauto, smanual, border, max_img):
+def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, sauto=True, smanual=0, border=0, \
+                    max_img=0, numpy=True):
 
     saved_pix = 0
     total_pix = 0
@@ -37,13 +39,16 @@ def convert_to_root(images, l1thresh, l2auto, l2manual, l2plus, sauto, smanual, 
     # handle S threshold settings
     if sauto:
         n_images_auto = 100
-        s_grid = find_bg(images[:n_images_auto])
+        s_grid = find_bg(images[:n_images_auto], out.split('.')[0]+"_bg.png")
         images = images[n_images_auto:]
     elif smanual:
         s_grid = np.array(Image.open(smanual)).transpose(1,0,2).astype(int)
     else:
         im = Image.open(images[0])
         s_grid = np.zeros((im.width, im.height, len(im.mode)),dtype=int)
+        
+    if l2plus:
+        s_grid += l2plus
 
 
     # create TTree
@@ -149,7 +154,7 @@ def convert_to_root(images, l1thresh, l2auto, l2manual, l2plus, sauto, smanual, 
         
         # find val, avg3, avg5
 
-        if not args.numpy:
+        if not numpy:
         
             for j,val in enumerate(im.getdata()):
 
@@ -162,8 +167,6 @@ def convert_to_root(images, l1thresh, l2auto, l2manual, l2plus, sauto, smanual, 
 
                 if x < border or x >= im.width-border or y < border or \
                    y >= im.height-border: continue
-
-                #if args.sample16 and (x%4 != 0 or y%4 != 0): continue 
 
                 # determine L1S and L2S
                 if sauto or smanual:
@@ -265,27 +268,7 @@ def convert_to_root(images, l1thresh, l2auto, l2manual, l2plus, sauto, smanual, 
     print "Done!"
     print
     print "Images saved:    %d\t(%.2f%%)" % (n_img[0], 100.*n_img[0]/float(len(images)))
-    print "Total pixels:    %d\t(%.2f%%)" % (saved_pix, 100.*saved_pix/total_pix)
-
-    if args.show:
-        
-        print "Drawing saved pixels..."
-        c1 = r.TCanvas('c1','Saved Pixels',300,250*n_bands)
-        c1.Divide(1,n_bands,0,0)
-        for cval,c in enumerate(mode):
-            c1.cd(cval+1)
-            t.Draw('pix_y:pix_x','col=="%s"' % c, 'colz')
-
-        print "Drawing background..."
-        
-        plt.figure(1)
-        d = math.ceil(math.sqrt(n_bands))
-        for b in xrange(s_grid.shape[2]):
-            plt.subplot(d,d,b+1)
-            bg = plt.imshow(s_grid[:,:,b].transpose(1,0), cmap='plasma',interpolation='nearest', vmin=0, vmax=20)
-            plt.colorbar()
-
-        plt.show()            
+    print "Total pixels:    %d\t(%.2f%%)" % (saved_pix, 100.*saved_pix/total_pix)           
     
     return t
     
@@ -306,9 +289,6 @@ if __name__ == '__main__':
     soption = parser.add_mutually_exclusive_group()
     soption.add_argument("--sauto", action='store_true', help='Add a spatially dependent threshold gradient.')
     soption.add_argument("--smanual", help='Manually add a threshold function. Input is an image of the same mode as those processed.')
-    #parser.add_argument("--devs", type=float, default=0, help='Number of standard deviations above mean to set sauto')
-    parser.add_argument("--conv_len", type=int, default=0, help='Distance to which pixels are included in sauto averaging')
-    parser.add_argument("--bg_cutoff", action='store_true', help='Removes tracks during sauto processing.')
 
     parser.add_argument("--border", type=int, default=0, help='Number of pixels around edge to crop out')
     parser.add_argument("--max_img", type=int, help='Maximum number of images to convert')
@@ -323,13 +303,22 @@ if __name__ == '__main__':
         
     ti = time.clock()
     t = convert_to_root(images, args.l1, args.l2auto, args.l2manual, args.l2plus, args.sauto, args.smanual, \
-                        args.border, args.max_img)
+                        args.border, args.max_img, args.numpy)
 
     tf = time.clock()
       
    
     outfile.Write()
     outfile.Close()
+    
+    if args.show:
+        
+        print "Drawing saved pixels..."
+        c1 = r.TCanvas('c1','Saved Pixels',300,250*n_bands)
+        c1.Divide(1,n_bands,0,0)
+        for cval,c in enumerate(mode):
+            c1.cd(cval+1)
+            t.Draw('pix_y:pix_x','col=="%s"' % c, 'colz')
 
     m,s = divmod(tf-ti,60)
     h,m = divmod(m,60)
@@ -342,6 +331,3 @@ if __name__ == '__main__':
         print "%d m %02d s" % (m,s)
     else:
         print "%f s" % (tf-ti)
-
-
-
