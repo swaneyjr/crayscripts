@@ -127,7 +127,7 @@ def find_bg(images, out, conv_len=0, bg_cutoff=False):
     
     return s_grid.transpose(1,0,2)
 
-if '__name__' == '__main__':
+if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser(description='Calculates the background levels for a set of images')
     parser.add_argument('--in', metavar='infiles', n_args='+', help='Images used to set thresholds')
