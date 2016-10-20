@@ -129,7 +129,7 @@ def find_bg(images, out, conv_len=0, bg_cutoff=False, max_img=0):
     print "Saving background as %s" % img_name
     s_img.save(img_name)
     
-    return s_grid.transpose(1,0,2)
+    return s_grid
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
