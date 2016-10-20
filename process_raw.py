@@ -15,8 +15,7 @@ def convert_to_root(images, l1thresh, l2thresh):
     adc_hist = np.zeros(1024)
 
     avg3_kernel = np.array([[1,1,1],[1,0,1],[1,1,1]])/8.0
-    avg5_kernel = np.array([[1,1,1,1,1,1,1],[1,0,0,0,0,0,1],[1,0,0,0,0,0,1],[1,0,0,0,0,0,1], \
-                            [1,0,0,0,0,0,1],[1,0,0,0,0,0,1],[1,1,1,1,1,1,1]])/24.0
+    avg5_kernel = np.array([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]])/16.0
 
 
     # create TTree
@@ -56,8 +55,8 @@ def convert_to_root(images, l1thresh, l2thresh):
                 if np.amax(raw_im) < l1thresh: continue
                 n_img[0] += 1
 
-                avg3_array = convolve2d(raw_im[:,:], avg3_kernel, mode='same', boundary='symm')
-                avg5_array = convolve2d(raw_im[:,:], avg5_kernel, mode='same', boundary='symm')
+                avg3_array = convolve2d(raw_im, avg3_kernel, mode='same', boundary='symm')
+                avg5_array = convolve2d(raw_im, avg5_kernel, mode='same', boundary='symm')
 
                 for x,y in np.argwhere(raw_im >= l2thresh):
                     t.pix_x.push_back(x)
