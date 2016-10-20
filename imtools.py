@@ -16,7 +16,8 @@ class ImGrid(np.array):
 
 # returns an array of counts of ADC values in a region
 def spectrum(imarray, counts=1024, region=(0,0)+imarray.shape):
-  return np.bincount(imarray[region[0]:region[2],region[1]:region[3]], minlength=counts)
+  return np.array([np.bincount(imarray[region[0]:region[2],region[1]:region[3], cval], minlength=counts) \
+                   for cval in xrange(imarray.shape[2])])
 
 # opens an image file and returns an array of dimensions (h,w,band)
 def get_imarray(file_name):
