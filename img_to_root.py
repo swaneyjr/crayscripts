@@ -6,7 +6,7 @@ import numpy as np
 import math
 import time
 from scipy.signal import convolve2d
-from imtools import vbranch
+import imtools
 from bg_threshold import find_bg
 
 matplotlib.use('tkagg')
@@ -91,7 +91,7 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
         print
         print "Image %d/%d:" % (i+1,len(images))
 
-        imarray = get_imarray(im_name, israw=raw)
+        imarray = imtools.get_imarray(im_name, israw=raw)
         n_bands = len(imarray.bands)
 
         im_pix = imarray.width*imarray.height
