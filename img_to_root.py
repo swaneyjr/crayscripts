@@ -124,14 +124,6 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
         grid_min = np.amin(np.amin(s_grid,axis=0),axis=0)
         l1diff = np.repeat(l1thresh,3)-grid_min
         l2diff = l2array-grid_min
-     
-
-        x_vectors = [r.vector('int')() for i in xrange(n_bands)]
-        y_vectors = [r.vector('int')() for i in xrange(n_bands)]
-        val_vectors = [r.vector('int')() for i in xrange(n_bands)]
-        avg3_vectors = [r.vector('double')() for i in xrange(n_bands)]
-        avg5_vectors = [r.vector('double')() for i in xrange(n_bands)]
-        l2s_vectors = [r.vector('int')() for i in xrange(n_bands)]
 
         # enforce L1S
         if np.count_nonzero(imarray>=s_grid+l1diff) == 0: continue
@@ -139,37 +131,22 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
 
         avg3_array = [convolve2d(imarray[:,:,cval], avg3_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]
         avg5_array = [convolve2d(imarray[:,:,cval], avg5_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]
-
-            
-        for y,x,cval in np.argwhere(imarray>=s_grid+l2diff):
-            x_vectors[cval].push_back(x)
-            y_vectors[cval].push_back(y)
-            val_vectors[cval].push_back(imarray[y,x,cval])
-            avg3_vectors[cval].push_back(avg3_array[cval][y,x])
-            avg5_vectors[cval].push_back(avg5_array[cval][y,x])
-            l2s_vectors[cval].push_back(s_grid[y,x,cval]+l2diff[cval])
                 
 
         # fill TTree with image data for each band
         for cval, c in enumerate(imarray.bands):
             
+            for y,x in np.argwhere(imarray[:,:,cval] >= s_grid[:,:,cval]+l2diff[cval]):
+                t.pix_x.push_back(x)
+                t.pix_y.push_back(y)
+                t.pix_val.push_back(imarray[y,x,cval])
+                t.pix_avg3.push_back(avg3_array[cval][y,x])
+                t.pix_avg5.push_back(avg5_array[cval][y,x])
+                t.l2s.push_back(s_grid[y,x,cval]+l2diff[cval])
+            
             color = np.array(c+'\0')
             t.SetBranchAddress('col', color)
             l2[0] = l2array[cval]
-
-            setattr(t,'pix_x', x_vectors[cval])
-            setattr(t,'pix_y', y_vectors[cval])
-            setattr(t,'pix_val', val_vectors[cval])
-            setattr(t,'pix_avg3', avg3_vectors[cval])
-            setattr(t,'pix_avg5', avg5_vectors[cval])
-            setattr(t, 'l2s', l2s_vectors[cval])
-
-            t.SetBranchAddress('pix_x', x_vectors[cval])
-            t.SetBranchAddress('pix_y', y_vectors[cval])
-            t.SetBranchAddress('pix_val', val_vectors[cval])
-            t.SetBranchAddress('pix_avg3', avg3_vectors[cval])
-            t.SetBranchAddress('pix_avg5', avg5_vectors[cval])
-            t.SetBranchAddress('l2s', l2s_vectors[cval])
             
             pix_n[0] = t.pix_x.size()
             print "%s: pix_n = %d" % (c, pix_n[0])
@@ -218,7 +195,7 @@ if __name__ == '__main__':
         
     ti = time.clock()
     t = convert_to_root(images, args.l1, args.l2auto, args.l2manual, args.l2plus, args.sauto, args.smanual, \
-                        args.border, args.max_img)
+                        args.border, args.max_img, args.source_format)
 
     tf = time.clock()
       
