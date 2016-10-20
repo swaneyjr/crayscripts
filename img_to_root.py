@@ -11,7 +11,7 @@ from bg_threshold import find_bg
 
 matplotlib.use('tkagg')
 
-# given an Image object and a threshold of pixels to keep, returns L2 values
+# given an ImGrid object and a threshold of pixels to keep, returns L2 values
 def set_thresh(imarray, thresh):
 
     n_bands = len(imarray.bands)
@@ -30,9 +30,7 @@ def set_thresh(imarray, thresh):
 
 def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, sauto=True, smanual=0, border=0, \
                     max_img=0, source_format=False):
-
-    raw_types = ['.dng']
-    
+ 
     avg3_kernel = np.array([[1,1,1],[1,0,1],[1,1,1]])/8.0
     avg5_kernel = np.array([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]])/16.0
     
@@ -86,12 +84,10 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
     print "Starting loop..."
     for i,im_name in enumerate(images):
         
-        raw = im_name.split('.')[1] in raw_types
-        
         print
         print "Image %d/%d:" % (i+1,len(images))
 
-        imarray = imtools.get_imarray(im_name, israw=raw)
+        imarray = imtools.ImGrid(im_name)
         n_bands = len(imarray.bands)
 
         im_pix = imarray.width*imarray.height
