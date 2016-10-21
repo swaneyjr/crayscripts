@@ -7,6 +7,7 @@ import math
 import time
 from scipy.signal import convolve2d
 import imtools
+from hotcell import vbranch
 from bg_threshold import find_bg
 
 matplotlib.use('tkagg')
