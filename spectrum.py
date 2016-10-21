@@ -5,7 +5,6 @@ import numpy as np
 from time import clock
 
 matplotlib.use('tkagg')
-plt.ion()
 
 # make plots for each color band of distribution of ADC 
 def plot_spectrum(images, rg, normalize):
@@ -55,7 +54,7 @@ if __name__ == '__main__':
   m,s = divmod(tf-ti,60)
   h,m = divmod(m,60)
     
-  print "Done! Wrote to %s." % args.out
+  print "Done!"
   print "Total time: ",
   if tf-ti > 3600:
     print "%d h %02d m %02d s" % (h,m,s)
