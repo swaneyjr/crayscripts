@@ -26,7 +26,7 @@ def plot_spectrum(images, rg, normalize):
   else:
     max_count = 1024
     
-  for cval in xrange(adc_counts.shape[0])
+  for cval in xrange(adc_counts.shape[0]):
     plt.figure(cval)
     plt.hist(np.arange(max_count), weights=adc_counts)
     plt.xlabel('ADC Counts')
