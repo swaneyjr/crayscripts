@@ -127,7 +127,7 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
 
         # enforce L1S
         if np.count_nonzero(imarray>=s_grid+l1diff) == 0: continue
-            n_img[0] += 1
+        n_img[0] += 1
 
         avg3_array = [convolve2d(imarray[:,:,cval], avg3_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]
         avg5_array = [convolve2d(imarray[:,:,cval], avg5_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]
