@@ -14,7 +14,7 @@ def plot_spectrum(images, rg, normalize):
   
    
     imarray = imtools.ImGrid(im)
-    adc_counts += imtools.find_spectrum(imarray, region=rg)
+    adc_counts += imtools.spectrum(imarray, region=rg)
     
   if normalize:
     adc_counts /= float(adc_counts.sum())
