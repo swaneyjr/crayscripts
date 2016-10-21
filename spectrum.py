@@ -30,7 +30,7 @@ def plot_spectrum(images, rg, normalize):
     
   for cval in xrange(adc_counts.shape[0]):
     plt.figure(cval+1)
-    plt.hist(np.arange(max_count), bins = max_count, weights=adc_counts[cval], log=True)
+    plt.hist(np.arange(max_count), bins = max_count, weights=adc_counts[cval], log=True, histtype='stepfilled')
     plt.xlabel('ADC Counts')
     plt.ylabel('Frequency')
   plt.show()
