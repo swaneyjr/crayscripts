@@ -58,3 +58,8 @@ if __name__ == '__main__':
   print "Done! Wrote to %s." % args.out
   print "Total time: ",
   if tf-ti > 3600:
+    print "%d h %02d m %02d s" % (h,m,s)
+  elif tf-ti > 60:
+    print "%d m %02d s" % (m,s)
+  else:
+    print "%f s" % (tf-ti)
