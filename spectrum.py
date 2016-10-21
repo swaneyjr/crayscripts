@@ -42,7 +42,8 @@ if __name__ == '__main__':
   parser.add_argument("--normalize", action='store_true', help='Normalize data')
   args = parser.parse_args()
   
-  region = tuple(map(int, args.region.split(',')))
+  if args.region:
+    region = tuple(map(int, args.region.split(',')))
   
   plot_spectrum(args.images, region, args.normalize)
   
