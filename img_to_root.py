@@ -29,7 +29,7 @@ def set_thresh(imarray, thresh):
 
     return thresh_array
 
-def convert_to_root(images, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, sauto=True, smanual=False, border=0, \
+def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, sauto=True, smanual=False, border=0, \
                     max_img=0, source_format=False):
  
     avg3_kernel = np.array([[1,1,1],[1,0,1],[1,1,1]])/8.0
@@ -195,7 +195,7 @@ if __name__ == '__main__':
     outfile = r.TFile(args.out, "recreate")        
         
     ti = time.clock()
-    t = convert_to_root(images, args.l1, args.l2auto, args.l2manual, args.l2plus, args.sauto, args.smanual, \
+    t = convert_to_root(images, out, args.l1, args.l2auto, args.l2manual, args.l2plus, args.sauto, args.smanual, \
                         args.border, args.max_img, args.source_format)
 
     tf = time.clock()
