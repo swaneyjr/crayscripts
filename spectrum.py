@@ -44,6 +44,8 @@ if __name__ == '__main__':
   
   if args.region:
     region = tuple(map(int, args.region.split(',')))
+  else:
+    region = None
   
   plot_spectrum(args.images, region, args.normalize)
   
