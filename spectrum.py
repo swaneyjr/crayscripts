@@ -14,7 +14,7 @@ def plot_spectrum(images, rg, normalize):
   print "Calculating ADC Counts..."
   for i, im in enumerate(images):
   
-    if i%(n_images/10) == 0:
+    if n_images > 10 and i%(n_images/10) == 0:
       print "%d/%d (%.1f%%)" % (i, n_images, 100.*i/n_images)
     
     imarray = imtools.ImGrid(im)
