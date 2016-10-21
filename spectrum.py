@@ -26,9 +26,11 @@ def plot_spectrum(images, rg, normalize):
   if np.count_nonzero(adc_counts[:,256:]) == 0:
     adc_counts = adc_counts[:,:256]
     
+  max_count = adc_counts.shape[1]
+    
   for cval in xrange(adc_counts.shape[0]):
     plt.figure(cval)
-    plt.hist(np.arange(adc_counts.shape[1]), weights=adc_counts[cval])
+    plt.hist(np.arange(max_count), bins = max_count, weights=adc_counts[cval])
     plt.xlabel('ADC Counts')
     plt.ylabel('Frequency')
   plt.show()
