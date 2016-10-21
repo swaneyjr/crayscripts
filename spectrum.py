@@ -17,7 +17,7 @@ def plot_spectrum(images, rg, normalize):
     adc_counts += imtools.find_spectrum(imarray, region=rg)
     
   if normalize:
-    adc_counts.astype(float) /= adc_counts.sum()
+    adc_counts /= float(adc_counts.sum())
     
   max_count = max(adc_counts[0].nonzero())
   if max_count < 256:
