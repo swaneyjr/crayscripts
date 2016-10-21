@@ -29,7 +29,7 @@ def set_thresh(imarray, thresh):
 
     return thresh_array
 
-def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, sauto=True, smanual=0, border=0, \
+def convert_to_root(images, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, sauto=True, smanual=False, border=0, \
                     max_img=0, source_format=False):
  
     avg3_kernel = np.array([[1,1,1],[1,0,1],[1,1,1]])/8.0
@@ -113,7 +113,7 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
         else:
             l2array = np.amin(np.amin(s_grid, axis=0), axis=0).astype(int)                   
             
-        minl2thresh = min(l2array)
+        minl2thresh = np.amin(l2array)
         
             
         print "L2 threshold: \t",
