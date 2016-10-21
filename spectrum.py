@@ -1,6 +1,8 @@
 import imtools
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
+from time import clock()
 
 matplotlib.use('tkagg')
 plt.ion()
@@ -10,11 +12,11 @@ def plot_spectrum(images, rg, normalize):
 
   adc_counts = 0
   n_images = len(images)
-  
+  print "Calculating ADC Counts..."
   for i, im in enumerate(images):
   
     if i%(n_images/10) == 0:
-      print "%d/%d \t%.1f%%" % (i, n_images, 100.*i/n_images)
+      print "%d/%d (%.1f%%)" % (i, n_images, 100.*i/n_images)
     
     imarray = imtools.ImGrid(im)
     adc_counts += imtools.spectrum(imarray, region=rg)
@@ -46,6 +48,13 @@ if __name__ == '__main__':
   else:
     region = None
   
+  ti = clock()
   plot_spectrum(args.images, region, args.normalize)
+  tf = clock()
   
-  
+  m,s = divmod(tf-ti,60)
+  h,m = divmod(m,60)
+    
+  print "Done! Wrote to %s." % args.out
+  print "Total time: ",
+  if tf-ti > 3600:
