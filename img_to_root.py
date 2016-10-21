@@ -195,7 +195,7 @@ if __name__ == '__main__':
     outfile = r.TFile(args.out, "recreate")        
         
     ti = time.clock()
-    t = convert_to_root(images, out, args.l1, args.l2auto, args.l2manual, args.l2plus, args.sauto, args.smanual, \
+    t = convert_to_root(images, args.out, args.l1, args.l2auto, args.l2manual, args.l2plus, args.sauto, args.smanual, \
                         args.border, args.max_img, args.source_format)
 
     tf = time.clock()
