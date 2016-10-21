@@ -9,26 +9,25 @@ plt.ion()
 def plot_spectrum(images, rg, normalize):
 
   adc_counts = 0
+  n_images = len(images)
   
   for i, im in enumerate(images):
   
-   
+    if i%(n_images/10) == 0:
+      print "%d/%d \t%.1f%%" % (i, n_images, 100.*i/n_images)
+    
     imarray = imtools.ImGrid(im)
     adc_counts += imtools.spectrum(imarray, region=rg)
     
   if normalize:
     adc_counts /= float(adc_counts.sum())
     
-  max_count = max(adc_counts[0].nonzero())
-  if max_count < 256:
-    max_count = 256
-    adc_counts = adc_counts[:,256]
-  else:
-    max_count = 1024
+  if np.count_nonzero(adc_counts[:,256:]) == 0:
+    adc_counts = adc_counts[:,:256]
     
   for cval in xrange(adc_counts.shape[0]):
     plt.figure(cval)
-    plt.hist(np.arange(max_count), weights=adc_counts)
+    plt.hist(np.arange(adc_counts.shape[1]), weights=adc_counts[cval])
     plt.xlabel('ADC Counts')
     plt.ylabel('Frequency')
   plt.show()
