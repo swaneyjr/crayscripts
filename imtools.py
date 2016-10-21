@@ -31,14 +31,20 @@ class ImGrid(np.ndarray):
   
     obj = np.asarray(imarray).view(cls)
     obj.bands = bands
+    obj.height = imarray.shape[0]
+    obj.width = imarray.shape[1]
     return obj
 
   def __array_finalize__(self, obj):
     if obj is None: return
     self.bands = getattr(obj, 'bands', None)
+    self.height = getattr(obj, 'height', None)
+    self.width = getattr(obj, 'width', None)
 
 # returns an array of counts of ADC values in a region
-def spectrum(imarray, counts=1024, region=(0,0)+imarray.shape):
-  return np.array([np.bincount(imarray[region[0]:region[2],region[1]:region[3], cval], minlength=counts) \
+def spectrum(imarray, counts=1024, region=None):
+  if region = None:
+    region = (0,0,imarray.width, imarray.height)
+  return np.array([np.bincount(imarray[region[1]:region[3],region[0]:region[2], cval], minlength=counts) \
                    for cval in xrange(imarray.shape[2])])
   
