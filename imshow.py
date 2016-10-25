@@ -46,7 +46,7 @@ if args.sample:
     imarray = np.repeat(np.repeat(imarray, sample_block, axis=0), sample_block, axis=1)
 
     
-for cval,b in enumerate(imarray.bands)
+for cval,b in enumerate(imarray.bands):
     plt.figure(i+1)
     plotchannel(imarray, cval)
     plt.title(b)
