@@ -47,7 +47,7 @@ if args.sample:
 
     
 for cval,b in enumerate(imarray.bands):
-    plt.figure(i+1)
+    plt.figure(cval+1)
     plotchannel(imarray, cval)
     plt.title(b)
 
