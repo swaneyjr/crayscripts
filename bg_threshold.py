@@ -1,12 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-from PIL import Image
 from fractions import gcd
+from PIL import Image
 from scipy.signal import convolve2d
+import imtools
 
 def outlier_cutoff(imarray):
-    n_bands = imarray.shape[2]
+    n_bands = len(imarray.bands)
     cutoff_vals = np.zeros(n_bands)
     mean_vals = np.mean(np.mean(imarray, axis=0), axis=0)
     empty_vals = [np.argwhere(np.bincount(imarray[:,:,cval].flatten())==0) for cval in xrange(n_bands)]
@@ -20,7 +21,7 @@ def outlier_cutoff(imarray):
     return np.amax(cutoff_vals)
 
 # uses an image to create a grid of background values
-def find_bg(images, out, conv_len=0, bg_cutoff=False, max_img=0):
+def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
 
     def divisorGen(n):
         large_divisors = []
@@ -35,11 +36,10 @@ def find_bg(images, out, conv_len=0, bg_cutoff=False, max_img=0):
     n_img_bg = len(images)
 
     # establish grid dimensions
-    im = Image.open(images[0])
+    im = imtools.Imgrid(images[0])
     w,h = im.width, im.height
     im_pix = w*h
-    img_mode = im.mode
-    n_bands = len(img_mode)
+    n_bands = len(im.bands)
     #mean_grid = np.zeros((h, w, n_bands))
     #var_grid = np.zeros((h, w, n_bands))
     s_grid = np.zeros((h, w, n_bands),dtype=int)
@@ -56,8 +56,7 @@ def find_bg(images, out, conv_len=0, bg_cutoff=False, max_img=0):
 
     # set cutoff for tracks
     if bg_cutoff:
-        cutoff = outlier_cutoff(np.array(im))
-    im.close()
+        cutoff = outlier_cutoff(im)
             
 
     print
@@ -94,7 +93,7 @@ def find_bg(images, out, conv_len=0, bg_cutoff=False, max_img=0):
         if (i+1) % 10 == 0:
             print " %d/%d" % (i+1,n_img_bg)
 
-        s_grid = np.maximum(np.array(Image.open(im)), s_grid)
+        s_grid = np.maximum(imtools.ImGrid(im), s_grid)
 
     # remove hot pixels and tracks
     if bg_cutoff:
