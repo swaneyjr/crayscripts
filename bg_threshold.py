@@ -36,7 +36,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
     n_img_bg = len(images)
 
     # establish grid dimensions
-    im = imtools.Imgrid(images[0])
+    im = imtools.ImGrid(images[0])
     w,h = im.width, im.height
     im_pix = w*h
     n_bands = len(im.bands)
