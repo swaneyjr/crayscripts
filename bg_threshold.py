@@ -39,7 +39,8 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
     im = imtools.ImGrid(images[0])
     w,h = im.width, im.height
     im_pix = w*h
-    n_bands = len(im.bands)
+    bands = im.bands
+    n_bands = len(bands)
     #mean_grid = np.zeros((h, w, n_bands))
     #var_grid = np.zeros((h, w, n_bands))
     s_grid = np.zeros((h, w, n_bands),dtype=int)
@@ -120,7 +121,10 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
 
     # resize
     s_grid = np.repeat(np.repeat(s_grid, sample_block, axis=0), sample_block, axis=1)
-                     
+    if n_bands == 1:
+        img_mode = 'L'
+    else:
+        img_mode = str(bands)
     s_img = Image.fromarray(s_grid.astype(np.uint8), mode=img_mode)
 
     # save as png
