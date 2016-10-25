@@ -56,7 +56,7 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
     # create TTree
     print
     print "Creating TTree..."
-    t = r.TTree("events", 'TTree with JPEG data')
+    t = r.TTree("events", 'TTree with image data')
 
     n_img = np.array([0], dtype=int)
     pix_n = np.array([0], dtype=int)
@@ -93,7 +93,7 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
 
         im_pix = imarray.width*imarray.height
         if source_format:
-            source[0] = bool(int(jpg[-5]))
+            source[0] = bool(int(im_name[-5]))
 
         # set L2 threshold
         if l2auto:
