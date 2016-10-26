@@ -24,7 +24,7 @@ class ImGrid(np.ndarray):
       else:
         f = open(file_name)
       raw = rawpy.imread(f)
-      imarray = np.array([raw.raw_image.copy()]).transpose(1,2,0)
+      imarray = np.array([raw.raw_image.copy()]).transpose(1,2,0).astype(int)
       bands = ['RAW']
       raw.close()
       f.close()
