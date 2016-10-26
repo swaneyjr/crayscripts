@@ -19,7 +19,7 @@ def set_thresh(imarray, thresh):
     thresh_array = np.repeat(-1,n_bands)
     im_pix = imarray.height*imarray.width
     target_pix = thresh*im_pix
-    histarray = np.array(im.histogram()).reshape((n_bands,256))
+    histarray = [np.bincount(imarray[:,:,cval].flatten()) for cval in n_bands]
 
     for cval in xrange(n_bands):
         thresh_pix = target_pix
