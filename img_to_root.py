@@ -133,8 +133,8 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
         avg3_array = [convolve2d(imarray[:,:,cval], avg3_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]
         avg5_array = [convolve2d(imarray[:,:,cval], avg5_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]
                 
-        if s_grid == '0':
-            s_grid = 0*imarray
+        if s_grid == 0:
+            s_grid *= imarray
             
         # fill TTree with image data for each band
         for cval, c in enumerate(imarray.bands):
