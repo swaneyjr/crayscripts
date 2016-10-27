@@ -136,6 +136,13 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
         # fill TTree with image data for each band
         for cval, c in enumerate(imarray.bands):
             
+            t.pix_x.clear()
+            t.pix_y.clear()
+            t.pix_val.clear()
+            t.pix_avg3.clear()
+            t.pix_avg5.clear()
+            t.l2s.clear()
+            
             for y,x in np.argwhere(imarray[:,:,cval] >= s_grid[:,:,cval]+l2diff[cval]):
                 t.pix_x.push_back(x)
                 t.pix_y.push_back(y)
