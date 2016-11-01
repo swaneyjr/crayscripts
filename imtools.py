@@ -59,7 +59,6 @@ class ImGrid(np.ndarray):
       bands.append('RAW')
       if raw_name.split('.')[-1] in zip_types:
         raw_file = gzip.open(raw_name)
-        extensions = extensions[:-1]
       else:
         raw_file = open(raw_name)
     
