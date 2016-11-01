@@ -8,27 +8,33 @@ class ImGrid(np.ndarray):
   def __new__(cls, file_name, bands=None):
     
     raw_types = ['dng']
+    img_types = ['jpg']
+    zip_types = ['gz']
+    
+    extensions = file_name.split('.')
   
-    # PIL
-    if not file_name.split('.')[1] in raw_types:
-      with Image.open(file_name) as im:
-        imarray = np.array(im).astype(int)
-        bands = list(im.mode)
-        if len(bands) == 1:
-          imarray = np.array([imarray]).transpose(1,2,0)
-  
-    # rawpy
+    # open file
+    if extensions[-1] in zip_types:
+      f = gzip.open(file_name)
+      extensions = extensions[:-1]
     else:
-      if file_name.endswith('.gz'):
-        f = gzip.open(file_name)
-      else:
-        f = open(file_name)
+      f = open(file_name)
+    
+    if extensions[-1] in raw_types:
       raw = rawpy.imread(f)
       imarray = np.array([raw.raw_image.copy()]).transpose(1,2,0).astype(int)
       bands = ['RAW']
       raw.close()
-      f.close()
-  
+    
+    # PIL
+    else: 
+      imarray = np.array(im).astype(int)
+      bands = list(im.mode)
+      if len(bands) == 1:
+        imarray = np.array([imarray]).transpose(1,2,0)
+          
+    f.close()
+    
     obj = np.asarray(imarray).view(cls)
     obj.bands = bands
     obj.height = imarray.shape[0]
