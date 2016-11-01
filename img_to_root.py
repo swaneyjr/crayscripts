@@ -88,7 +88,11 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
         print
         print "Image %d/%d:" % (i+1,len(images))
 
-        imarray = imtools.ImGrid(im_name)
+        if i > 0 and im_name.split('.')[0] == images[i-1].split('.')[0]: continue
+        elif i < len(images)-1 and im_name.split('.')[0] == images[i+1].split('.')[0]:
+            imarray = imtools.ImGrid(im_name, images[i+1])
+        else:
+            imarray = imtools.ImGrid(im_name)
         n_bands = len(imarray.bands)
 
         im_pix = imarray.width*imarray.height
