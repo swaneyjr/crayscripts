@@ -79,7 +79,7 @@ class ImGrid(np.ndarray):
     else:
       imarray = []
     
-    fullarray = np.array([r for r in rawarray] + [c for c in imarray]).transpose(1,2,0)
+    fullarray = np.array([r for r in rawarray] + [c for c in imarray])
     
     obj = np.asarray(fullarray).view(cls)
     obj.bands = bands
