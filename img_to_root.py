@@ -208,9 +208,8 @@ if __name__ == '__main__':
       
    
     outfile.Write()
-    outfile.Close()
     
-    if args.show:
+        if args.show:
         
         print "Drawing saved pixels..."
         im = imtools.ImGrid(images[0])
@@ -233,3 +232,5 @@ if __name__ == '__main__':
         print "%d m %02d s" % (m,s)
     else:
         print "%f s" % (tf-ti)
+        
+    outfile.Close()
