@@ -9,6 +9,7 @@ class ImGrid(np.ndarray):
   compressed_types = ['jpg','png','gif']
   zip_types = ['gz']
   
+  """
   def __new__(cls, file_name, bands=None):
     
     extensions = file_name.split('.')
@@ -41,34 +42,44 @@ class ImGrid(np.ndarray):
     obj.height = imarray.shape[0]
     obj.width = imarray.shape[1]
     return obj
+    """
   
-  def __new__(cls, fname1, fname2, bands=None):
+  def __new__(cls, fname1, fname2=None, bands=None):
+    
+    bands = []
     
     if set(fname1.split('.')) & set(compressed_types):
-      im_name = f1
-      raw_name = f2
+      im_name = fname1
+      raw_name = fname2
     else:
-      im_name = f2
-      raw_name = f1
+      im_name = fname2
+      raw_name = fname1
   
     # open file
-    if raw_name.split('.')[-1] in zip_types:
-      raw_file = gzip.open(raw_name)
-      extensions = extensions[:-1]
-    else:
-      raw_file = open(raw_name)
+    if raw_name:
+      bands.append('RAW')
+      if raw_name.split('.')[-1] in zip_types:
+        raw_file = gzip.open(raw_name)
+        extensions = extensions[:-1]
+      else:
+        raw_file = open(raw_name)
     
-    raw = rawpy.imread(raw_file)
-    rawarray = np.array([raw.raw_image_visible.copy()]).astype(int)
-    raw.close()
-    raw_file.close()
+      raw = rawpy.imread(raw_file)
+      rawarray = np.array([raw.raw_image_visible.copy()]).astype(int)
+      raw.close()
+      raw_file.close()
+    else:
+      raw_array = []
     
     # PIL
-    with Image.open(im_name) as im:
-      imarray = np.array(im).astype(int)
-      bands = ['RAW'] + list(im.mode)
-      if len(bands) == 1:
-        imarray = np.array([imarray])
+    if im_name:
+      with Image.open(im_name) as im:
+        imarray = np.array(im).astype(int)
+        bands += list(im.mode)
+        if len(bands) == 1:
+          imarray = np.array([imarray])
+    else:
+      imarray = []
     
     fullarray = np.array([r for r in rawarray] + [c for c in imarray]).transpose(1,2,0)
     
