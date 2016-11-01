@@ -209,7 +209,7 @@ if __name__ == '__main__':
    
     outfile.Write()
     
-        if args.show:
+    if args.show:
         
         print "Drawing saved pixels..."
         im = imtools.ImGrid(images[0])
