@@ -8,7 +8,6 @@ class ImGrid(np.ndarray):
   def __new__(cls, file_name, bands=None):
     
     raw_types = ['dng']
-    img_types = ['jpg']
     zip_types = ['gz']
     
     extensions = file_name.split('.')
@@ -27,11 +26,12 @@ class ImGrid(np.ndarray):
       raw.close()
     
     # PIL
-    else: 
-      imarray = np.array(im).astype(int)
-      bands = list(im.mode)
-      if len(bands) == 1:
-        imarray = np.array([imarray]).transpose(1,2,0)
+    else:
+      with Image.open(f) as im:
+        imarray = np.array(im).astype(int)
+        bands = list(im.mode)
+        if len(bands) == 1:
+          imarray = np.array([imarray]).transpose(1,2,0)
           
     f.close()
     
