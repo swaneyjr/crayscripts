@@ -67,7 +67,7 @@ class ImGrid(np.ndarray):
       raw.close()
       raw_file.close()
     else:
-      raw_array = []
+      rawarray = []
     
     # PIL
     if im_name:
