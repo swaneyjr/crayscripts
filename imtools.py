@@ -6,9 +6,6 @@ import gzip
 
 class ImGrid(np.ndarray):
   
-  compressed_types = ['jpg','png','gif']
-  zip_types = ['gz']
-  
   """
   def __new__(cls, file_name, bands=None):
     
@@ -46,6 +43,8 @@ class ImGrid(np.ndarray):
   
   def __new__(cls, fname1, fname2=None, bands=None):
     
+    compressed_types = ['jpg','png','gif']
+    zip_types = ['gz']
     bands = []
     
     if set(fname1.split('.')) & set(compressed_types):
