@@ -29,8 +29,7 @@ def set_thresh(imarray, thresh):
 
     return thresh_array
 
-def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, sauto=True, smanual=False, border=0, \
-                    max_img=0, source_format=False):
+def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, sauto=True, smanual=False, max_img=0):
  
     avg3_kernel = np.array([[1,1,1],[1,0,1],[1,1,1]])/8.0
     avg5_kernel = np.array([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]])/16.0
@@ -60,18 +59,12 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
 
     n_img = np.array([0], dtype=int)
     pix_n = np.array([0], dtype=int)
-    color = np.array('', dtype=str)
-    l2 = np.array([0], dtype=int)
+    name = np.array('', dtype=str)
    
     t.Branch('n_img', n_img, 'n_img/i')
     t.Branch('pix_n', pix_n, 'pix_n/i')
     t.Branch('col', color, 'col/C')
-    t.Branch('l2thresh', l2, 'l2thresh/i')
-    
-    if source_format:
-        source = np.array([0], dtype=bool)
-        t.Branch('source', source, 'source/O')
-    
+    t.Branch('name', name, 'name/C')   
 
     vbranch(t, 'pix_x', btype=int)
     vbranch(t, 'pix_y', btype=int)
@@ -83,21 +76,17 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
 
     # fill TTree
     print "Starting loop..."
-    for i,im_name in enumerate(images):
+    prev_name = ''
+    for i,im_name in enumerate(map(split('.'), infiles)):
         
         print
         print "Image %d/%d:" % (i+1,len(images))
 
-        #if i > 0 and im_name.split('.')[0] == images[i-1].split('.')[0]: continue
-        #elif i < len(images)-1 and im_name.split('.')[0] == images[i+1].split('.')[0]:
-        #    imarray = imtools.ImGrid(im_name, images[i+1])
-        #else:
         imarray = imtools.ImGrid(im_name)
         n_bands = len(imarray.bands)
+        im_split = im_name.split('.')
 
         im_pix = imarray.width*imarray.height
-        if source_format:
-            source[0] = bool(int(im_name[-5]))
 
         # set L2 threshold
         if l2auto:
@@ -132,7 +121,8 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
 
         # enforce L1S
         if np.count_nonzero(imarray>=s_grid+l1diff) == 0: continue
-        n_img[0] += 1
+        if im_split[0] != prev_name:
+            n_img[0] += 1
 
         avg3_array = [convolve2d(imarray[:,:,cval], avg3_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]
         avg5_array = [convolve2d(imarray[:,:,cval], avg5_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]
@@ -147,17 +137,18 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
             t.pix_avg5.clear()
             t.l2s.clear()
             
-            for y,x in np.argwhere(imarray[:,:,cval] >= s_grid[:,:,cval]+l2diff[cval]):
+            for y,x in np.argwhere(imarray[cval] >= s_grid[cval]+l2diff[cval]):
                 t.pix_x.push_back(x)
                 t.pix_y.push_back(y)
-                t.pix_val.push_back(imarray[y,x,cval])
+                t.pix_val.push_back(imarray[cval][y,x])
                 t.pix_avg3.push_back(avg3_array[cval][y,x])
                 t.pix_avg5.push_back(avg5_array[cval][y,x])
-                t.l2s.push_back(s_grid[y,x,cval]+l2diff[cval])
+                t.l2s.push_back(s_grid[cval][y,x]+l2diff[cval])
             
             color = np.array(c+'\0')
+            name = np.array(im_split[0]+'\0')
             t.SetBranchAddress('col', color)
-            l2[0] = l2array[cval]
+            t.SetBranchAddress('name', name)
             
             pix_n[0] = t.pix_x.size()
             print "%s: pix_n = %d" % (c, pix_n[0])
@@ -165,12 +156,13 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
             total_pix += im_pix
             
             t.Fill()
-            
+        
+        prev_name = im_split[0]
         if max_img and n_img >= max_img: break
 
     print "Done!"
     print
-    print "Images saved:    %d\t(%.2f%%)" % (n_img[0], 100.*n_img[0]/float(len(images)))
+    print "Images saved:    %d\t(%.2f%%)" % (n_img[0], 100.*n_img[0]/float(len(infiles)))
     print "Total pixels:    %d\t(%.2f%%)" % (saved_pix, 100.*saved_pix/total_pix)           
     
     return t
@@ -193,20 +185,15 @@ if __name__ == '__main__':
     soption.add_argument("--sauto", action='store_true', help='Add a spatially dependent threshold gradient.')
     soption.add_argument("--smanual", help='Manually add a threshold function. Input is an image of the same mode as those processed.')
 
-    parser.add_argument("--border", type=int, default=0, help='Number of pixels around edge to crop out')
     parser.add_argument("--max_img", type=int, help='Maximum number of images to convert')
-    parser.add_argument("--source_format", action='store_true', help='Preserves data from files of format "phone_time_s.jpg"')
     parser.add_argument("--show", action='store_true', help='Generate graphs of background thresholds and saved pixels')
     
     args = parser.parse_args()
 
-    images = list(args.infiles)
-
     outfile = r.TFile(args.out, "recreate")        
         
     ti = time.clock()
-    t = convert_to_root(images, args.out, args.l1, args.l2auto, args.l2manual, args.l2plus, args.sauto, args.smanual, \
-                        args.border, args.max_img, args.source_format)
+    t = convert_to_root(infiles, args.out, args.l1, args.l2auto, args.l2manual, args.l2plus, args.sauto, args.smanual, args.max_img)
 
     tf = time.clock()
       
@@ -216,7 +203,7 @@ if __name__ == '__main__':
     if args.show:
         
         print "Drawing saved pixels..."
-        im = imtools.ImGrid(images[0])
+        im = imtools.ImGrid(infiles[0])
         bands = im.bands
         n_bands = len(bands)
         c1 = r.TCanvas('c1','Saved Pixels',300,250*n_bands)
