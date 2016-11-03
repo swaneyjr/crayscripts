@@ -8,7 +8,7 @@ class ImGrid(np.ndarray):
   
   def __new__(cls, file_name, bands=None):
     
-    extensions = file_name.split('.')
+    extensions = file_name.split('.')[1:]
   
     # open file
     if extensions[-1] in zip_types:
