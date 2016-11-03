@@ -6,7 +6,6 @@ import gzip
 
 class ImGrid(np.ndarray):
   
-  """
   def __new__(cls, file_name, bands=None):
     
     extensions = file_name.split('.')
@@ -20,7 +19,7 @@ class ImGrid(np.ndarray):
     
     if extensions[-1] not in compressed_types:
       raw = rawpy.imread(f)
-      imarray = np.array([raw.raw_image_visible.copy()]).transpose(1,2,0).astype(int)
+      imarray = np.array([raw.raw_image.copy()]).astype(int)
       bands = ['RAW']
       raw.close()
     
@@ -30,17 +29,17 @@ class ImGrid(np.ndarray):
         imarray = np.array(im).astype(int)
         bands = list(im.mode)
         if len(bands) == 1:
-          imarray = np.array([imarray]).transpose(1,2,0)
+          imarray = np.array([imarray])
           
     f.close()
     
     obj = np.asarray(imarray).view(cls)
     obj.bands = bands
-    obj.height = imarray.shape[0]
-    obj.width = imarray.shape[1]
+    obj.height = imarray.shape[1]
+    obj.width = imarray.shape[2]
     return obj
-    """
   
+  """
   def __new__(cls, fname1, fname2=None, bands=None):
     
     compressed_types = ['jpg','png','gif']
@@ -79,13 +78,15 @@ class ImGrid(np.ndarray):
     else:
       imarray = []
     
-    fullarray = np.array([r for r in rawarray] + [c for c in imarray]).transpose(1,2,0)
+    fullarray = np.array([r for r in rawarray] + [c for c in imarray])
     
     obj = np.asarray(fullarray).view(cls)
     obj.bands = bands
-    obj.height = fullarray.shape[0]
-    obj.width = fullarray.shape[1]
+    obj.height = fullarray.shape[1]
+    obj.width = fullarray.shape[2]
     return obj
+  
+  """
 
 
   def __array_finalize__(self, obj):
