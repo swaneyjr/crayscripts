@@ -140,12 +140,12 @@ if __name__ == '__main__':
     parser.add_argument("--conv_len", type=int, default=0, help='Distance to which pixels are included in averaging')
     parser.add_argument("--bg_cutoff", action='store_true', help='Removes tracks during sauto processing.')
     parser.add_argument('--show', action='store_true', help='Display resulting threshold image')
-    parser.add_argument('--max_img', 
+    #parser.add_argument('--max_img', type=int, help='Limits number of images to be processed')
     
     
     args = parser.parse_args()
     
-    bg = find_bg(list(args.infiles), args.out, args.conv_len, args.bg_cutoff)
+    bg = find_bg(args.infiles, args.out, args.conv_len, args.bg_cutoff)
     if args.show:
         mx = outlier_cutoff(bg)
         mx += 5 - (mx%5)
