@@ -41,7 +41,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
     n_bands = im.n_bands
     #mean_grid = np.zeros((h, w, im.n_bands))
     #var_grid = np.zeros((h, w, im.n_bands))
-    s_grid = np.zeros((h, w, n_bands), dtype=int)
+    s_grid = np.zeros((n_bands,h,w), dtype=int)
 
     # determine sampling resolution
     full_block_len = gcd(h,w)
@@ -99,9 +99,9 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
         print "Removing thresholds above %d..." % cutoff
           
         mask_kernel = np.array([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]],dtype=float)/16.
-        masked_grid = np.zeros((h, w, n_bands))
+        masked_grid = np.zeros((n_bands, h, w))
         for cval in xrange(n_bands):
-            masked_grid[:,:,cval] = convolve2d(s_grid[:,:,cval], mask_kernel, mode='same', boundary='symm')
+            masked_grid[cval] = convolve2d(s_grid[cval], mask_kernel, mode='same', boundary='symm')
         s_grid = np.where(s_grid <= cutoff, s_grid, masked_grid)
 
 
