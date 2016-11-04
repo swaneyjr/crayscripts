@@ -107,7 +107,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
 
     print "Downsampling image..."
 
-    s_grid = np.amax([s_grid[:,x::sample_block,y::sample_block] for x,y in np.ndindex(sample_block,sample_block)], axis=1)
+    s_grid = np.amax([s_grid[:,x::sample_block,y::sample_block] for x,y in np.ndindex(sample_block,sample_block)], axis=0)
     
     print "Applying convolution kernel..."
 
