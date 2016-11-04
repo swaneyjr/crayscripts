@@ -38,7 +38,7 @@ class ImGrid(np.ndarray):
     
     obj = np.asarray(imarray).view(cls)
     obj.bands = bands
-    obg.n_bands = len(bands)
+    obj.n_bands = len(bands)
     obj.height = imarray.shape[1]
     obj.width = imarray.shape[2]
     return obj
