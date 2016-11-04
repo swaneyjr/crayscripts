@@ -8,6 +8,9 @@ class ImGrid(np.ndarray):
   
   def __new__(cls, file_name, bands=None):
     
+    compressed_types = ['jpg','png','gif']
+    zip_types = ['gz']
+    
     extensions = file_name.split('.')[1:]
   
     # open file
@@ -35,6 +38,7 @@ class ImGrid(np.ndarray):
     
     obj = np.asarray(imarray).view(cls)
     obj.bands = bands
+    obg.n_bands = len(bands)
     obj.height = imarray.shape[1]
     obj.width = imarray.shape[2]
     return obj
@@ -42,8 +46,6 @@ class ImGrid(np.ndarray):
   """
   def __new__(cls, fname1, fname2=None, bands=None):
     
-    compressed_types = ['jpg','png','gif']
-    zip_types = ['gz']
     bands = []
     
     if set(fname1.split('.')) & set(compressed_types):
