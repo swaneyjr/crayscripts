@@ -29,7 +29,7 @@ class ImGrid(np.ndarray):
     # PIL
     else:
       with Image.open(f) as im:
-        imarray = np.array(im).astype(int)
+        imarray = np.array(im).astype(int).transpose(2,0,1)
         bands = list(im.mode)
         if len(bands) == 1:
           imarray = np.array([imarray])
@@ -96,6 +96,7 @@ class ImGrid(np.ndarray):
     self.bands = getattr(obj, 'bands', None)
     self.height = getattr(obj, 'height', None)
     self.width = getattr(obj, 'width', None)
+    self.n_bands = getattr(obj, 'n_bands', None)
 
 
 # returns an array of counts of ADC values in a region
