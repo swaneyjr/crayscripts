@@ -7,9 +7,10 @@ from scipy.signal import convolve2d
 import imtools
 
 def outlier_cutoff(imarray):
-    cutoff_vals = np.zeros(imarray.n_bands)
+    n_bands = imarray.shape[0]
+    cutoff_vals = np.zeros(n_bands)
     mean_vals = np.mean(np.mean(imarray, axis=0), axis=0)
-    empty_vals = [np.argwhere(np.bincount(imarray[cval].flatten())==0) for cval in xrange(imarray.n_bands)]
+    empty_vals = [np.argwhere(np.bincount(imarray[cval].flatten())==0) for cval in xrange(n_bands)]
     for cval,vals in enumerate(empty_vals):
         above_mean = vals[vals>mean_vals[cval]]
         if len(above_mean)>0:
