@@ -7,16 +7,15 @@ from scipy.signal import convolve2d
 import imtools
 
 def outlier_cutoff(imarray):
-    n_bands = len(imarray.bands)
-    cutoff_vals = np.zeros(n_bands)
+    cutoff_vals = np.zeros(imarray.n_bands)
     mean_vals = np.mean(np.mean(imarray, axis=0), axis=0)
-    empty_vals = [np.argwhere(np.bincount(imarray[:,:,cval].flatten())==0) for cval in xrange(n_bands)]
+    empty_vals = [np.argwhere(np.bincount(imarray[cval].flatten())==0) for cval in xrange(imarray.n_bands)]
     for cval,vals in enumerate(empty_vals):
         above_mean = vals[vals>mean_vals[cval]]
         if len(above_mean)>0:
             cutoff_vals[cval] = min(above_mean)
         else:
-            cutoff_vals[cval] = np.amax(np.amax(imarray[:,:,cval], axis=0), axis=0) + 1
+            cutoff_vals[cval] = np.amax(np.amax(imarray[cval], axis=0), axis=0) + 1
 
     return np.amax(cutoff_vals)
 
@@ -38,12 +37,11 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
     # establish grid dimensions
     im = imtools.ImGrid(images[0])
     w,h = im.width, im.height
-    im_pix = w*h
     bands = im.bands
-    n_bands = len(bands)
-    #mean_grid = np.zeros((h, w, n_bands))
-    #var_grid = np.zeros((h, w, n_bands))
-    s_grid = np.zeros((h, w, n_bands),dtype=int)
+    n_bands = im.n_bands
+    #mean_grid = np.zeros((h, w, im.n_bands))
+    #var_grid = np.zeros((h, w, im.n_bands))
+    s_grid = np.zeros((h, w, n_bands), dtype=int)
 
     # determine sampling resolution
     full_block_len = gcd(h,w)
