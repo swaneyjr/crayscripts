@@ -107,18 +107,18 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
 
     print "Downsampling image..."
 
-    s_grid = np.amax([s_grid[x::sample_block,y::sample_block] for x,y in np.ndindex(sample_block,sample_block)], axis=0)
+    s_grid = np.amax([s_grid[:,x::sample_block,y::sample_block] for x,y in np.ndindex(sample_block,sample_block)], axis=1)
     
     print "Applying convolution kernel..."
 
     kernel_side = 2*conv_len+1
     s_kernel = np.repeat(1, kernel_side**2).reshape((kernel_side,kernel_side))/float(kernel_side)**2
-    convolved_grid = np.array([convolve2d(s_grid[:,:,cval], s_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]).transpose(1,2,0)
+    convolved_grid = np.array([convolve2d(s_grid[cval], s_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)])
     s_grid = np.maximum(s_grid, convolved_grid)
     s_grid = np.ceil(s_grid+0.9).astype(int)
 
     # resize
-    s_grid = np.repeat(np.repeat(s_grid, sample_block, axis=0), sample_block, axis=1)
+    s_grid = np.repeat(np.repeat(s_grid, sample_block, axis=1), sample_block, axis=2)
     if n_bands == 1:
         img_mode = 'L'
     else:
@@ -140,6 +140,7 @@ if __name__ == '__main__':
     parser.add_argument("--conv_len", type=int, default=0, help='Distance to which pixels are included in averaging')
     parser.add_argument("--bg_cutoff", action='store_true', help='Removes tracks during sauto processing.')
     parser.add_argument('--show', action='store_true', help='Display resulting threshold image')
+    parser.add_argument('--max_img', 
     
     
     args = parser.parse_args()
@@ -149,10 +150,10 @@ if __name__ == '__main__':
         mx = outlier_cutoff(bg)
         mx += 5 - (mx%5)
         plt.figure(1)
-        d = math.ceil(math.sqrt(bg.shape[2]))
-        for b in xrange(bg.shape[2]):
+        d = math.ceil(math.sqrt(bg.shape[0]))
+        for b in xrange(bg.shape[0]):
             plt.subplot(d,d,b+1)
-            grid=plt.imshow(bg[:,:,b].transpose(1,0), cmap='plasma', interpolation='nearest', vmin=0, vmax=mx)
+            grid=plt.imshow(bg[b].transpose(1,0), cmap='plasma', interpolation='nearest', vmin=0, vmax=mx)
             plt.colorbar()      
         plt.show()        
  
