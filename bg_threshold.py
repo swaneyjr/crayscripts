@@ -106,8 +106,8 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
             print "%d," % cutoff[cval],
         print "%d" % cutoff[n_bands-1]
           
-        mask_kernel = np.array([[1,0,0,0,0,0,0,0,1],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],\
-                                [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[1,0,0,0,0,0,0,0,1]],dtype=float)/4.
+        mask_kernel = np.array([[1,0,0,0,0,0,1],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],\
+                                [0,0,0,0,0,0,0],[1,0,0,0,0,0,1]],dtype=float)/4.
         masked_grid = 0*s_grid
         cutoff = cutoff.reshape(3,1,1)
         while np.any(np.amax(np.amax(s_grid, axis=1), axis=1) > cutoff):
