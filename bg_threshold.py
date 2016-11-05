@@ -154,7 +154,7 @@ if __name__ == '__main__':
         d = math.ceil(math.sqrt(bg.shape[0]))
         for b in xrange(bg.shape[0]):
             plt.subplot(d,d,b+1)
-            grid=plt.imshow(bg[b].transpose(1,0), cmap='plasma', interpolation='nearest', vmin=0, vmax=mx)
+            grid=plt.imshow(bg[b], cmap='plasma', interpolation='nearest', vmin=0, vmax=mx)
             plt.colorbar()      
         plt.show()        
  
