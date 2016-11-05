@@ -27,7 +27,7 @@ def set_thresh(imarray, thresh):
 
     return thresh_array
 
-def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, sauto=True, smanual=False, max_img=0):
+def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, sauto=True, smanual=False, max_img=0):
  
     avg3_kernel = np.array([[1,1,1],[1,0,1],[1,1,1]])/8.0
     avg5_kernel = np.array([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]])/16.0
@@ -39,12 +39,11 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
 
     # handle S threshold settings
     if sauto:
-        s_grid = find_bg(images[:n_images_auto], out.split('.')[0]+"_bg.png")
-        images = images[n_images_auto:]
+        s_grid = find_bg(infiles[:n_images_auto], out.split('.')[0]+"_bg.png")
     elif smanual:
         s_grid = np.array(Image.open(smanual)).astype(int)
     else:
-        s_grid = 0*imtools.ImGrid(images[0])
+        s_grid = 0*imtools.ImGrid(infiles[0])
         
     if l2plus:
         s_grid += l2plus
@@ -79,7 +78,7 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
     for i,im_name in enumerate(map(str.split('.'), infiles)):
         
         print
-        print "Image %d/%d:" % (i+1,len(images))
+        print "Image %d/%d:" % (i+1,len(infiles))
 
         imarray = imtools.ImGrid(im_name)
         n_bands = len(imarray.bands)
