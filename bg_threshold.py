@@ -106,14 +106,14 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
             print "%d," % cutoff[cval],
         print "%d" % cutoff[n_bands-1]
           
-        mask_kernel = np.array([[1,0,0,0,0,0,1],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],[0,0,0,0,0,0,0],\
-                                [0,0,0,0,0,0,0],[1,0,0,0,0,0,1]],dtype=float)/4.
+        mask_kernel = np.array([[1,1,1,1,1,1,1],[1,0,0,0,0,0,1],[1,0,0,0,0,0,1],[1,0,0,0,0,0,1],[1,0,0,0,0,0,1],\
+                                [1,0,0,0,0,0,1],[1,1,1,1,1,1,1]],dtype=float)/24.
         masked_grid = 0*s_grid
-        cutoff = cutoff.reshape(3,1,1)
+        cutoff = cutoff.reshape(s_grid.shape)
         while np.any(np.amax(np.amax(s_grid, axis=1), axis=1) > cutoff):
             for cval in xrange(n_bands):
                 masked_grid[cval] = convolve2d(s_grid[cval], mask_kernel, mode='same', boundary='symm')
-            s_grid = np.where(s_grid <= cutoff, s_grid, masked_grid)
+            s_grid = np.where(s_grid <= cutoff, s_grid, cutoff)
     
     print "Applying convolution kernel..."
 
