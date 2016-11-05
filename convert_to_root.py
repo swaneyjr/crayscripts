@@ -118,7 +118,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
         l2diff = l2array-grid_min
 
         # enforce L1S
-        if np.count_nonzero(imarray>=s_grid+l1diff) == 0: continue
+        if np.count_nonzero(imarray>=s_grid+l1diff.reshape(3,1,1)) == 0: continue
         if im_split[0] != prev_name:
             n_img[0] += 1
 
