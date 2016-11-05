@@ -109,7 +109,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
         mask_kernel = np.array([[1,0,0,0,0,0,0,0,1],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],\
                                 [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[1,0,0,0,0,0,0,0,1]],dtype=float)/4.
         masked_grid = 0*s_grid
-        cutoff = cutoff.reshape(1,1,3)
+        cutoff = cutoff.reshape(3,1,1)
         while np.any(np.amax(np.amax(s_grid, axis=1), axis=1) > cutoff):
             for cval in xrange(n_bands):
                 masked_grid[cval] = convolve2d(s_grid[cval], mask_kernel, mode='same', boundary='symm')
