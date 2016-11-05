@@ -15,7 +15,7 @@ matplotlib.use('tkagg')
 # given an ImGrid object and a threshold of pixels to keep, returns L2 values
 def set_thresh(imarray, thresh):
 
-    thresh_array = np.repeat(-1,n_bands)
+    thresh_array = np.repeat(-1, imarray.n_bands)
     target_pix = thresh*imarray.size
     histarray = [np.bincount(imarray[cval].flatten()) for cval in xrange(imarray.n_bands)]
 
