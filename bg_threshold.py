@@ -101,9 +101,10 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
           
         mask_kernel = np.array([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]],dtype=float)/16.
         masked_grid = np.zeros((n_bands, h, w))
-        for cval in xrange(n_bands):
-            masked_grid[cval] = convolve2d(s_grid[cval], mask_kernel, mode='same', boundary='symm')
-        s_grid = np.where(s_grid <= cutoff, s_grid, masked_grid)
+        while np.amax(s_grid) > cutoff:
+            for cval in xrange(n_bands):
+                masked_grid[cval] = convolve2d(s_grid[cval], mask_kernel, mode='same', boundary='symm')
+            s_grid = np.where(s_grid <= cutoff, s_grid, masked_grid)
 
 
     print "Downsampling image..."
