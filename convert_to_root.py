@@ -19,7 +19,7 @@ def set_thresh(imarray, thresh):
     target_pix = thresh*imarray.size
     histarray = [np.bincount(imarray[cval].flatten()) for cval in xrange(imarray.n_bands)]
 
-    for cval in xrange(n_bands):
+    for cval in xrange(imarray.n_bands):
         thresh_pix = target_pix
         while target_pix <= thresh_pix:
             thresh_array[cval] += 1
