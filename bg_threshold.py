@@ -95,21 +95,21 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
 
         s_grid = np.maximum(imtools.ImGrid(im), s_grid)
 
+    print "Downsampling image..."
+
+    s_grid = np.amax([s_grid[:,x::sample_block,y::sample_block] for x,y in np.ndindex(sample_block,sample_block)], axis=0)
+    
     # remove hot pixels and tracks
     if bg_cutoff:
         print "Removing thresholds above %d..." % cutoff
           
-        mask_kernel = np.array([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]],dtype=float)/16.
+        mask_kernel = np.array([[1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,1],\
+                                [1,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1]],dtype=float)/32.
         masked_grid = np.zeros((n_bands, h, w))
         while np.amax(s_grid) > cutoff:
             for cval in xrange(n_bands):
                 masked_grid[cval] = convolve2d(s_grid[cval], mask_kernel, mode='same', boundary='symm')
             s_grid = np.where(s_grid <= cutoff, s_grid, masked_grid)
-
-
-    print "Downsampling image..."
-
-    s_grid = np.amax([s_grid[:,x::sample_block,y::sample_block] for x,y in np.ndindex(sample_block,sample_block)], axis=0)
     
     print "Applying convolution kernel..."
 
