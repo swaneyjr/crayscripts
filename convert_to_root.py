@@ -76,7 +76,7 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
     # fill TTree
     print "Starting loop..."
     prev_name = ''
-    for i,im_name in enumerate(map(split('.'), infiles)):
+    for i,im_name in enumerate(map(str.split('.'), infiles)):
         
         print
         print "Image %d/%d:" % (i+1,len(images))
@@ -103,7 +103,7 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
                 l2array[i] = v
 
         else:
-            l2array = np.amin(np.amin(s_grid, axis=0), axis=0).astype(int)                   
+            l2array = np.amin(np.amin(s_grid, axis=1), axis=1).astype(int)                   
             
         minl2thresh = np.amin(l2array)
         
@@ -114,7 +114,7 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
         print
 
         # determine relevant S thresholds    
-        grid_min = np.amin(np.amin(s_grid,axis=0),axis=0)
+        grid_min = np.amin(np.amin(s_grid,axis=1),axis=1)
         l1diff = np.repeat(l1thresh,3)-grid_min
         l2diff = l2array-grid_min
 
@@ -123,8 +123,8 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
         if im_split[0] != prev_name:
             n_img[0] += 1
 
-        avg3_array = [convolve2d(imarray[:,:,cval], avg3_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]
-        avg5_array = [convolve2d(imarray[:,:,cval], avg5_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]
+        avg3_array = [convolve2d(imarray[cval], avg3_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]
+        avg5_array = [convolve2d(imarray[cval], avg5_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]
             
         # fill TTree with image data for each band
         for cval, c in enumerate(imarray.bands):
