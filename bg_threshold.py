@@ -9,12 +9,12 @@ import imtools
 def outlier_cutoff(imarray):
     n_bands = imarray.shape[0]
     cutoff_vals = np.zeros(n_bands)
-    mean_vals = np.mean(np.mean(imarray, axis=1), axis=1)
+    median_vals = np.median(np.median(imarray, axis=1), axis=1)
     empty_vals = [np.argwhere(np.bincount(imarray[cval,0])==0) for cval in xrange(n_bands)]
     for cval,vals in enumerate(empty_vals):
-        above_mean = vals[vals>mean_vals[cval]]
-        if len(above_mean)>0:
-            cutoff_vals[cval] = min(above_mean)
+        above_median = vals[vals>median_vals[cval]]
+        if len(above_median)>0:
+            cutoff_vals[cval] = min(above_median)
         else:
             cutoff_vals[cval] = np.amax(np.amax(imarray[cval], axis=0), axis=0) + 1
 
@@ -109,6 +109,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
         mask_kernel = np.array([[1,0,0,0,0,0,0,0,1],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],\
                                 [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[1,0,0,0,0,0,0,0,1]],dtype=float)/4.
         masked_grid = 0*s_grid
+        cutoff = masked_grid + cutoff
         while np.any(np.amax(np.amax(s_grid, axis=1), axis=1) > cutoff):
             for cval in xrange(n_bands):
                 masked_grid[cval] = convolve2d(s_grid[cval], mask_kernel, mode='same', boundary='symm')
