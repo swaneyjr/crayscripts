@@ -15,11 +15,9 @@ matplotlib.use('tkagg')
 # given an ImGrid object and a threshold of pixels to keep, returns L2 values
 def set_thresh(imarray, thresh):
 
-    n_bands = len(imarray.bands)
     thresh_array = np.repeat(-1,n_bands)
-    im_pix = imarray.height*imarray.width
-    target_pix = thresh*im_pix
-    histarray = [np.bincount(imarray[:,:,cval].flatten()) for cval in xrange(n_bands)]
+    target_pix = thresh*imarray.size
+    histarray = [np.bincount(imarray[cval].flatten()) for cval in xrange(imarray.n_bands)]
 
     for cval in xrange(n_bands):
         thresh_pix = target_pix
@@ -60,6 +58,7 @@ def convert_to_root(images, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, 
     n_img = np.array([0], dtype=int)
     pix_n = np.array([0], dtype=int)
     name = np.array('', dtype=str)
+    color = np.array('', dtype=str)
    
     t.Branch('n_img', n_img, 'n_img/i')
     t.Branch('pix_n', pix_n, 'pix_n/i')
