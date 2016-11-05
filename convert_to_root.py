@@ -193,7 +193,7 @@ if __name__ == '__main__':
     outfile = r.TFile(args.out, "recreate")        
         
     ti = time.clock()
-    t = convert_to_root(infiles, args.out, args.l1, args.l2auto, args.l2manual, args.l2plus, args.sauto, args.smanual, args.max_img)
+    t = convert_to_root(args.infiles, args.out, args.l1, args.l2auto, args.l2manual, args.l2plus, args.sauto, args.smanual, args.max_img)
 
     tf = time.clock()
       
