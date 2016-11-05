@@ -75,7 +75,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
     # fill TTree
     print "Starting loop..."
     prev_name = ''
-    for i,im_name in enumerate(map(lambda s: s.split('.'), infiles)):
+    for i,im_name in enumerate(infiles):
         
         print
         print "Image %d/%d:" % (i+1,len(infiles))
