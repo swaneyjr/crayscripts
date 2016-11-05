@@ -9,7 +9,7 @@ import imtools
 def outlier_cutoff(imarray):
     n_bands = imarray.shape[0]
     cutoff_vals = np.zeros(n_bands)
-    mean_vals = np.mean(np.mean(imarray, axis=0), axis=0)
+    mean_vals = np.mean(np.mean(imarray, axis=1), axis=1)
     empty_vals = [np.argwhere(np.bincount(imarray[cval].flatten())==0) for cval in xrange(n_bands)]
     for cval,vals in enumerate(empty_vals):
         above_mean = vals[vals>mean_vals[cval]]
@@ -124,7 +124,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
         img_mode = 'L'
     else:
         img_mode = ''.join(bands)
-    s_img = Image.fromarray(s_grid.astype(np.uint8), mode=img_mode)
+    s_img = Image.fromarray(s_grid.transpose(1,2,0).astype(np.uint8), mode=img_mode)
 
     # save as png
     img_name = out
