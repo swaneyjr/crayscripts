@@ -10,7 +10,7 @@ def outlier_cutoff(imarray):
     n_bands = imarray.shape[0]
     cutoff_vals = np.zeros(n_bands)
     mean_vals = np.mean(np.mean(imarray, axis=1), axis=1)
-    empty_vals = [np.argwhere(np.bincount(imarray[cval].flatten())==0) for cval in xrange(n_bands)]
+    empty_vals = [np.argwhere(np.bincount(imarray[cval,0])==0) for cval in xrange(n_bands)]
     for cval,vals in enumerate(empty_vals):
         above_mean = vals[vals>mean_vals[cval]]
         if len(above_mean)>0:
@@ -18,7 +18,7 @@ def outlier_cutoff(imarray):
         else:
             cutoff_vals[cval] = np.amax(np.amax(imarray[cval], axis=0), axis=0) + 1
 
-    return np.amax(cutoff_vals)
+    return cutoff_vals
 
 # uses an image to create a grid of background values
 def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
@@ -101,12 +101,16 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
     
     # remove hot pixels and tracks
     if bg_cutoff:
-        print "Removing thresholds above %d..." % cutoff
+        print "Removing thresholds above ",
+        for cval in xrange(n_bands-1):
+            print "%d," % cutoff[cval],
+        print "%d," % cutoff[n_bands-1],
+        print "..."
           
-        mask_kernel = np.array([[1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,1],\
-                                [1,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1]],dtype=float)/32.
+        mask_kernel = np.array([[1,0,0,0,0,0,0,0,1],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],\
+                                [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[1,0,0,0,0,0,0,0,1]],dtype=float)/4.
         masked_grid = np.zeros((n_bands, h, w))
-        while np.amax(s_grid) > cutoff:
+        while np.any(np.amax((np.amax(s_grid, axis=1), axis=1) > cutoff):
             for cval in xrange(n_bands):
                 masked_grid[cval] = convolve2d(s_grid[cval], mask_kernel, mode='same', boundary='symm')
             s_grid = np.where(s_grid <= cutoff, s_grid, masked_grid)
