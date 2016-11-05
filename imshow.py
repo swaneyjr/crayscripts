@@ -27,7 +27,7 @@ def plotchannel(imarray, cval):
     else:
         mx = outlier_cutoff(imarray)
         mx += 5 - (mx%5)
-    plt.imshow(imarray[:,:,cval], cmap='plasma', interpolation='nearest',vmin=0, vmax=mx)
+    plt.imshow(imarray[cval], cmap='plasma', interpolation='nearest',vmin=0, vmax=mx)
     plt.colorbar()
     
 imarray = imtools.ImGrid(args.img)
@@ -42,8 +42,8 @@ elif args.div_bg:
     imarray = imarray.astype(float) / bg
 
 if args.sample:
-    imarray = np.amax([imarray[x::sample_block,y::sample_block] for x,y in np.ndindex(sample_block,sample_block)], axis=0)
-    imarray = np.repeat(np.repeat(imarray, sample_block, axis=0), sample_block, axis=1)
+    imarray = np.amax([imarray[:,x::sample_block,y::sample_block] for x,y in np.ndindex(sample_block,sample_block)], axis=0)
+    imarray = np.repeat(np.repeat(imarray, sample_block, axis=1), sample_block, axis=2)
 
     
 for cval,b in enumerate(imarray.bands):
