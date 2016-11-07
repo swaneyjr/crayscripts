@@ -23,7 +23,7 @@ def outlier_cutoff(imarray):
 # uses an image to create a grid of background values
 def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
 
-    if max_img:
+    if max_img and len_images > max_img:
         images = images[:max_img]
     
     def divisorGen(n):
