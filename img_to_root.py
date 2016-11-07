@@ -78,13 +78,10 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
     for i,im_name in enumerate(infiles):
         
         print
-        print "Image %d/%d:" % (i+1,len(infiles))
+        print "File %d/%d:" % (i+1,len(infiles))
 
         imarray = imtools.ImGrid(im_name)
-        n_bands = len(imarray.bands)
         im_split = im_name.split('.')
-
-        im_pix = imarray.width*imarray.height
 
         # set L2 threshold
         if l2auto:
@@ -97,7 +94,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
             
                 
         elif l2manual:
-            l2array = np.repeat(max(l2manual),n_bands)
+            l2array = np.repeat(max(l2manual),imarray.n_bands)
             for i,v in enumerate(l2manual):
                 l2array[i] = v
 
@@ -122,8 +119,8 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
         if im_split[0] != prev_name:
             n_img[0] += 1
 
-        avg3_array = [convolve2d(imarray[cval], avg3_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]
-        avg5_array = [convolve2d(imarray[cval], avg5_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)]
+        avg3_array = [convolve2d(imarray[cval], avg3_kernel, mode='same', boundary='symm') for cval in xrange(imarray.n_bands)]
+        avg5_array = [convolve2d(imarray[cval], avg5_kernel, mode='same', boundary='symm') for cval in xrange(imarray.n_bands)]
             
         # fill TTree with image data for each band
         for cval, c in enumerate(imarray.bands):
@@ -151,10 +148,10 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
             pix_n[0] = t.pix_x.size()
             print "%s: pix_n = %d" % (c, pix_n[0])
             saved_pix += pix_n[0]
-            total_pix += im_pix
             
             t.Fill()
         
+        total_pix += imarray.size
         prev_name = im_split[0]
         if max_img and n_img >= max_img: break
 
@@ -202,11 +199,9 @@ if __name__ == '__main__':
         
         print "Drawing saved pixels..."
         im = imtools.ImGrid(infiles[0])
-        bands = im.bands
-        n_bands = len(bands)
-        c1 = r.TCanvas('c1','Saved Pixels',300,250*n_bands)
-        c1.Divide(1,n_bands,0,0)
-        for cval,c in enumerate(bands):
+        c1 = r.TCanvas('c1','Saved Pixels',300,250*im.n_bands)
+        c1.Divide(1,im.n_bands,0,0)
+        for cval,c in enumerate(im.bands):
             c1.cd(cval+1)
             t.Draw('pix_y:pix_x','col=="%s"' % c, 'colz')
 
