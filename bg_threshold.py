@@ -42,7 +42,9 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
     n_bands = im.n_bands
     #mean_grid = np.zeros((h, w, im.n_bands))
     #var_grid = np.zeros((h, w, im.n_bands))
+    max_grid = np.zeros((n_bands,h,w), dtype=int)
     s_grid = np.zeros((n_bands,h,w), dtype=int)
+    
 
     # determine sampling resolution
     full_block_len = gcd(h,w)
@@ -92,8 +94,9 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
     for i,im in enumerate(images):
         if (i+1) % 10 == 0:
             print " %d/%d" % (i+1,n_img_bg)
-
-        s_grid = np.maximum(imtools.ImGrid(im), s_grid)
+        im_grid = imtools.ImGrid(im)
+        s_grid = np.median([max_grid, s_grid, im_grid], axis=0)
+        max_grid = np.maximum(im_grid, max_grid, s_grid)
 
     print "Downsampling image..."
 
