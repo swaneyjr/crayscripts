@@ -7,20 +7,6 @@ from scipy.signal import convolve2d
 import imtools
 from cv2 import VideoCapture
 
-def outlier_cutoff(imarray):
-    n_bands = imarray.shape[0]
-    cutoff_vals = np.zeros(n_bands)
-    median_vals = np.median(np.median(imarray, axis=1), axis=1)
-    empty_vals = [np.argwhere(np.bincount(imarray[cval,0])==0) for cval in xrange(n_bands)]
-    for cval,vals in enumerate(empty_vals):
-        above_median = vals[vals>median_vals[cval]]
-        if len(above_median)>0:
-            cutoff_vals[cval] = min(above_median)
-        else:
-            cutoff_vals[cval] = np.amax(np.amax(imarray[cval], axis=0), axis=0) + 1
-
-    return cutoff_vals
-
 # uses an image to create a grid of background values
 def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
 
