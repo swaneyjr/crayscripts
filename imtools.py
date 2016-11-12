@@ -88,3 +88,17 @@ def is_video(file):
     if is_type(file, t):
       return True
   return False
+
+
+def outlier_cutoff(imarray):
+    cutoff_vals = np.zeros(imarray.n_bands)
+    median_vals = np.median(np.median(imarray, axis=1), axis=1)
+    empty_vals = [np.argwhere(np.bincount(imarray[cval,0])==0) for cval in xrange(imarray.n_bands)]
+    for cval,vals in enumerate(empty_vals):
+        above_median = vals[vals>median_vals[cval]]
+        if len(above_median)>0:
+            cutoff_vals[cval] = min(above_median)
+        else:
+            cutoff_vals[cval] = np.amax(np.amax(imarray[cval], axis=0), axis=0) + 1
+
+    return cutoff_vals
