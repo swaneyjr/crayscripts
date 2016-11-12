@@ -34,14 +34,17 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
         retval, frame = cap.read()
         bands = ['R','G','B']
         h,w,n_bands = frame.shape
+        if bg_cutoff:
+            cutoff = imtools.outlier_cutoff(frame.transpose(2,0,1))
+        cap.release()
     else:
         im = imtools.ImGrid(images[0])
         w,h = im.width, im.height
         bands = im.bands
         n_bands = im.n_bands
+        if bg_cutoff:
+            cutoff = imtools.outlier_cutoff(im)
     
-    #mean_grid = np.zeros((h, w, im.n_bands))
-    #var_grid = np.zeros((h, w, im.n_bands))
     max_grid = np.zeros((n_bands,h,w), dtype=int)
     s_grid = np.zeros((n_bands,h,w), dtype=int)
     
@@ -55,10 +58,6 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
         print " [%d] %d x %d" % (i+1, w/divisor_list[i], h/divisor_list[i])
 
     sample_block = divisor_list[int(raw_input("Select [1]-[%d]: " % len(divisor_list)))-1]
-
-    # set cutoff for tracks
-    if bg_cutoff:
-        cutoff = outlier_cutoff(im)
             
 
     print
@@ -66,29 +65,6 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
     print "Processing levels..." 
     print " 0/%d" % n_img_bg
 
-    """
-    for i,im in enumerate(images):
-        if (i+1) % 10 == 0:
-            print " %d/%d" % (i+1,n_img_bg)
-                        
-        mean_grid += np.array(Image.open(im))
-
-    mean_grid /= float(n_img_bg)
-
-    print "Processing variances..."
-    print " 0/%d" % n_img_bg
-    
-    for i,im in enumerate(images):
-        if (i+1) % 10 == 0:
-            print " %d/%d" % (i+1,n_img_bg)
-                        
-        var_grid += np.square(np.array(Image.open(im))-mean_grid)
-
-    var_grid /= float(n_img_bg)
-
-    s_grid = mean_grid + std_devs * np.sqrt(var_grid)
-
-    """
     
     # find second largest ADC count of each pixel
     if vid:
