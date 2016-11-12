@@ -17,7 +17,7 @@ def outlier_cutoff(imarray):
         if len(above_median)>0:
             cutoff_vals[cval] = min(above_median)
         else:
-            cutoff_vals[cval] = np.amax(np.amax(imarray[cval], axis=0), axis=0) + 5
+            cutoff_vals[cval] = np.amax(np.amax(imarray[cval], axis=0), axis=0) + 1
 
     return cutoff_vals
 
@@ -42,7 +42,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
     n_img_bg = len(images)
 
     # establish grid dimensions
-    if imtools.is_vid(images[0]):
+    if imtools.is_video(images[0]):
         vid = True
         cap = VideoCapture(images[0])
         retval, frame = cap.read()
@@ -118,6 +118,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
             max_grid = np.maximum(max_grid, s_grid, frame)
             if iframe >= max_img: break
         cap.release()
+        s_grid = s_grid.transpose(2,0,1)
     else:
         for i,im in enumerate(images):
             if (i+1) % 10 == 0:
