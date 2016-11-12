@@ -8,7 +8,6 @@ class ImGrid(np.ndarray):
   
   def __new__(cls, file_name, bands=None):
     
-    compressed_types = ['jpg','png','gif']
     zip_types = ['gz']
     
     extensions = file_name.split('.')[1:]
@@ -20,14 +19,14 @@ class ImGrid(np.ndarray):
     else:
       f = open(file_name)
     
-    if extensions[-1] not in compressed_types:
+    if is_raw(file_name)
       raw = rawpy.imread(f)
       imarray = np.array([raw.raw_image.copy()]).astype(int)
       bands = ['RAW']
       raw.close()
     
     # PIL
-    else:
+    elif is_img(file_name):
       with Image.open(f) as im:
         imarray = np.array(im).astype(int).transpose(2,0,1)
         bands = list(im.mode)
@@ -58,13 +57,16 @@ def spectrum(imarray, counts=1024, region=None):
     region = (0,0,imarray.width, imarray.height)
   return np.array([np.bincount(imarray[region[1]:region[3],region[0]:region[2], cval].flatten(), minlength=counts) \
                    for cval in xrange(imarray.shape[2])])
-  
-def is_type(file, ext):
+
+def unzipped_ext(file):
   zip_types = ['gz','tar']
-  file_ext = file.split('.')[1:]
-  if file_ext[-1] in zip_types:
+  file_ext = file.split('.')
+  while file_ext[-1] in zip_types:
     file_ext = file_ext[:-1]
-  return file[-1] == ext
+  return file_ext[-1]
+
+def is_type(file, ext):
+  return unzipped_ext(file) == ext
 
 def is_raw(file):
   raw_types = ['dng']
@@ -74,7 +76,7 @@ def is_raw(file):
   return False
   
 def is_img(file):
-  im_types = ['jpg']
+  im_types = ['jpg','png','gif']
   for t in im_types:
     if is_type(file, t):
       return True
