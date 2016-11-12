@@ -16,7 +16,7 @@ def outlier_cutoff(imarray):
         if len(above_median)>0:
             cutoff_vals[cval] = min(above_median)
         else:
-            cutoff_vals[cval] = np.amax(np.amax(imarray[cval], axis=0), axis=0) + 1
+            cutoff_vals[cval] = np.amax(np.amax(imarray[cval], axis=0), axis=0) + 5
 
     return cutoff_vals
 
