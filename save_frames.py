@@ -1,10 +1,16 @@
 import cv2
 import numpy as np
+import bg_threshold as bg
 
-def save_frames(infiles, l1thresh=0):
+def save_frames(vids, l1thresh=None):
+ 
   imlist = []
+  autothresh = (l1thresh == None)
   
   for fname in infiles:
+    
+    if autothresh:
+      l1thresh = np.amax(bg.outlier_cutoff(bg.find_bg(fname)))
   
     fbase = fname.split('.')[0]
     cap = cv2.VideoCapture(fname)
