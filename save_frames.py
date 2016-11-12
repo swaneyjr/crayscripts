@@ -27,6 +27,7 @@ def save_frames(vids, l1thresh=None):
         
       iframe += 1
       ret, frame = cap.read()
+    cap.release()
       
   return imlist
         
