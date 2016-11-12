@@ -5,6 +5,7 @@ from fractions import gcd
 from PIL import Image
 from scipy.signal import convolve2d
 import imtools
+import cv2
 
 def outlier_cutoff(imarray):
     n_bands = imarray.shape[0]
