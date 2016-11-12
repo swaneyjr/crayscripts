@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import numpy as np
 from scipy.signal import convolve2d
-from imtools import outlier_cutoff
 import imtools
 
 # enable X-forwarding
@@ -15,7 +14,7 @@ def plotchannel(imarray, cval, minus_bg=False, div_bg=False, colormap='plasma'):
     elif div_bg:
         mx = 5
     else:
-        mx = outlier_cutoff(imarray)
+        mx = imtools.outlier_cutoff(imarray)
         mx += 5 - (mx%5)
     plt.imshow(imarray[cval], cmap=colormap, interpolation='nearest',vmin=0, vmax=mx)
     plt.colorbar()
