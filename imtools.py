@@ -42,53 +42,6 @@ class ImGrid(np.ndarray):
     obj.height = imarray.shape[1]
     obj.width = imarray.shape[2]
     return obj
-  
-  """
-  def __new__(cls, fname1, fname2=None, bands=None):
-    
-    bands = []
-    
-    if set(fname1.split('.')) & set(compressed_types):
-      im_name = fname1
-      raw_name = fname2
-    else:
-      im_name = fname2
-      raw_name = fname1
-  
-    # open file
-    if raw_name:
-      bands.append('RAW')
-      if raw_name.split('.')[-1] in zip_types:
-        raw_file = gzip.open(raw_name)
-      else:
-        raw_file = open(raw_name)
-    
-      raw = rawpy.imread(raw_file)
-      rawarray = np.array([raw.raw_image_visible.copy()]).astype(int)
-      raw.close()
-      raw_file.close()
-    else:
-      rawarray = []
-    
-    # PIL
-    if im_name:
-      with Image.open(im_name) as im:
-        imarray = np.array(im).astype(int).transpose(2,0,1)
-        bands += list(im.mode)
-        if len(bands) == 1:
-          imarray = np.array([imarray])
-    else:
-      imarray = []
-    
-    fullarray = np.array([r for r in rawarray] + [c for c in imarray])
-    
-    obj = np.asarray(fullarray).view(cls)
-    obj.bands = bands
-    obj.height = fullarray.shape[1]
-    obj.width = fullarray.shape[2]
-    return obj
-  
-  """
 
 
   def __array_finalize__(self, obj):
@@ -106,3 +59,30 @@ def spectrum(imarray, counts=1024, region=None):
   return np.array([np.bincount(imarray[region[1]:region[3],region[0]:region[2], cval].flatten(), minlength=counts) \
                    for cval in xrange(imarray.shape[2])])
   
+def is_type(file, ext):
+  zip_types = ['gz','tar']
+  file_ext = file.split('.')[1:]
+  if file_ext[-1] in zip_types:
+    file_ext = file_ext[:-1]
+  return file[-1] == ext
+
+def is_raw(file):
+  raw_types = ['dng']
+  for t in raw_types:
+    if is_type(file, t):
+      return True
+  return False
+  
+def is_img(file):
+  im_types = ['jpg']
+  for t in im_types:
+    if is_type(file, t):
+      return True
+  return False
+  
+def is_video(file):
+  vid_types = ['mp4']
+  for t in raw_types:
+    if is_type(file, t):
+      return True
+  return False
