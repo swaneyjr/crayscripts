@@ -5,7 +5,7 @@ from fractions import gcd
 from PIL import Image
 from scipy.signal import convolve2d
 import imtools
-import cv2
+from cv2 import VideoCapture
 
 def outlier_cutoff(imarray):
     n_bands = imarray.shape[0]
@@ -22,8 +22,10 @@ def outlier_cutoff(imarray):
     return cutoff_vals
 
 # uses an image to create a grid of background values
-def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
+def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
 
+    vid = False
+    
     if max_img and len_images > max_img:
         images = images[:max_img]
     
@@ -40,10 +42,18 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
     n_img_bg = len(images)
 
     # establish grid dimensions
-    im = imtools.ImGrid(images[0])
-    w,h = im.width, im.height
-    bands = im.bands
-    n_bands = im.n_bands
+    if imtools.is_vid(images[0]):
+        vid = True
+        cap = VideoCapture(images[0])
+        retval, frame = cap.read()
+        bands = ['R','G','B']
+        h,w,n_bands = frame.shape
+    else:
+        im = imtools.ImGrid(images[0])
+        w,h = im.width, im.height
+        bands = im.bands
+        n_bands = im.n_bands
+    
     #mean_grid = np.zeros((h, w, im.n_bands))
     #var_grid = np.zeros((h, w, im.n_bands))
     max_grid = np.zeros((n_bands,h,w), dtype=int)
@@ -94,13 +104,27 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=0):
 
     """
     
-    # find max of each pixel
-    for i,im in enumerate(images):
-        if (i+1) % 10 == 0:
-            print " %d/%d" % (i+1,n_img_bg)
-        im_grid = imtools.ImGrid(im)
-        s_grid = np.median([max_grid, s_grid, im_grid], axis=0)
-        max_grid = np.maximum(im_grid, max_grid, s_grid)
+    # find second largest ADC count of each pixel
+    if vid:
+        cap = cv2.VideoCapture(images[0])
+        iframe = 0
+        ret, frame = cap.read()
+        while ret and cap.isOpened(): 
+            if (iframe+1) % 10 == 0:
+                print " %d/%d" % (iframe+1,n_img_bg)
+            iframe += 1
+            ret, frame = cap.read()
+            s_grid = np.median([max_grid, s_grid, frame], axis=0)
+            max_grid = np.maximum(max_grid, s_grid, frame)
+            if iframe >= max_img: break
+        cap.release()
+    else:
+        for i,im in enumerate(images):
+            if (i+1) % 10 == 0:
+                print " %d/%d" % (i+1,n_img_bg)
+            im_grid = imtools.ImGrid(im)
+            s_grid = np.median([max_grid, s_grid, im_grid], axis=0)
+            max_grid = np.maximum(max_grid, s_grid, im_grid)
 
     print "Downsampling image..."
 
