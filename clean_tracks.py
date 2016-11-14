@@ -13,6 +13,9 @@ Pixel = namedtuple('Pixel',['x','y','val','avg3','avg5'])
 # finds the furthest two pixels in a list of pixels (or one such pair)
 def find_endpoints(pixels):
     
+    if len(pixels) == 1:
+        return pixels[0],pixels[0]
+    
     furthest_pix = {p: 0 for p in pixels}
 
     for i,p1 in enumerate(pixels):
