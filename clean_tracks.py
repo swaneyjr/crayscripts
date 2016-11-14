@@ -37,9 +37,9 @@ def find_endpoints(pixels):
 
 # returns a list of tracks separated by > iso_thresh and whose pixels are
 # within iso_thresh of each other
-def extract_tracks(pixels, min_pix_n, iso_thresh):
+def extract_tracks(pixels, min_pix_tr, iso_thresh):
 
-    if len(pixels) == 1 and min_pix_n <= 1:
+    if len(pixels) == 1 and min_pix_tr <= 1:
         return [pixels]
     
     x_track_list = []
@@ -53,10 +53,10 @@ def extract_tracks(pixels, min_pix_n, iso_thresh):
         if x_diffs[i] < iso_thresh:
             x_track.append(p)
         else:
-            if len(x_track) >= min_pix_n:
+            if len(x_track) >= min_pix_tr:
                 x_track_list.append(x_track)
             x_track = [p]
-    if len(x_track) >= min_pix_n:
+    if len(x_track) >= min_pix_tr:
         x_track_list.append(x_track)
 
     tracks = []
@@ -70,10 +70,10 @@ def extract_tracks(pixels, min_pix_n, iso_thresh):
             if y_diffs[i] < iso_thresh:
                 y_track.append(p)
             else:
-                if len(y_track) >= min_pix_n:
+                if len(y_track) >= min_pix_tr:
                     tracks.append(y_track)
                 y_track = [p]
-        if len(y_track) >= min_pix_n:
+        if len(y_track) >= min_pix_tr:
             tracks.append(y_track)
         
     
@@ -161,21 +161,21 @@ def find_hough_theta(pixels):
     
     return theta, rho_std, rho, sig_min, sig_max, curv_ratio
 
-def clean_tracks(t0, min_pix_n, iso_thresh, fit):
+def clean_tracks(t0, min_pix_tr, iso_thresh, fit):
     saved_pix = total_pix = 0
     total_events = t0.GetEntries()
 
     print "Starting CopyTree..."
-    t1 = t0.CopyTree("pix_n >= " + str(min_pix_n))
+    t1 = t0.CopyTree("pix_n >= " + str(min_pix_tr))
     t1_events = t1.GetEntries()
-    print "Pixels over min_pix_n: %d/%d %.0f%%" % (t1_events, total_events, 100.*t1_events/total_events)
+    print "Pixels over min_pix_tr: %d/%d %.0f%%" % (t1_events, total_events, 100.*t1_events/total_events)
     print "Starting CloneTree..."
     t2 = t0.CloneTree(0)
              
     # add branches
 
     print "Adding TBranches..."
-    pix_n = np.array([0], dtype=int)
+    pix_tr = np.array([0], dtype=int)
     
     max_val = np.array([0], dtype=int)
     tr_len = np.array([0], dtype=float)
@@ -190,14 +190,13 @@ def clean_tracks(t0, min_pix_n, iso_thresh, fit):
     t2.Branch('tr_len', tr_len, 'tr_len/d')
     t2.Branch('discr_len', discr_len, 'discr_len/i')
     t2.Branch('tr_eff', tr_eff, 'tr_eff/d')
+    t2.Branch('pix_tr', pix_tr, 'pix_tr/i')
     if fit:
         t2.Branch('hough_theta', hough_theta, 'hough_theta/d')
         t2.Branch('rho_std', rho_std, 'rho_std/d')
         t2.Branch('curv_ratio', curv_ratio, 'curve_ratio/d')
         vbranch(t2, 'd_rho')
         vbranch(t2, 'sigma')
-
-    t2.SetBranchAddress('pix_n', pix_n)
     
     print 'Starting loop...'
     sys.stdout.flush()
@@ -207,7 +206,7 @@ def clean_tracks(t0, min_pix_n, iso_thresh, fit):
 
         # read pixels from TTree
         raw_pixels = list(starmap(Pixel, izip(evt.pix_x, evt.pix_y, evt.pix_val, evt.pix_avg3, evt.pix_avg5)))
-        tracks = extract_tracks(raw_pixels, min_pix_n, iso_thresh)
+        tracks = extract_tracks(raw_pixels, min_pix_tr, iso_thresh)
 
         
         for cleaned_pixels in tracks:
@@ -253,7 +252,7 @@ def clean_tracks(t0, min_pix_n, iso_thresh, fit):
                 if p.val > max_pix_val:
                     max_pix_val = p.val
 
-            pix_n[0] = t2.pix_x.size()
+            pix_tr[0] = t2.pix_x.size()
             max_val[0] = max_pix_val
             
             total_pix += len(raw_pixels)
@@ -279,7 +278,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description = 'Extract clean tracks from data')
     parser.add_argument("--in", required=True, dest='infiles', nargs='+', help='File to be cleaned')
     parser.add_argument("--out", default='tracks.root', help='Output file name')
-    parser.add_argument("--min", type=int, default=2, help='Minimum pix_n to be kept')
+    parser.add_argument("--min", type=int, default=2, help='Minimum pix_tr to be kept')
     parser.add_argument("--iso", type=int, default=15, help='Distance above which a pixel is classified as isolated')
     parser.add_argument("--fit", action='store_true', help='Compute linear fit parameters')
     args = parser.parse_args()
@@ -290,7 +289,7 @@ if __name__ == '__main__':
     outfile = r.TFile(args.out, "recreate")
 
     print "Cleaning tracks..."
-    t1 = clean_tracks(t0, min_pix_n=args.min, iso_thresh=args.iso, fit=args.fit)
+    t1 = clean_tracks(t0, min_pix_tr=args.min, iso_thresh=args.iso, fit=args.fit)
     outfile.Write()
     outfile.Close()
     print "Done! Wrote to %s." % args.out
