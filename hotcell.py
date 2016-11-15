@@ -66,13 +66,13 @@ def clean_pix(t0, thresh, mask=None, stats=None, keep_empty=False, bad_regions=N
     t1 = t0.CloneTree(0)
     print "clonetree done"
     vbranch(t1, 'pix_freq')
+    t1.Branch('pix_n_clean', pix_n, 'pix_n_clean/i')
     if 'pix_masked' in existing_branches:
         t1._pix_masked = r.vector('int')()
         t1.SetBranchAddress('pix_masked', t1._pix_masked)
     else:
         vbranch(t1, 'pix_masked', int)
     pix_n = np.array([0], dtype=int)
-    t1.SetBranchAddress('pix_n', pix_n)
 
     total_pix = 0
     saved_pix = 0
