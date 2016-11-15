@@ -13,13 +13,13 @@ def pix_mask(p):
         if ((p.x-x)**2 + (p.y-y)**2) < (PIX_RADIUS**2): return False
     return True
 
-def pix_stats(t0):
-    rx,ry = args.res
+def pix_stats(t0, res):
+    rx,ry = res
     t0.Draw("pix_y:pix_x>>pstats({rx},0,{rx},{ry},0,{ry})".format(rx=rx, ry=ry), "", "goff")
     h = r.gROOT.FindObject("pstats")
     h.Scale(1./t0.GetEntries())
 
-    arr = np.zeros(args.res, dtype=float)
+    arr = np.zeros(res, dtype=float)
     for x,y in product(xrange(rx), xrange(ry)):
         i = h.GetBin(x+1,y+1)
         arr[x,y] = h.GetBinContent(i)
@@ -41,10 +41,10 @@ def vbranch(t, bname, btype=float):
     setattr(t, '_%s'%bname, v)
     t.Branch(bname, v)
 
-def clean_pix(t0, thresh, mask=None, stats=None, keep_empty=False, bad_regions=None, drop_source=False, l2thresh=None):
+def clean_pix(t0, thresh, mask=None, stats=None, keep_empty=False, bad_regions=None, drop_source=False, l2thresh=None, res=(1280,720)):
     if stats is None:
         print "Calculating pixel stats..."
-        stats = pix_stats(t0)
+        stats = pix_stats(t0, res)
         print "stats finished."
 
     def in_mask(x,y):
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     parser.add_argument("--out", metavar="OUTFILE", default="cleaned.root", help="The output file")
     parser.add_argument("--sel", help="An event-level selection to apply to the input tree(s) before copying.")
     parser.add_argument("--in", dest="infiles", metavar="INFILE", required=True, nargs="+", help="The input file(s)")
-    parser.add_argument("--res", metavar="RESX,RESY", default='1920,1080', required=True)
+    parser.add_argument("--res", metavar="RESX,RESY", default='1920,1080', required=True, help="Comma-delimited resolution")
     args = parser.parse_args()
 
     if args.source_mask:
