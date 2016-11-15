@@ -62,6 +62,7 @@ def clean_pix(t0, thresh, mask=None, stats=None, keep_empty=False, bad_regions=N
 
 
     existing_branches = [b.GetName() for b in t0.GetListOfBranches()]
+    pix_n = np.array([0], dtype=int)
     print "calling clonetree()"
     t1 = t0.CloneTree(0)
     print "clonetree done"
@@ -72,7 +73,6 @@ def clean_pix(t0, thresh, mask=None, stats=None, keep_empty=False, bad_regions=N
         t1.SetBranchAddress('pix_masked', t1._pix_masked)
     else:
         vbranch(t1, 'pix_masked', int)
-    pix_n = np.array([0], dtype=int)
 
     total_pix = 0
     saved_pix = 0
