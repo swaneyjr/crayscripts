@@ -105,7 +105,7 @@ def find_hough_theta(pixels):
             theta = math.copysign(math.pi/4., -num)
     else:
         theta = 0.5 * math.atan2(-2*num, -den)
-        if theta = math.pi/2:
+        if theta == math.pi/2:
             theta *= -1
     rho = (sum_x*math.cos(theta)+sum_y*math.sin(theta))/sum_weights
 
