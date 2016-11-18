@@ -1,15 +1,15 @@
 import ROOT as r
 import math
 
-def compare_theta(t, n_bins=100, cut=''):
+def compare_theta(t, name='hist', n_bins=100, cut=''):
 
-  hist = r.TH1F('hist','hist',n_bins,-2,2)
-  r_hist = r.TH1F('r_hist','r_hist',n_bins,-2,2)
-  std_hist = r.TH1F('std_hist','std_hist',n_bins,-2,2)
+  hist = r.TH1F(name,name,n_bins,-math.pi/2,math.pi/2)
+  r_hist = r.TH1F('r_hist','r_hist',n_bins,-math.pi/2,math.pi/2)
+  std_hist = r.TH1F('std_hist','std_hist',n_bins,-math.pi/2,math.pi/2)
   
   for track in t:
     hist.Fill(track.theta)
-    if track.theta<=0:
+    if track.theta<0:
       r_hist.Fill(track.theta+math.pi/2)
     else:
       r_hist.Fill(track.theta-math.pi/2)
