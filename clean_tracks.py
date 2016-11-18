@@ -193,7 +193,7 @@ def clean_tracks(t0, min_pix_tr, iso_thresh, fit):
     t2.Branch('tr_eff', tr_eff, 'tr_eff/d')
     t2.Branch('pix_tr', pix_tr, 'pix_tr/i')
     if fit:
-        t2.Branch('hough_theta', hough_theta, 'hough_theta/d')
+        t2.Branch('theta', hough_theta, 'theta/d')
         t2.Branch('rho_std', rho_std, 'rho_std/d')
         t2.Branch('curv_ratio', curv_ratio, 'curve_ratio/d')
         vbranch(t2, 'd_rho')
