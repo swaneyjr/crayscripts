@@ -8,11 +8,11 @@ def compare_theta(t, n_bins=100, cut=''):
   std_hist = r.TH1F('std_hist','std_hist',n_bins,-2,2)
   
   for track in t:
-    hist.Fill(track.hough_theta)
+    hist.Fill(track.theta)
     if theta<=0:
-      r_hist.Fill(track.hough_theta+math.pi/2)
+      r_hist.Fill(track.theta+math.pi/2)
     else:
-      r_hist.Fill(track.hough_theta-math.pi/2)
+      r_hist.Fill(track.theta-math.pi/2)
   
   for b in xrange(n_bins):
     std_hist.SetBinContent(b, math.sqrt(hist.GetBinContent(b)+r_hist.GetBinContent(b)))
@@ -20,7 +20,7 @@ def compare_theta(t, n_bins=100, cut=''):
   return (hist - r_hist)/std_hist
     
 
-def track_density(events, tracks, region=None, cut=''):
+def track_density(frames, tracks, region=None, cut=''):
   if region:
     x0,y0,x1,y1 = region
   else:
