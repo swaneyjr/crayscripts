@@ -86,7 +86,7 @@ def find_hough_theta(pixels):
     n = len(pixels)
     
     # orthogonal least squares fit
-    sum_x = sum_y = sum_x_sq = sum_y_sq = sum_xy = 0
+    sum_x = sum_y = sum_x_sq = sum_y_sq = sum_xy = sum_weights = 0
     for p in pixels:
         weight = p.val
         sum_x += weight*p.x
@@ -94,17 +94,18 @@ def find_hough_theta(pixels):
         sum_x_sq += weight*p.x**2
         sum_y_sq += weight*p.y**2
         sum_xy += weight*p.x*p.y
+        sum_weights += weight
 
-    num = n*sum_xy-sum_x*sum_y
-    den = n*sum_x_sq-n*sum_y_sq-sum_x**2+sum_y**2
+    num = sum_weights*sum_xy-sum_x*sum_y
+    den = sum_weights*sum_x_sq-sum_weights*sum_y_sq-sum_x**2+sum_y**2
     if den == 0:
-        if False: #num == 0:
+        if num == 0:
             theta = float('nan')
         else:
             theta = math.copysign(math.pi/4., -num)
     else:
         theta = 0.5 * math.atan2(-2*num, -den)
-    rho = (sum_x*math.cos(theta)+sum_y*math.sin(theta))/n
+    rho = (sum_x*math.cos(theta)+sum_y*math.sin(theta))/sum_weights
 
     # calculate other stats based on theta fit
 
