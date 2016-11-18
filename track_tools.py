@@ -17,7 +17,7 @@ def compare_theta(t, n_bins=100, cut=''):
   for b in xrange(n_bins):
     std_hist.SetBinContent(b, math.sqrt(hist.GetBinContent(b)+r_hist.GetBinContent(b)))
                            
-  return (hist - r_hist)/std_hist
+  return (hist - r_hist).Divide(std_hist)
     
 
 def track_density(frames, tracks, region=None, cut=''):
