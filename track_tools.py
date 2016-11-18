@@ -27,7 +27,7 @@ def track_density(frames, tracks, region=None, cut=''):
     x0 = y0 = -float('inf')
     x1 = y1 = float('inf')
   
-  total_tracks = tracks.GetEntries('Sum$(pix_x)/Length$(pix_x) >= x0 && Sum$(pix_x)/Length$(pix_x)' \\
+  total_tracks = tracks.GetEntries('Sum$(pix_x)/Length$(pix_x) >= x0 && Sum$(pix_x)/Length$(pix_x)' \
     + '&& Sum$(pix_y)/Length$(pix_y) >= y0 && Sum$(pix_y)/Length$(pix_y) < y1' + cut)
   
   total_frames = frames.GetEntries(cut)
