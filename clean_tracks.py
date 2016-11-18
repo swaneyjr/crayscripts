@@ -90,8 +90,6 @@ def find_hough_theta(pixels):
     if weight:
         intersections = []
 
-    
-
         def theta_weight(dx, dy):
             return dx**2 + dy**2
         
@@ -128,7 +126,10 @@ def find_hough_theta(pixels):
         num = n*sum_xy-sum_x*sum_y
         den = n*sum_x_sq-n*sum_y_sq-sum_x**2+sum_y**2
         if den == 0:
-            theta = math.copysign(math.pi/4., -num)
+            if num == 0:
+                theta = float('nan')
+            else:
+                theta = math.copysign(math.pi/4., -num)
         else:
             theta = 0.5 * math.atan2(-2*num, -den)
         rho = (sum_x*math.cos(theta)+sum_y*math.sin(theta))/n
