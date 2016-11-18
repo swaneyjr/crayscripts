@@ -98,7 +98,7 @@ def find_hough_theta(pixels):
     num = n*sum_xy-sum_x*sum_y
     den = n*sum_x_sq-n*sum_y_sq-sum_x**2+sum_y**2
     if den == 0:
-        if num == 0:
+        if False: #num == 0:
             theta = float('nan')
         else:
             theta = math.copysign(math.pi/4., -num)
@@ -116,7 +116,7 @@ def find_hough_theta(pixels):
         rho_std = np.std(rho_vals, ddof = 2)
         
     else:
-        rho_std = None
+        rho_std = float('nan')
 
     if n > 3:
         sig_plus = []
