@@ -88,11 +88,12 @@ def find_hough_theta(pixels):
     # orthogonal least squares fit
     sum_x = sum_y = sum_x_sq = sum_y_sq = sum_xy = 0
     for p in pixels:
-        sum_x += p.x
-        sum_y += p.y
-        sum_x_sq += p.x**2
-        sum_y_sq += p.y**2
-        sum_xy += p.x*p.y
+        weight = p.val
+        sum_x += weight*p.x
+        sum_y += weight*p.y
+        sum_x_sq += weight*p.x**2
+        sum_y_sq += weight*p.y**2
+        sum_xy += weight*p.x*p.y
 
     num = n*sum_xy-sum_x*sum_y
     den = n*sum_x_sq-n*sum_y_sq-sum_x**2+sum_y**2
