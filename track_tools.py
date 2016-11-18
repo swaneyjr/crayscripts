@@ -9,7 +9,7 @@ def compare_theta(t, n_bins=100, cut=''):
   
   for track in t:
     hist.Fill(track.theta)
-    if theta<=0:
+    if track.theta<=0:
       r_hist.Fill(track.theta+math.pi/2)
     else:
       r_hist.Fill(track.theta-math.pi/2)
