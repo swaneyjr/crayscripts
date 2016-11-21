@@ -86,8 +86,8 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
             if (i+1) % 10 == 0:
                 print " %d/%d" % (i+1,n_img_bg)
             im_grid = imtools.ImGrid(im)
-            s_grid = np.median([max_grid, s_grid, im_grid], axis=0)
-            max_grid = np.maximum(max_grid, s_grid, im_grid)
+            s_grid = np.median([max_grid, s_grid, im_grid], axis=0).astype(int)
+            max_grid = np.maximum(max_grid, s_grid, im_grid).astype(int)
 
     print "Downsampling image..."
 
