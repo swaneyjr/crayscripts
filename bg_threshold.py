@@ -9,7 +9,7 @@ import imshow
 from cv2 import VideoCapture
 
 # uses an image to create a grid of background values
-def find_bg(images, out, conv_len=5, bg_cutoff=False, max_img=50):
+def find_bg(images, out=None, conv_len=5, bg_cutoff=False, max_img=50):
 
     vid = False
     
@@ -126,16 +126,17 @@ def find_bg(images, out, conv_len=5, bg_cutoff=False, max_img=50):
 
     # resize
     s_grid = np.repeat(np.repeat(s_grid, sample_block, axis=1), sample_block, axis=2)
-    if n_bands == 1:
-        img_mode = 'L'
-    else:
-        img_mode = ''.join(bands)
-    s_img = Image.fromarray(s_grid.transpose(1,2,0).astype(np.uint8), mode=img_mode)
+    
+    if out:
+        if n_bands == 1:
+            img_mode = 'L'
+        else:
+            img_mode = ''.join(bands)
+        s_img = Image.fromarray(s_grid.transpose(1,2,0).astype(np.uint8), mode=img_mode)
 
-    # save as png
-    img_name = out
-    print "Saving background as %s" % img_name
-    s_img.save(img_name)
+        # save as png
+        print "Saving background as %s" % out
+        s_img.save(out)
     
     return s_grid
 
