@@ -12,7 +12,7 @@ def save_frames(vids, l1thresh=None):
     print fname
     
     if autothresh:
-      l1thresh = np.amax(outlier_cutoff(find_bg([fname]),1))
+      l1thresh = np.amax(find_bg([fname]))
   
     fbase = fname.split('.')[0]
     cap = cv2.VideoCapture(fname)
@@ -24,6 +24,7 @@ def save_frames(vids, l1thresh=None):
       if np.amax(frame) >= l1thresh:
         imname = fbase + '_f' + str(iframe) + '.jpg'
         imlist.append(imname)
+        print "Writing to %s" % imname
         cv2.imwrite(imname, frame, CV_IMWRITE_JPEG_QUALITY=100)
         
         
