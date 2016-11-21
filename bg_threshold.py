@@ -40,12 +40,12 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
             cutoff = imtools.outlier_cutoff(frame.transpose(2,0,1))
         cap.release()
     else:
-        im = imtools.ImGrid(images[0])
-        w,h = im.width, im.height
-        bands = im.bands
-        n_bands = im.n_bands
+        im_grid = imtools.ImGrid(images[0])
+        w,h = im_grid.width, im_grid.height
+        bands = im_grid.bands
+        n_bands = im_grid.n_bands
         if bg_cutoff:
-            cutoff = imtools.outlier_cutoff(im)
+            cutoff = imtools.outlier_cutoff(im_grid)
     
     max_grid = np.zeros((n_bands,h,w), dtype=int)
     s_grid = np.zeros((n_bands,h,w), dtype=int)
@@ -88,6 +88,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
             if (i+1) % 10 == 0:
                 print " %d/%d" % (i+1,n_img_bg)
             im_grid = imtools.ImGrid(im)
+            print "Max pixel = %d" % np.amax(im_grid)
             s_grid = np.median([max_grid, s_grid, im_grid], axis=0).astype(int)
             max_grid = np.maximum(max_grid, s_grid, im_grid).astype(int)
 
