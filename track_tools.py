@@ -4,8 +4,8 @@ import math
 def compare_theta(t, name='hist', n_bins=100, cut=''):
 
   hist = r.TH1F(name,'Track angle excess, compared to 90 degree rotation',n_bins,-math.pi/2,math.pi/2)
-  hist.GetXAxis.SetTitle('Track angle')
-  hist.GetYAxis.SetTitle('Standard deviations above perpendicular')
+  hist.GetXAxis().SetTitle('Track angle')
+  hist.GetYAxis().SetTitle('Standard deviations above perpendicular')
   r_hist = r.TH1F('r_hist','r_hist',n_bins,-math.pi/2,math.pi/2)
   std_hist = r.TH1F('std_hist','std_hist',n_bins,-math.pi/2,math.pi/2)
   
