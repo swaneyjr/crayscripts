@@ -124,7 +124,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
         img_mode = 'L'
     else:
         img_mode = ''.join(bands)
-    s_img = Image.fromarray(s_grid.transpose(1,2,0).astype(np.uint8), mode=img_mode)
+    s_img = Image.fromarray(max_grid.transpose(1,2,0).astype(np.uint8), mode=img_mode)
 
     # save as png
     img_name = out
@@ -148,14 +148,5 @@ if __name__ == '__main__':
     
     bg = find_bg(args.infiles, args.out, args.conv_len, args.bg_cutoff, args.max_img)
     if args.show:
-        imshow.imshow(args.out)
-        #mx = imtools.outlier_cutoff(bg)[cval]
-        #mx += 5 - (mx%5)
-        #plt.figure(1)
-        #d = math.ceil(math.sqrt(bg.shape[0]))
-        #for b in xrange(bg.shape[0]):
-        #    plt.subplot(d,d,b+1)
-        #    grid=plt.imshow(bg[b], cmap='plasma', interpolation='nearest', vmin=0, vmax=mx)
-        #    plt.colorbar()      
-        #plt.show()        
+        imshow.imshow(args.out)      
  
