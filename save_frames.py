@@ -26,7 +26,7 @@ def save_frames(vids, l1thresh=None):
         imname = fbase + '_f' + str(iframe) + '.jpg'
         imlist.append(imname)
         print "Writing to %s" % imname
-        cv2.imwrite(imname, frame, CV_IMWRITE_JPEG_QUALITY_100)
+        cv2.imwrite(imname, frame, params=CV_IMWRITE_JPEG_QUALITY_100)
         
         
       iframe += 1
