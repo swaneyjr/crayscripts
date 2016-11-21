@@ -80,7 +80,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=False, max_img=50):
             s_grid = np.median([max_grid, s_grid, frame], axis=0).astype(int)
             max_grid = np.amax([max_grid, s_grid, frame], axis=0).astype(int)
             if (iframe+1) % 10 == 0:
-                print " %d" % iframe+1
+                print " %d" % (iframe+1)
             iframe += 1
             ret, frame = cap.read()
             if iframe >= max_img: break
