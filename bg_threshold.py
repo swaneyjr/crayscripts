@@ -82,8 +82,8 @@ def find_bg(images, out, conv_len=5, bg_cutoff=False, max_img=50):
                 print " %d/%d" % (iframe+1,n_img_bg)
             iframe += 1
             ret, frame = cap.read()
-            s_grid = np.median([max_grid, s_grid, frame], axis=0)
-            max_grid = np.maximum(max_grid, s_grid, frame)
+            s_grid = np.median([max_grid, s_grid, frame], axis=0).astype(int)
+            max_grid = np.amax([max_grid, s_grid, frame], axis=0).astype(int)
             if iframe >= max_img: break
         cap.release()
         s_grid = s_grid.transpose(2,0,1)
