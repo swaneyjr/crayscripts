@@ -126,7 +126,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
         img_mode = 'L'
     else:
         img_mode = ''.join(bands)
-    s_img = Image.fromarray(max_grid.transpose(1,2,0).astype(np.uint8), mode=img_mode)
+    s_img = Image.fromarray(s_grid.transpose(1,2,0).astype(np.uint8), mode=img_mode)
 
     # save as png
     img_name = out
