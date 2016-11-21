@@ -31,6 +31,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
     # establish grid dimensions
     if imtools.is_video(images[0]):
         vid = True
+        print "Processing as video..."
         cap = VideoCapture(images[0])
         retval, frame = cap.read()
         bands = ['R','G','B']
@@ -110,13 +111,14 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
                 masked_grid[cval] = convolve2d(s_grid[cval], mask_kernel, mode='same', boundary='symm')
             s_grid = np.where(s_grid <= cutoff, s_grid, cutoff)
     
-    print "Applying convolution kernel..."
+    if conv_len:
+        print "Applying convolution kernel..."
 
-    kernel_side = 2*conv_len+1
-    s_kernel = np.repeat(1, kernel_side**2).reshape((kernel_side,kernel_side))/float(kernel_side)**2
-    convolved_grid = np.array([convolve2d(s_grid[cval], s_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)])
-    s_grid = np.maximum(s_grid, convolved_grid)
-    s_grid = np.ceil(s_grid+0.9).astype(int)
+        kernel_side = 2*conv_len+1
+        s_kernel = np.repeat(1, kernel_side**2).reshape((kernel_side,kernel_side))/float(kernel_side)**2
+        convolved_grid = np.array([convolve2d(s_grid[cval], s_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)])
+        s_grid = np.maximum(s_grid, convolved_grid)
+        s_grid = np.ceil(s_grid+0.9).astype(int)
 
     # resize
     s_grid = np.repeat(np.repeat(s_grid, sample_block, axis=1), sample_block, axis=2)
