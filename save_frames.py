@@ -39,6 +39,6 @@ if __name__ == '__main__':
   parser = ArgumentParser(description='Converts video to JPEG for frames above L1 threshold')
   parser.add_argument("--in", dest='infiles', nargs='+', help='Video(s) to convert')
   parser.add_argument("--l1thresh", type=int, help='L1 threshold for keeping frames')
-  parser.parse_args()
+  args = parser.parse_args()
   
   imlist = save_frames(args.infiles, args.l1thresh)
