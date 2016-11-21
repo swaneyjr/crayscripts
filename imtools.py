@@ -19,7 +19,7 @@ class ImGrid(np.ndarray):
     else:
       f = open(file_name)
     
-    if is_raw(file_name)
+    if is_raw(file_name):
       raw = rawpy.imread(f)
       imarray = np.array([raw.raw_image.copy()]).astype(int)
       bands = ['RAW']
