@@ -68,7 +68,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
     
     # find second largest ADC count of each pixel
     if vid:
-        cap = cv2.VideoCapture(images[0])
+        cap = VideoCapture(images[0])
         iframe = 0
         ret, frame = cap.read()
         while ret and cap.isOpened(): 
