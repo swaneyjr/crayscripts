@@ -147,7 +147,7 @@ if __name__ == '__main__':
     
     bg = find_bg(args.infiles, args.out, args.conv_len, args.bg_cutoff, args.max_img)
     if args.show:
-        mx = outlier_cutoff(bg)
+        mx = imtools.outlier_cutoff(bg)
         mx += 5 - (mx%5)
         plt.figure(1)
         d = math.ceil(math.sqrt(bg.shape[0]))
