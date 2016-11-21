@@ -13,9 +13,6 @@ def find_bg(images, out, conv_len=5, bg_cutoff=False, max_img=50):
 
     vid = False
     
-    if max_img and (len(images) > max_img):
-        images = images[:max_img]
-    
     def divisorGen(n):
         large_divisors = []
         for i in xrange(1, int(math.sqrt(n) + 1)):
@@ -44,6 +41,8 @@ def find_bg(images, out, conv_len=5, bg_cutoff=False, max_img=50):
         s_grid = np.zeros((h,w,n_bands), dtype=int)
         
     else:
+        if max_img and (len(images) > max_img):
+            images = images[:max_img]
         im_grid = imtools.ImGrid(images[0])
         w,h = im_grid.width, im_grid.height
         bands = im_grid.bands
