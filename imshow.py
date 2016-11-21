@@ -19,7 +19,7 @@ def plotchannel(imarray, cval, minus_bg=False, div_bg=False, colormap='plasma'):
     plt.imshow(imarray[cval], cmap=colormap, interpolation='nearest',vmin=0, vmax=mx)
     plt.colorbar()
     
-def imshow(img, minus_bg, div_bg, sample, cmap):
+def imshow(img, minus_bg=False, div_bg=False, sample=False, cmap='plasma'):
 
     imarray = imtools.ImGrid(img)
     sample_block = 4
