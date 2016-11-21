@@ -9,7 +9,7 @@ import imshow
 from cv2 import VideoCapture
 
 # uses an image to create a grid of background values
-def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
+def find_bg(images, out, conv_len=5, bg_cutoff=False, max_img=50):
 
     vid = False
     
