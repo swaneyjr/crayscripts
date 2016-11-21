@@ -84,7 +84,7 @@ def is_img(file):
   
 def is_video(file):
   vid_types = ['mp4']
-  for t in raw_types:
+  for t in vid_types:
     if is_type(file, t):
       return True
   return False
