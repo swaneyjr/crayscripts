@@ -76,7 +76,6 @@ def find_bg(images, out=None, conv_len=5, bg_cutoff=False, max_img=50):
         iframe = 0
         ret, frame = cap.read()
         while ret and cap.isOpened(): 
-            print "Max pixel = %d" % np.amax(frame)
             s_grid = np.median([max_grid, s_grid, frame], axis=0).astype(int)
             max_grid = np.amax([max_grid, s_grid, frame], axis=0).astype(int)
             if (iframe+1) % 10 == 0:
