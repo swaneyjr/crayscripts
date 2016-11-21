@@ -37,7 +37,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
         bands = ['R','G','B']
         h,w,n_bands = frame.shape
         if bg_cutoff:
-            cutoff = imtools.outlier_cutoff(frame.transpose(2,0,1))
+            cutoff = imtools.outlier_cutoff(frame.transpose(2,0,1), 2)
         cap.release()
     else:
         im_grid = imtools.ImGrid(images[0])
@@ -45,7 +45,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
         bands = im_grid.bands
         n_bands = im_grid.n_bands
         if bg_cutoff:
-            cutoff = imtools.outlier_cutoff(im_grid)
+            cutoff = imtools.outlier_cutoff(im_grid, 2)
     
     max_grid = np.zeros((n_bands,h,w), dtype=int)
     s_grid = np.zeros((n_bands,h,w), dtype=int)
