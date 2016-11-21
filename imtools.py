@@ -93,8 +93,8 @@ def is_video(file):
 def outlier_cutoff(imarray):
     n_bands = imarray.shape[0]
     cutoff_vals = np.zeros(n_bands)
-    median_vals = np.median(np.median(imarray, axis=1), axis=1)
-    empty_vals = [np.argwhere(np.bincount(imarray[cval,0])==0) for cval in xrange(n_bands)]
+    median_vals = np.mean(np.median(imarray, axis=1), axis=1)
+    empty_vals = [np.argwhere(np.bincount(imarray[cval].flatten())<imarray.size/10000) for cval in xrange(n_bands)]
     for cval,vals in enumerate(empty_vals):
         above_median = vals[vals>median_vals[cval]]
         if len(above_median)>0:
