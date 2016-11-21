@@ -37,7 +37,7 @@ def save_frames(vids, l1thresh=None):
 if __name__ == '__main__':
   from argparse import ArgumentParser
   parser = ArgumentParser(description='Converts video to JPEG for frames above L1 threshold')
-  parser.add_argument("--in", dest=infiles, n_args='+', help='Video(s) to convert')
+  parser.add_argument("--in", dest='infiles', n_args='+', help='Video(s) to convert')
   parser.add_argument("--l1thresh", type=int, help='L1 threshold for keeping frames')
   parser.parse_args()
   
