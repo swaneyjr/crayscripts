@@ -5,6 +5,7 @@ from fractions import gcd
 from PIL import Image
 from scipy.signal import convolve2d
 import imtools
+import imshow
 from cv2 import VideoCapture
 
 # uses an image to create a grid of background values
@@ -147,13 +148,14 @@ if __name__ == '__main__':
     
     bg = find_bg(args.infiles, args.out, args.conv_len, args.bg_cutoff, args.max_img)
     if args.show:
-        mx = imtools.outlier_cutoff(bg)
-        mx += 5 - (mx%5)
-        plt.figure(1)
-        d = math.ceil(math.sqrt(bg.shape[0]))
-        for b in xrange(bg.shape[0]):
-            plt.subplot(d,d,b+1)
-            grid=plt.imshow(bg[b], cmap='plasma', interpolation='nearest', vmin=0, vmax=mx)
-            plt.colorbar()      
-        plt.show()        
+        imshow.imshow(args.out)
+        #mx = imtools.outlier_cutoff(bg)[cval]
+        #mx += 5 - (mx%5)
+        #plt.figure(1)
+        #d = math.ceil(math.sqrt(bg.shape[0]))
+        #for b in xrange(bg.shape[0]):
+        #    plt.subplot(d,d,b+1)
+        #    grid=plt.imshow(bg[b], cmap='plasma', interpolation='nearest', vmin=0, vmax=mx)
+        #    plt.colorbar()      
+        #plt.show()        
  
