@@ -11,7 +11,7 @@ def save_frames(vids, l1thresh=None):
   for fname in vids:
     
     if autothresh:
-      l1thresh = np.amax(outlier_cutoff(find_bg(fname)))
+      l1thresh = np.amax(outlier_cutoff(find_bg(fname)),1)
   
     fbase = fname.split('.')[0]
     cap = cv2.VideoCapture(fname)
