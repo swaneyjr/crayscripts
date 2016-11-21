@@ -8,7 +8,7 @@ def save_frames(vids, l1thresh=None):
   imlist = []
   autothresh = (l1thresh == None)
   
-  for fname in infiles:
+  for fname in vids:
     
     if autothresh:
       l1thresh = np.amax(outlier_cutoff(find_bg(fname)))
