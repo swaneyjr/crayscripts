@@ -68,8 +68,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=False, max_img=50):
     print
     print "Calibrating S thresholds..."
     print "Processing levels..." 
-    print " 0/%d" % n_img_bg
-
+    
     
     # find second largest ADC count of each pixel
     if vid:
@@ -87,6 +86,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=False, max_img=50):
         cap.release()
         s_grid = s_grid.transpose(2,0,1)
     else:
+        print " 0/%d" % n_img_bg
         for i,im in enumerate(images):
             if (i+1) % 10 == 0:
                 print " %d/%d" % (i+1,n_img_bg)
