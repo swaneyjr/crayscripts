@@ -24,7 +24,6 @@ def save_frames(vids, l1thresh=None):
     
       if np.amax(frame) >= l1thresh:
         imname = fbase + '_f' + str(iframe) + '.jpg'
-        imlist.append(imname)
         print "Writing to %s" % imname
         cv2.imwrite(imname, frame, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
         
@@ -32,8 +31,6 @@ def save_frames(vids, l1thresh=None):
       iframe += 1
       ret, frame = cap.read()
     cap.release()
-      
-  return imlist
         
     
 
@@ -44,4 +41,4 @@ if __name__ == '__main__':
   parser.add_argument("--l1thresh", type=int, help='L1 threshold for keeping frames')
   args = parser.parse_args()
   
-  imlist = save_frames(args.infiles, args.l1thresh)
+  save_frames(args.infiles, args.l1thresh)
