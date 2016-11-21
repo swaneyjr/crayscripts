@@ -39,6 +39,10 @@ def find_bg(images, out, conv_len=5, bg_cutoff=False, max_img=50):
         if bg_cutoff:
             cutoff = imtools.outlier_cutoff(frame.transpose(2,0,1), 2)
         cap.release()
+        
+        max_grid = np.zeros((h,w,n_bands), dtype=int)
+        s_grid = np.zeros((h,w,n_bands), dtype=int)
+        
     else:
         im_grid = imtools.ImGrid(images[0])
         w,h = im_grid.width, im_grid.height
@@ -46,9 +50,9 @@ def find_bg(images, out, conv_len=5, bg_cutoff=False, max_img=50):
         n_bands = im_grid.n_bands
         if bg_cutoff:
             cutoff = imtools.outlier_cutoff(im_grid, 2)
-    
-    max_grid = np.zeros((n_bands,h,w), dtype=int)
-    s_grid = np.zeros((n_bands,h,w), dtype=int)
+ 
+        max_grid = np.zeros((n_bands,h,w), dtype=int)
+        s_grid = np.zeros((n_bands,h,w), dtype=int)
     
 
     # determine sampling resolution
