@@ -12,7 +12,7 @@ def find_bg(images, out, conv_len=5, bg_cutoff=True, max_img=None):
 
     vid = False
     
-    if max_img and len_images > max_img:
+    if max_img and (len(images) > max_img):
         images = images[:max_img]
     
     def divisorGen(n):
