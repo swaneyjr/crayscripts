@@ -14,7 +14,7 @@ def plotchannel(imarray, cval, minus_bg=False, div_bg=False, colormap='plasma'):
     elif div_bg:
         mx = 5
     else:
-        mx = np.amax(imtools.outlier_cutoff(imarray))
+        mx = imtools.outlier_cutoff(imarray)[cval]
         mx += 5 - (mx%5)
     plt.imshow(imarray[cval], cmap=colormap, interpolation='nearest',vmin=0, vmax=mx)
     plt.colorbar()
