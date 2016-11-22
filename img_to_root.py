@@ -200,8 +200,8 @@ if __name__ == '__main__':
     soption.add_argument("--smanual", help='Manually add a threshold function. Input is an image of the same mode as those processed.')
 
     parser.add_argument("--max_img", type=int, help='Maximum number of images to convert')
-    parser.add_argument("--rawcam_format", type=int, help='Creates branches from image name: name_t_(bname val)_(bname val)...')
-    parser.add_argument("--show", action='store_true', help='Generate graphs of background thresholds and saved pixels')
+    parser.add_argument('-r', "--rawcam_format", action='store_true', help='Creates branches from image name: name_t_(bname val)_(bname val)...')
+    parser.add_argument('-s', "--show", action='store_true', help='Generate graphs of background thresholds and saved pixels')
     
     args = parser.parse_args()
 
