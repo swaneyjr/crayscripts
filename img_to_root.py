@@ -198,7 +198,7 @@ if __name__ == '__main__':
     if args.show:
         
         print "Drawing saved pixels..."
-        im = imtools.ImGrid(infiles[0])
+        im = imtools.ImGrid(args.infiles[0])
         c1 = r.TCanvas('c1','Saved Pixels',300,250*im.n_bands)
         c1.Divide(1,im.n_bands,0,0)
         for cval,c in enumerate(im.bands):
