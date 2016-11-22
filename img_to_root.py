@@ -162,7 +162,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
                 if len(im_split) > 2:
                     for i,b in enumerate(im_split[2:]):
                         brancharray[i][0] = int(b[1:])
-                        t.SetBranchAddress(b, brancharray[i])
+                        t.SetBranchAddress(b[0], brancharray[i])
             
             pix_n[0] = t.pix_x.size()
             print "%s: pix_n = %d" % (c, pix_n[0])
