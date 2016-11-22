@@ -71,7 +71,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
         if len(im_split) > 2:
             brancharray = np.zeros((len(im_split)-2,0)).astype(int)
             for i,b in enumerate(im_split[2:]):
-                t.Branch(b[0], brancharray[b], b[0]+'/i')
+                t.Branch(b[0], brancharray[i], b[0]+'/i')
         
 
     vbranch(t, 'pix_x', btype=int)
