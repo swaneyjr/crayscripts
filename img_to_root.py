@@ -27,7 +27,7 @@ def set_thresh(imarray, thresh):
 
     return thresh_array
 
-def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, sauto=True, smanual=False, max_img=0):
+def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, sauto=True, smanual=False, max_img=0, rawcam_format=False):
  
     avg3_kernel = np.array([[1,1,1],[1,0,1],[1,1,1]])/8.0
     avg5_kernel = np.array([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]])/16.0
@@ -62,7 +62,17 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
     t.Branch('n_img', n_img, 'n_img/i')
     t.Branch('pix_n', pix_n, 'pix_n/i')
     t.Branch('col', color, 'col/C')
-    t.Branch('name', name, 'name/C')   
+    t.Branch('name', name, 'name/C') 
+    
+    if rawcam_format:
+        time = np.array([0],dtype=int)
+        t.Branch('t', time, 't/i')
+        im_split = (infiles.split('.')[0]).split('_')
+        if len(im_split) > 2:
+            brancharray = np.zeros((len(im_split)-2,0)).astype(int)
+            for i,b in enumerate(im_split[2:]):
+                t.Branch(b[0], brancharray[b], b[0]+'/i')
+        
 
     vbranch(t, 'pix_x', btype=int)
     vbranch(t, 'pix_y', btype=int)
@@ -70,6 +80,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
     vbranch(t, 'pix_avg3', btype=float)
     vbranch(t, 'pix_avg5', btype=float)
     vbranch(t, 'l2s', btype=int)
+    
 
 
     # fill TTree
@@ -81,7 +92,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
         print "File %d/%d:" % (i+1,len(infiles))
 
         imarray = imtools.ImGrid(im_name)
-        im_split = im_name.split('.')
+        im_base = im_name.split('.')
 
         # set L2 threshold
         if l2auto:
@@ -116,7 +127,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
 
         # enforce L1S
         if np.count_nonzero(imarray>=s_grid+l1diff.reshape(3,1,1)) == 0: continue
-        if im_split[0] != prev_name:
+        if im_base[0] != prev_name:
             n_img[0] += 1
 
         avg3_array = [convolve2d(imarray[cval], avg3_kernel, mode='same', boundary='symm') for cval in xrange(imarray.n_bands)]
@@ -141,9 +152,17 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
                 t.l2s.push_back(s_grid[cval][y,x]+l2diff[cval])
             
             color = np.array(c+'\0')
-            name = np.array(im_split[0]+'\0')
+            name = np.array(im_base[0]+'\0')
             t.SetBranchAddress('col', color)
             t.SetBranchAddress('name', name)
+            
+            if rawcam_format:
+                im_split = im_base[0].split('_')
+                time[0] = int(im_split[1])
+                if len(im_split) > 2:
+                    for i,b in enumerate(im_split[2:]):
+                        brancharray[i][0] = int(b[1:])
+                        t.SetBranchAddress(b, brancharray[i])
             
             pix_n[0] = t.pix_x.size()
             print "%s: pix_n = %d" % (c, pix_n[0])
@@ -152,7 +171,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
             t.Fill()
         
         total_pix += imarray.size
-        prev_name = im_split[0]
+        prev_name = im_base[0]
         if max_img and n_img >= max_img: break
 
     print "Done!"
@@ -181,6 +200,7 @@ if __name__ == '__main__':
     soption.add_argument("--smanual", help='Manually add a threshold function. Input is an image of the same mode as those processed.')
 
     parser.add_argument("--max_img", type=int, help='Maximum number of images to convert')
+    parser.add_argument("--rawcam_format", type=int, help='Creates branches from image name: name_t_(bname val)_(bname val)...')
     parser.add_argument("--show", action='store_true', help='Generate graphs of background thresholds and saved pixels')
     
     args = parser.parse_args()
@@ -188,7 +208,8 @@ if __name__ == '__main__':
     outfile = r.TFile(args.out, "recreate")        
         
     ti = time.clock()
-    t = convert_to_root(args.infiles, args.out, args.l1, args.l2auto, args.l2manual, args.l2plus, args.sauto, args.smanual, args.max_img)
+    t = convert_to_root(args.infiles, args.out, args.l1, args.l2auto, args.l2manual, args.l2plus, args.sauto, args.smanual, \
+                        args.max_img, args.rawcam_format)
 
     tf = time.clock()
       
