@@ -41,7 +41,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
     if sauto:
         s_grid = find_bg(infiles[:n_images_auto], out.split('.')[0]+"_bg.png")
     elif smanual:
-        s_grid = np.array(Image.open(smanual)).astype(int)
+        s_grid = np.array(Image.open(smanual)).astype(int).transpose(2,0,1)
     else:
         s_grid = 0*imtools.ImGrid(infiles[0])
         
