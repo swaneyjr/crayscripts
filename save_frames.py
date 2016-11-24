@@ -13,6 +13,8 @@ def save_frames(vids, l1thresh=None):
   
   if l1thresh == None:
    
+    print "Calculating video stats..."
+    
     adc_array = np.zeros(256, dtype=int)
     
     for fname in vids:
@@ -29,6 +31,7 @@ def save_frames(vids, l1thresh=None):
     ax.set_xlabel('ADC count')
     ax.set_ylabel('Frequency')
     ax.set_title('Max ADC count by frame')
+    plt.show()
     
     l1thresh = int(raw_input('L1 Threshold: '))
   
