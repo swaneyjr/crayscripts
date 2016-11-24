@@ -2,19 +2,39 @@ import cv2
 import numpy as np
 from bg_threshold import find_bg
 from imtools import outlier_cutoff
+import matplotlib
+import matplotlib.pyplot as plt
+
+matplotlib.use('tkagg')
 
 def save_frames(vids, l1thresh=None):
  
   imlist = []
-  autothresh = (l1thresh == None)
+  
+  if l1thresh == None:
+   
+    adc_array = np.zeros(256, dtype=int)
+    
+    for fname in vids:
+      cap = cv2.VideoCapture(fname)
+      ret, frame = cap.read()
+      while ret and cap.isOpened():
+        adc_array[np.amax(frame)] += 1
+        ret, frame = cap.read()
+      cap.release()
+        
+    figure = plt.figure()
+    ax = figure.add_subplot(111)
+    plt.hist(np.arange(256), weights=adc_array, bins=256)
+    ax.set_xlabel('ADC count')
+    ax.set_ylabel('Frequency')
+    ax.set_title('Max ADC count by frame')
+    
+    l1thresh = int(raw_input('L1 Threshold: '))
   
   for fname in vids:
     print fname
-    
-    if autothresh:
-      l1thresh = np.amax(find_bg([fname]))
-      print "L1 Threshold: %d" % l1thresh
-  
+      
     fbase = fname.split('.')[0]
     cap = cv2.VideoCapture(fname)
     iframe = 0
