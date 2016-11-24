@@ -16,13 +16,21 @@ def save_frames(vids, l1thresh=None):
     print "Calculating video stats..."
     
     adc_array = np.zeros(256, dtype=int)
+    iframe = 0
+    
+    print "Frames processed:"
+    print " 0"
     
     for fname in vids:
       cap = cv2.VideoCapture(fname)
       ret, frame = cap.read()
+      iframe += 1
       while ret and cap.isOpened():
         adc_array[np.amax(frame)] += 1
         ret, frame = cap.read()
+        iframe += 1
+        if iframe % 1000 == 0:
+          print " %d" % iframe 
       cap.release()
         
     figure = plt.figure()
