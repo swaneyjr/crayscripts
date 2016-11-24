@@ -17,6 +17,7 @@ def save_frames(vids, l1thresh=None):
     
     adc_array = np.zeros(256, dtype=int)
     iframe = 0
+    max_frame = 25000
     
     print "Frames processed:"
     print " 0"
@@ -25,7 +26,7 @@ def save_frames(vids, l1thresh=None):
       cap = cv2.VideoCapture(fname)
       ret, frame = cap.read()
       iframe += 1
-      while ret and cap.isOpened():
+      while ret and cap.isOpened() and iframe <= max_frame:
         adc_array[np.amax(frame)] += 1
         ret, frame = cap.read()
         iframe += 1
@@ -39,6 +40,7 @@ def save_frames(vids, l1thresh=None):
     ax.set_xlabel('ADC count')
     ax.set_ylabel('Frequency')
     ax.set_title('Max ADC count by frame')
+    ax.set_xlim(0, np.amax(adc_array.nonzero()[0])+1)
     plt.show()
     
     l1thresh = int(raw_input('L1 Threshold: '))
