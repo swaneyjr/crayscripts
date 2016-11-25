@@ -116,7 +116,7 @@ def find_bg(images, out=None, conv_len=5, bg_cutoff=False, max_img=50):
                 masked_grid[cval] = convolve2d(s_grid[cval], mask_kernel, mode='same', boundary='symm')
             s_grid = np.where(s_grid <= cutoff, s_grid, cutoff)
             n_iter += 1
-            print "Iter%d: %d" % np.amax(s_grid)
+            print "Iter%d: %d" % (n_iter, np.amax(s_grid))
     
     if conv_len:
         print "Applying convolution kernel..."
