@@ -28,10 +28,13 @@ class ImGrid(np.ndarray):
     # PIL
     elif is_img(file_name):
       with Image.open(f) as im:
-        imarray = np.array(im).astype(int).transpose(2,0,1)
         bands = list(im.mode)
-        if len(bands) == 1:
+        imarray = np.array(im).astype(int)
+        if len(bands) > 1:
+          imarray = imarray.transpose(2,0,1)
+        else:
           imarray = np.array([imarray])
+        
           
     f.close()
     
