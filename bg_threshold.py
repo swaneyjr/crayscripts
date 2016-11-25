@@ -128,10 +128,11 @@ def find_bg(images, out=None, conv_len=5, bg_cutoff=False, max_img=50):
     
     if out:
         if n_bands == 1:
-            img_mode = 'L'
+            s_img = Image.fromarray(s_grid[0].astype(np.uint8), mode='L')
+            
         else:
             img_mode = ''.join(bands)
-        s_img = Image.fromarray(s_grid.transpose(1,2,0).astype(np.uint8), mode=img_mode)
+            s_img = Image.fromarray(s_grid.transpose(1,2,0).astype(np.uint8), mode=img_mode)
 
         # save as png
         print "Saving background as %s" % out
