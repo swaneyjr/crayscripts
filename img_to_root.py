@@ -56,19 +56,19 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
 
     n_img = np.array([0], dtype=int)
     pix_n = np.array([0], dtype=int)
-    bg_lvl = np.array([0], dtype=int)
+    bg_lvl = np.array([0], dtype=float)
     name = np.array('', dtype=str)
     color = np.array('', dtype=str)
    
     t.Branch('n_img', n_img, 'n_img/i')
     t.Branch('pix_n', pix_n, 'pix_n/i')
-    t.Branch('bg_lvl', bg_lvl, 'bg_lvl/i')
+    t.Branch('bg_lvl', bg_lvl, 'bg_lvl/D')
     t.Branch('col', color, 'col/C')
     t.Branch('name', name, 'name/C') 
     
     if rawcam_format:
-        time = np.array([0],dtype=int)
-        t.Branch('t', time, 't/i')
+        time = np.array([0], dtype=int)
+        t.Branch('t', time, 't/L')
         im_split = (infiles[0].split('.')[0]).split('_')
         if len(im_split) > 2:
             brancharray = np.zeros((len(im_split)-2,1)).astype(int)
