@@ -162,7 +162,7 @@ if __name__ == "__main__":
     outfile = r.TFile(args.out, "recreate")
 
     print "Filtering pixels..."
-    t1 = clean_pix(t0, args.thresh, args.source_mask, bad_regions=args.bad_region, drop_source=args.drop_source, l2thresh=args.L2)
+    t1 = clean_pix(t0, args.thresh, args.source_mask, bad_regions=args.bad_region, drop_source=args.drop_source, l2thresh=args.L2, res=args.res)
     outfile.Write()
     outfile.Close()
     print "Done! Wrote to %s." % args.out
