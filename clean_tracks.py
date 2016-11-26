@@ -35,6 +35,33 @@ def find_endpoints(pixels):
     return start,end
     
 
+def cluster(block, iso_thresh):
+    
+    def d(p1,p2):
+        return math.sqrt((p1.x-p2.x)**2 + (p1.y-p2.y)**2)
+    
+    clusters = []
+    while block != []:
+        p = block.pop()
+        match = None
+        for cl in clusters:
+            for pcl in cl:
+                if d(p,pcl) < iso_thresh:
+                    if match:
+                        clusters.remove(match)
+                        cl += match
+                        match = cl
+                        break
+                    else:
+                        cl.append(p)
+                        match = cl
+                        break
+        if match == None:
+            clusters.append([p])
+                               
+    return clusters
+    
+    
 # returns a list of tracks separated by > iso_thresh and whose pixels are
 # within iso_thresh of each other
 def extract_tracks(pixels, min_pix_tr, iso_thresh):
@@ -59,7 +86,7 @@ def extract_tracks(pixels, min_pix_tr, iso_thresh):
     if len(x_track) >= min_pix_tr:
         x_track_list.append(x_track)
 
-    tracks = []
+    xy_track_list = []
     # further separate each set of tracks by y
     for x_track in x_track_list:
         x_track = sorted(x_track, key=itemgetter(1))
@@ -71,12 +98,18 @@ def extract_tracks(pixels, min_pix_tr, iso_thresh):
                 y_track.append(p)
             else:
                 if len(y_track) >= min_pix_tr:
-                    tracks.append(y_track)
+                    xy_track_list.append(y_track)
                 y_track = [p]
         if len(y_track) >= min_pix_tr:
-            tracks.append(y_track)
+            xy_track_list.append(y_track)
+   
+    tracks = []
+    for block in xy_track_list:
+        if len(block) < 3:
+            tracks.append(block)
+        else:
+            tracks += cluster(block, iso_thresh)
         
-    
     return tracks
     
     
