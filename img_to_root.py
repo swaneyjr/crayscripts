@@ -56,11 +56,13 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
 
     n_img = np.array([0], dtype=int)
     pix_n = np.array([0], dtype=int)
+    bg_lvl = np.array([0], dtype=int)
     name = np.array('', dtype=str)
     color = np.array('', dtype=str)
    
     t.Branch('n_img', n_img, 'n_img/i')
     t.Branch('pix_n', pix_n, 'pix_n/i')
+    t.Branch('bg_lvl', bg_lvl, 'bg_lvl/i')
     t.Branch('col', color, 'col/C')
     t.Branch('name', name, 'name/C') 
     
@@ -165,6 +167,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
                         t.SetBranchAddress(b[0], brancharray[i])
             
             pix_n[0] = t.pix_x.size()
+            bg_lvl[0] = np.mean(imarray[cval])
             print "%s: pix_n = %d" % (c, pix_n[0])
             saved_pix += pix_n[0]
             
