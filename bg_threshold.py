@@ -96,7 +96,7 @@ def find_bg(images, out=None, conv_len=5, bg_cutoff=False, max_img=50):
 
     print "Downsampling image..."
 
-    s_grid = np.amax([s_grid[:,x::sample_block,y::sample_block] for x,y in np.ndindex(sample_block,sample_block)], axis=0)
+    s_grid = np.median([s_grid[:,x::sample_block,y::sample_block] for x,y in np.ndindex(sample_block,sample_block)], axis=0)
     
     # remove hot pixels and tracks
     if bg_cutoff:
