@@ -218,7 +218,8 @@ def clean_tracks(t0, min_pix_tr, iso_thresh, fit):
 
         # read pixels from TTree
         if cleaned:
-            raw_pixels = list(starmap(Clean_Pixel, izip(evt.pix_x, evt.pix_y, evt.pix_val, evt.pix_avg3, evt.pix_avg5, evt.pix_freq, evt.pix_masked)))
+            raw_pixels = list(starmap(Clean_Pixel, izip(evt.pix_x, evt.pix_y, evt.pix_val, evt.pix_avg3, evt.pix_avg5, \
+                                                        evt.pix_freq, evt.pix_masked)))
         else:    
             raw_pixels = list(starmap(Pixel, izip(evt.pix_x, evt.pix_y, evt.pix_val, evt.pix_avg3, evt.pix_avg5)))
         total_pix += len(raw_pixels)
@@ -260,8 +261,8 @@ def clean_tracks(t0, min_pix_tr, iso_thresh, fit):
                 t2.pix_avg3.push_back(p.avg3)
                 t2.pix_avg5.push_back(p.avg5)
                 if cleaned:
-                    t2.pix_freq.push_back(p.pix_freq)
-                    t2.pix_freq.push_back(p.pix_masked)
+                    t2.pix_freq.push_back(p.freq)
+                    t2.pix_freq.push_back(p.masked)
 
                 if fit:
                     t2.sigma.push_back((p.x*math.sin(hough_theta[0])-p.y*math.cos(hough_theta[0])-sig_min)/(sig_max-sig_min))
