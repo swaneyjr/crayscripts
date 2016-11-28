@@ -65,7 +65,7 @@ def cluster(block, iso_thresh):
     
 # returns a list of tracks separated by > iso_thresh and whose pixels are
 # within iso_thresh of each other
-def extract_tracks(pixels, min_pix_tr, iso_thresh, sel):
+def extract_tracks(pixels, min_pix_tr, iso_thresh):
 
     if len(pixels) == 1 and min_pix_tr <= 1:
         return [pixels]
@@ -171,7 +171,7 @@ def find_hough_theta(pixels):
     
     return theta, rho_std, rho, sig_min, sig_max, curv_ratio
 
-def clean_tracks(t0, min_pix_tr, iso_thresh, fit):
+def clean_tracks(t0, min_pix_tr=2, iso_thresh=3, fit=False, sel=None):
     saved_pix = total_pix = 0
     total_events = t0.GetEntries()
 
