@@ -65,7 +65,7 @@ def cluster(block, iso_thresh):
     
 # returns a list of tracks separated by > iso_thresh and whose pixels are
 # within iso_thresh of each other
-def extract_tracks(pixels, min_pix_tr, iso_thresh):
+def extract_tracks(pixels, min_pix_tr, iso_thresh, sel):
 
     if len(pixels) == 1 and min_pix_tr <= 1:
         return [pixels]
@@ -176,7 +176,11 @@ def clean_tracks(t0, min_pix_tr, iso_thresh, fit):
     total_events = t0.GetEntries()
 
     print "Starting CopyTree..."
-    t1 = t0.CopyTree("pix_n >= " + str(min_pix_tr))
+    if sel:
+        sel += " && pix_n >= " + str(min_pix_tr)
+    else:
+        sel = "pix_n >= " + str(min_pix_tr)
+    t1 = t0.CopyTree(sel)
     t1_events = t1.GetEntries()
     print "Pixels over min_pix_tr: %d/%d %.0f%%" % (t1_events, total_events, 100.*t1_events/total_events)
     print "Starting CloneTree..."
@@ -298,6 +302,7 @@ if __name__ == '__main__':
     parser.add_argument("--min", type=int, default=2, help='Minimum pix_tr to be kept')
     parser.add_argument("--iso", type=int, default=5, help='Distance above which a pixel is classified as isolated')
     parser.add_argument("--fit", action='store_true', help='Compute linear fit parameters')
+    parser.add_argument("--sel", help='Selection to be applied to input tree')
     args = parser.parse_args()
 
     t0 = r.TChain("events")
@@ -306,7 +311,7 @@ if __name__ == '__main__':
     outfile = r.TFile(args.out, "recreate")
 
     print "Cleaning tracks..."
-    t1 = clean_tracks(t0, min_pix_tr=args.min, iso_thresh=args.iso, fit=args.fit)
+    t1 = clean_tracks(t0, min_pix_tr=args.min, iso_thresh=args.iso, fit=args.fit, sel=args.sel)
     outfile.Write()
     outfile.Close()
     print "Done! Wrote to %s." % args.out
