@@ -9,6 +9,7 @@ import cmath
 from hotcell import vbranch
 
 Pixel = namedtuple('Pixel',['x','y','val','avg3','avg5'])
+Clean_Pixel = namedtuple('Clean_Pixel',['x','y','val','avg3','avg5','freq','masked'])
 
 # finds the furthest two pixels in a list of pixels (or one such pair)
 def find_endpoints(pixels):
@@ -180,6 +181,8 @@ def clean_tracks(t0, min_pix_tr, iso_thresh, fit):
     print "Pixels over min_pix_tr: %d/%d %.0f%%" % (t1_events, total_events, 100.*t1_events/total_events)
     print "Starting CloneTree..."
     t2 = t0.CloneTree(0)
+    
+    cleaned = 'pix_freq' in t2.GetListOfBranches()
              
     # add branches
 
@@ -214,7 +217,10 @@ def clean_tracks(t0, min_pix_tr, iso_thresh, fit):
             print "%d/%d  %.1f%%" % (ievt, t1_events, 100.*ievt/t1_events)
 
         # read pixels from TTree
-        raw_pixels = list(starmap(Pixel, izip(evt.pix_x, evt.pix_y, evt.pix_val, evt.pix_avg3, evt.pix_avg5)))
+        if cleaned:
+            raw_pixels = list(starmap(Clean_Pixel, izip(evt.pix_x, evt.pix_y, evt.pix_val, evt.pix_avg3, evt.pix_avg5, evt.pix_freq, evt.pix_masked)))
+        else:    
+            raw_pixels = list(starmap(Pixel, izip(evt.pix_x, evt.pix_y, evt.pix_val, evt.pix_avg3, evt.pix_avg5)))
         total_pix += len(raw_pixels)
         tracks = extract_tracks(raw_pixels, min_pix_tr, iso_thresh)
 
@@ -253,6 +259,9 @@ def clean_tracks(t0, min_pix_tr, iso_thresh, fit):
                 t2.pix_val.push_back(p.val)
                 t2.pix_avg3.push_back(p.avg3)
                 t2.pix_avg5.push_back(p.avg5)
+                if cleaned:
+                    t2.pix_freq.push_back(p.pix_freq)
+                    t2.pix_freq.push_back(p.pix_masked)
 
                 if fit:
                     t2.sigma.push_back((p.x*math.sin(hough_theta[0])-p.y*math.cos(hough_theta[0])-sig_min)/(sig_max-sig_min))
