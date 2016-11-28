@@ -65,7 +65,7 @@ def cluster(block, iso_thresh):
     
 # returns a list of tracks separated by > iso_thresh and whose pixels are
 # within iso_thresh of each other
-def extract_tracks(pixels, min_pix_tr, iso_thresh):
+def extract_tracks(pixels, min_pix_tr, iso_thresh, use_cluster=False):
 
     if len(pixels) == 1 and min_pix_tr <= 1:
         return [pixels]
@@ -106,7 +106,7 @@ def extract_tracks(pixels, min_pix_tr, iso_thresh):
    
     tracks = []
     for block in xy_track_list:
-        if len(block) < 3:
+        if len(block) < 3 or not use_cluster:
             tracks.append(block)
         else:
             tracks += cluster(block, iso_thresh)
@@ -171,7 +171,7 @@ def find_hough_theta(pixels):
     
     return theta, rho_std, rho, sig_min, sig_max, curv_ratio
 
-def clean_tracks(t0, min_pix_tr=2, iso_thresh=3, fit=False, sel=None):
+def clean_tracks(t0, min_pix_tr=2, iso_thresh=3, fit=False, sel=None, cluster=False):
     saved_pix = total_pix = 0
     total_events = t0.GetEntries()
 
@@ -227,7 +227,7 @@ def clean_tracks(t0, min_pix_tr=2, iso_thresh=3, fit=False, sel=None):
         else:    
             raw_pixels = list(starmap(Pixel, izip(evt.pix_x, evt.pix_y, evt.pix_val, evt.pix_avg3, evt.pix_avg5)))
         total_pix += len(raw_pixels)
-        tracks = extract_tracks(raw_pixels, min_pix_tr, iso_thresh)
+        tracks = extract_tracks(raw_pixels, min_pix_tr, iso_thresh, use_cluster=cluster)
 
         
         for cleaned_pixels in tracks:
@@ -301,7 +301,8 @@ if __name__ == '__main__':
     parser.add_argument("--out", default='tracks.root', help='Output file name')
     parser.add_argument("--min", type=int, default=2, help='Minimum pix_tr to be kept')
     parser.add_argument("--iso", type=int, default=5, help='Distance above which a pixel is classified as isolated')
-    parser.add_argument("--fit", action='store_true', help='Compute linear fit parameters')
+    parser.add_argument('-f', "--fit", action='store_true', help='Compute linear fit parameters')
+    parser.add_argument('-c', "--cluster", action='store_true', help='Use more advanced clustering algorithm')
     parser.add_argument("--sel", help='Selection to be applied to input tree')
     args = parser.parse_args()
 
@@ -311,7 +312,7 @@ if __name__ == '__main__':
     outfile = r.TFile(args.out, "recreate")
 
     print "Cleaning tracks..."
-    t1 = clean_tracks(t0, min_pix_tr=args.min, iso_thresh=args.iso, fit=args.fit, sel=args.sel)
+    t1 = clean_tracks(t0, min_pix_tr=args.min, iso_thresh=args.iso, fit=args.fit, sel=args.sel, cluster=args.cluster)
     outfile.Write()
     outfile.Close()
     print "Done! Wrote to %s." % args.out
