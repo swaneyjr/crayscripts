@@ -248,8 +248,6 @@ def clean_tracks(t0, min_pix_tr=2, iso_thresh=3, fit=False, sel=None, cluster=Fa
                 t2.d_rho.clear()
                 
             max_val[0] = 0
-            max_x[0] = None
-            max_y[0] = None
             n_max = 1
 
             # find new variables of interest
