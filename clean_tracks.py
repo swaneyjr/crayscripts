@@ -246,7 +246,11 @@ def clean_tracks(t0, min_pix_tr=2, iso_thresh=3, fit=False, sel=None, cluster=Fa
             if fit:
                 t2.sigma.clear()
                 t2.d_rho.clear()
-
+                
+            max_val[0] = 0
+            max_x[0] = None
+            max_y[0] = None
+            n_max = 1
 
             # find new variables of interest
             if fit:
@@ -277,14 +281,24 @@ def clean_tracks(t0, min_pix_tr=2, iso_thresh=3, fit=False, sel=None, cluster=Fa
                 
 
                 if p.val > max_val[0]:
+                    # replace with new maximum and reset counter
                     max_val[0] = p.val
-                    max_x = p.x
-                    max_y = p.y
+                    max_x[0] = p.x
+                    max_y[0] = p.y
+                    n_max = 1
                     
+                elif p.val == max_val[0]:
+                    # average xy of maximum points
+                    max_x[0] += p.x
+                    max_y[0] += p.y
+                    n_max += 1
 
-            pix_tr[0] = t2.pix_x.size()
             
+            pix_tr[0] = t2.pix_x.size()
             saved_pix += t2.pix_x.size()
+            
+            max_x[0] /= n_max
+            max_y[0] /= n_max
 
             t2.Fill()
 
