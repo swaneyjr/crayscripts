@@ -194,6 +194,8 @@ def clean_tracks(t0, min_pix_tr=2, iso_thresh=3, fit=False, sel=None, cluster=Fa
     pix_tr = np.array([0], dtype=int)
     
     max_val = np.array([0], dtype=int)
+    max_x = np.array([0], dtype=int)
+    max_y = np.array([0], dtype=int)
     tr_len = np.array([0], dtype=float)
     discr_len = np.array([0], dtype=int)
     tr_eff = np.array([0], dtype=float)
@@ -203,6 +205,8 @@ def clean_tracks(t0, min_pix_tr=2, iso_thresh=3, fit=False, sel=None, cluster=Fa
         curv_ratio = np.array([0], dtype=float)
 
     t2.Branch('max_val', max_val, 'max_val/i')
+    t2.Branch('max_x', max_x, 'max_x/i')
+    t2.Branch('max_y', max_y, 'max_y/i')
     t2.Branch('tr_len', tr_len, 'tr_len/d')
     t2.Branch('discr_len', discr_len, 'discr_len/i')
     t2.Branch('tr_eff', tr_eff, 'tr_eff/d')
@@ -243,7 +247,6 @@ def clean_tracks(t0, min_pix_tr=2, iso_thresh=3, fit=False, sel=None, cluster=Fa
                 t2.sigma.clear()
                 t2.d_rho.clear()
 
-            max_pix_val = 0
 
             # find new variables of interest
             if fit:
@@ -273,11 +276,13 @@ def clean_tracks(t0, min_pix_tr=2, iso_thresh=3, fit=False, sel=None, cluster=Fa
                     t2.d_rho.push_back(p.x*math.cos(hough_theta[0])+p.y*math.sin(hough_theta[0])-rho)
                 
 
-                if p.val > max_pix_val:
-                    max_pix_val = p.val
+                if p.val > max_val[0]:
+                    max_val[0] = p.val
+                    max_x = p.x
+                    max_y = p.y
+                    
 
             pix_tr[0] = t2.pix_x.size()
-            max_val[0] = max_pix_val
             
             saved_pix += t2.pix_x.size()
 
