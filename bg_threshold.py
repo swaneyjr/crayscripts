@@ -137,13 +137,12 @@ def find_bg(images, out=None, conv_len=2, bg_cutoff=False, bg_img=50, l1cal=True
     if l1cal:
 	print "Calibrating L1 threshold..."
 	l1thresh = 256
-	sqrt_grid = np.sqrt(s_grid)
 	n_bins = 20
 	failed = False
 	
-	while l1thresh > 5:
+	while l1thresh > 3:
             if failed:
-                s_grid += sqrt_grid
+                s_grid *= 1.1
             max_array = np.zeros(n_bins)
             if vid:
                 test_frames = 10/l1cal
