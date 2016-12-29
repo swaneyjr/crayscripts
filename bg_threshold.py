@@ -1,15 +1,14 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import math
 from fractions import gcd
 from PIL import Image
 from scipy.signal import convolve2d
 import imtools
-import imshow
+
 from cv2 import VideoCapture
 
 # uses an image to create a grid of background values
-def find_bg(images, out=None, conv_len=5, bg_cutoff=False, max_img=50):
+def find_bg(images, out=None, conv_len=2, bg_cutoff=False, bg_img=50, l1cal=True):
 
     vid = False
     
@@ -38,11 +37,15 @@ def find_bg(images, out=None, conv_len=5, bg_cutoff=False, max_img=50):
         cap.release()
         
         max_grid = np.zeros((h,w,n_bands), dtype=int)
-        s_grid = np.zeros((h,w,n_bands), dtype=int)
+        s_grid = np.zeros((h,w,n_bands), dtype=float)
         
     else:
-        if max_img and (len(images) > max_img):
-            images = images[:max_img]
+        if bg_img and (len(images) > bg_img):
+            l1test = images[bg_img:]
+	    images = images[:bg_img]
+        elif l1cal:
+            l1cal = None
+            print "Unable to perform L1 Calibration: too few images"
         im_grid = imtools.ImGrid(images[0])
         w,h = im_grid.width, im_grid.height
         bands = im_grid.bands
@@ -78,12 +81,11 @@ def find_bg(images, out=None, conv_len=5, bg_cutoff=False, max_img=50):
         while ret and cap.isOpened(): 
             s_grid = np.median([max_grid, s_grid, frame], axis=0).astype(int)
             max_grid = np.amax([max_grid, s_grid, frame], axis=0).astype(int)
-            if (iframe+1) % 10 == 0:
+            if (iframe+1) % 100 == 0:
                 print " %d" % (iframe+1)
             iframe += 1
             ret, frame = cap.read()
-            if iframe >= max_img: break
-        cap.release()
+            if bg_image and iframe >= bg_img: break
         s_grid = s_grid.transpose(2,0,1)
     else:
         print " 0/%d" % n_img_bg
@@ -124,13 +126,64 @@ def find_bg(images, out=None, conv_len=5, bg_cutoff=False, max_img=50):
         kernel_side = 2*conv_len+1
         s_kernel = np.repeat(1, kernel_side**2).reshape((kernel_side,kernel_side))/float(kernel_side)**2
         convolved_grid = np.array([convolve2d(s_grid[cval], s_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)])
-        s_grid = np.maximum(s_grid, convolved_grid)
-        s_grid = np.ceil(s_grid+0.9).astype(int)
+	hot_pix = (s_grid - convolved_grid >= 2)
+	print "%d hot pixels found" % np.sum(hot_pix)
+	s_grid = np.where(hot_pix, 256, convolved_grid)
 
     # resize
     s_grid = np.repeat(np.repeat(s_grid, sample_block, axis=1), sample_block, axis=2)
     
+    # calibrate L1
+    if l1cal:
+	print "Calibrating L1 threshold..."
+	l1thresh = 256
+	sqrt_grid = np.sqrt(s_grid)
+	n_bins = 20
+	failed = False
+	
+	while l1thresh > 5:
+            if failed:
+                s_grid += sqrt_grid
+            max_array = np.zeros(n_bins)
+            if vid:
+                test_frames = 10/l1cal
+                frames_passed = test_frames
+                ret, frame = cap.read()
+                iframe = 0
+                while ret and cap.isOpened():
+                    iframe += 1
+                    max_minus_bg = np.amax(frame-s_grid)
+                    if max_minus_bg >= n_bins-1:
+                        max_array[n_bins-1] += 1
+                    elif max_minus_bg >= 0:
+                        max_array[int(max_minus_bg)] += 1
+                    if iframe >= test_frames: break
+                    ret, frame = cap.read()
+            else:
+                frames_passed = len(l1test)
+                for i,im in enumerate(l1test):
+                    if i%100==0:
+                        print " %d/%d" % (i, len(l1test))
+                    im_grid = imtools.ImGrid(im)
+                    max_minus_bg = np.amax(im_grid-s_grid)
+                    if max_minus_bg >= n_bins-1:
+                        max_array[n_bins-1] += 1
+                    elif max_minus_bg >= 0:
+                        max_array[int(max_minus_bg)] += 1
+            l1thresh = 0
+            target_passed = frames_passed*l1cal
+            frames_passed = np.sum(max_array)
+            while frames_passed > target_passed:
+                l1thresh += 1
+                frames_passed -= max_array[l1thresh-1]
+            print "L1 threshold = %d" % l1thresh
+            failed = True
+	s_grid += l1thresh
+	
+
+    
     if out:
+	s_grid = np.ceil(s_grid+0.1).astype(int)
         if n_bands == 1:
             s_img = Image.fromarray(s_grid[0].astype(np.uint8), mode='L')
             
@@ -141,6 +194,9 @@ def find_bg(images, out=None, conv_len=5, bg_cutoff=False, max_img=50):
         # save as png
         print "Saving background as %s" % out
         s_img.save(out)
+
+    if vid:
+	cap.release();
     
     return s_grid
 
@@ -152,12 +208,14 @@ if __name__ == '__main__':
     parser.add_argument("--conv_len", type=int, default=0, help='Distance to which pixels are included in averaging')
     parser.add_argument("--bg_cutoff", action='store_true', help='Removes tracks during sauto processing.')
     parser.add_argument('--show', action='store_true', help='Display resulting threshold image')
-    parser.add_argument('--max_img', type=int, default=0, help='Limits number of images to be processed')
-    
+    parser.add_argument('--bg_img', type=int, default=0, help='Limits number of images to be processed')
+    parser.add_argument('--l1cal', type=float, help='Target rate of passing L1 threshold')
     
     args = parser.parse_args()
     
-    bg = find_bg(args.infiles, args.out, args.conv_len, args.bg_cutoff, args.max_img)
+    if args.l1cal and args.bg_img==0:
+        args.bg_img = 50
+    bg = find_bg(args.infiles, args.out, args.conv_len, args.bg_cutoff, args.bg_img, args.l1cal)
     if args.show:
-        imshow.imshow(args.out)      
- 
+       import imshow
+       imshow.imshow(args.out)
