@@ -123,10 +123,11 @@ def find_bg(images, out=None, conv_len=2, bg_cutoff=False, bg_img=50, l1cal=Fals
     if conv_len:
         print "Applying convolution kernel..."
 
+        hot_pix_cutoff = 1.5
         kernel_side = 2*conv_len+1
         s_kernel = np.repeat(1, kernel_side**2).reshape((kernel_side,kernel_side))/float(kernel_side)**2
         convolved_grid = np.array([convolve2d(s_grid[cval], s_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)])
-	hot_pix = (s_grid - convolved_grid >= 2)
+	hot_pix = (s_grid - convolved_grid >= hot_pix_cutoff)
 	print "%d hot pixels found" % np.sum(hot_pix)
 	s_grid = np.where(hot_pix, 256, convolved_grid)
 
