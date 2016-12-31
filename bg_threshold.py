@@ -182,7 +182,7 @@ def find_bg(images, out=None, conv_len=2, bg_cutoff=False, bg_img=50, l1cal=True
 
     
     if out:
-	s_grid = np.ceil(s_grid+0.1).astype(int)
+	s_grid = np.where(s_grid > 255, 255, np.ceil(s_grid).astype(int))
         if n_bands == 1:
             s_img = Image.fromarray(s_grid[0].astype(np.uint8), mode='L')
             
