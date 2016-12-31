@@ -85,7 +85,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
     vbranch(t, 'pix_val', btype=int)
     vbranch(t, 'pix_avg3', btype=float)
     vbranch(t, 'pix_avg5', btype=float)
-    vbranch(t, 'l2s', btype=int)
+    vbranch(t, 'l2s', btype=float)
     
 
 
