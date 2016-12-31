@@ -8,7 +8,7 @@ import imtools
 from cv2 import VideoCapture
 
 # uses an image to create a grid of background values
-def find_bg(images, out=None, conv_len=2, bg_cutoff=False, bg_img=50, l1cal=True):
+def find_bg(images, out=None, conv_len=2, bg_cutoff=False, bg_img=50, l1cal=False):
 
     vid = False
     
@@ -182,13 +182,13 @@ def find_bg(images, out=None, conv_len=2, bg_cutoff=False, bg_img=50, l1cal=True
 
     
     if out:
-	s_grid = np.where(s_grid > 255, 255, np.ceil(s_grid).astype(int))
+	save_grid = np.where(s_grid > 255, 255, np.ceil(s_grid).astype(int))
         if n_bands == 1:
-            s_img = Image.fromarray(s_grid[0].astype(np.uint8), mode='L')
+            s_img = Image.fromarray(save_grid[0].astype(np.uint8), mode='L')
             
         else:
             img_mode = ''.join(bands)
-            s_img = Image.fromarray(s_grid.transpose(1,2,0).astype(np.uint8), mode=img_mode)
+            s_img = Image.fromarray(save_grid.transpose(1,2,0).astype(np.uint8), mode=img_mode)
 
         # save as png
         print "Saving background as %s" % out

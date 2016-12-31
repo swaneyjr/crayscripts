@@ -39,7 +39,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
 
     # handle S threshold settings
     if sauto:
-        s_grid = find_bg(infiles[:n_images_auto], out.split('.')[0]+"_bg.png")
+        s_grid = find_bg(infiles[:n_images_auto])
     elif smanual:
         with Image.open(smanual) as im:
             if len(im.mode) > 1:
