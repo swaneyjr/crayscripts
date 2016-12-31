@@ -116,7 +116,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
                 l2array[i] = v
 
         else:
-            l2array = np.amin(np.amin(s_grid, axis=1), axis=1).astype(int)                   
+            l2array = np.ceil(np.amin(np.amin(s_grid, axis=1), axis=1))                   
             
         minl2thresh = np.amin(l2array)
         
