@@ -63,7 +63,7 @@ def pb_to_tree(fname):
         
         for evt in xb.events:
             pix_n[0] = len(evt.pixels)
-            for evt_field,val in evt.ListFields()):
+            for evt_field,val in evt.ListFields():
                 if evt_field == 'pixels': continue
                 evt_containers[evt_field][0] = val
                 
