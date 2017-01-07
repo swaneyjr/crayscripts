@@ -57,7 +57,7 @@ def pb_to_tree(fname):
     for xb in dc.exposure:
         
         for xb_field,val in xb.ListFields():
-            if xb_field == 'daq_state' or xb_field = 'events': continue
+            if xb_field == 'daq_state' or xb_field == 'events': continue
             xb_containers[xb_field][0] = val
         exposure.Fill()
         
