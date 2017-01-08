@@ -86,6 +86,7 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--in", required=True, dest="infiles", nargs='+', help='.bin files to be converted')
     parser.add_argument("--out", default="pbfiles.root", help='Output file name')
+    args = parser.parse_args()
     
     if len(args.infiles) > 1:
         fname = merge_pb(args.infiles)
