@@ -38,19 +38,19 @@ def pb_to_trees(fname):
     for xb_field,val in dc.exposure_blocks[0].ListFields():
         if xb_field != 'events' and xb_field != 'daq_state':
             xb_containers[xb_field]= np.zeros(1,dtype=type(val))
-            exposure.TBranch(xb_field, xb_containers[xb_field], xb_field+str_type[val])
+            exposure.Branch(xb_field, xb_containers[xb_field], xb_field+str_type[val])
         
 
     for evt_field,val in dc.exposure_blocks[0].events[0].ListFields():
         if evt_field != 'pixels':
             evt_containers[evt_field] = np.zeros(1,dtype=type(val))
-            events.TBranch(evt_field, evt_containers[evt_field], evt_field+str_type[val])
+            events.Branch(evt_field, evt_containers[evt_field], evt_field+str_type[val])
 
     for pix_field,val in dc.exposure_blocks[0].events[0].pixels[0].ListFields():
         pix_containers[pix_field] = r.vector(full_type[type(val)])()
-        events.TBranch('pix_'+pix_field, pix_containers[pix_field])
+        events.Branch('pix_'+pix_field, pix_containers[pix_field])
 
-    events.TBranch('pix_n', pix_n, 'pix_n/I')
+    events.Branch('pix_n', pix_n, 'pix_n/I')
     
     
     # fill tree
