@@ -18,7 +18,7 @@ def merge_pb(infiles):
 def pb_to_trees(fname):
     dc = pb.DataChunk()
     f = open(fname)
-    dc.ParseFromString(fname)
+    dc.ParseFromString(f)
     f.close()
     
     # write to ROOT
