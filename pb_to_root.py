@@ -8,7 +8,7 @@ def merge_pb(infiles):
         f = open(fname)
         dc.MergeFromString(f.read())
         f.close()
-    merge_name = fname[0].split('_')[0] + '.bin'
+    merge_name = infiles[0].split('_')[0] + '.bin'
     merge_file = open(merge_name, "wb")
     merge_file.write(dc.SerializeToString())
     merge_file.close()
