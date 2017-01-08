@@ -9,9 +9,11 @@ def merge_pb(infiles):
         dc.MergeFromString(f.read())
         f.close()
     merge_name = infiles[0].split('_')[0] + '.bin'
+    print "Compiling messages into %s" % merge_name
     merge_file = open(merge_name, "wb")
     merge_file.write(dc.SerializeToString())
     merge_file.close()
+    print "Messages saved."
     return merge_name
 
 
@@ -36,35 +38,39 @@ def pb_to_trees(fname):
     pix_n = np.zeros(1, dtype=int)
 
     for xb_field,val in dc.exposure_blocks[0].ListFields():
-        if xb_field != 'events' and xb_field != 'daq_state':
-            xb_containers[xb_field]= np.zeros(1,dtype=type(val))
-            exposure.Branch(xb_field, xb_containers[xb_field], xb_field+str_type[val])
+        if xb_field.label != 3: # save repeated fields for events
+            xb_containers[xb_field.name]= np.zeros(1,dtype=type(val))
+            exposure.Branch(xb_field.name, xb_containers[xb_field.name], xb_field.name+str_type[val])
         
 
     for evt_field,val in dc.exposure_blocks[0].events[0].ListFields():
-        if evt_field != 'pixels':
-            evt_containers[evt_field] = np.zeros(1,dtype=type(val))
-            events.Branch(evt_field, evt_containers[evt_field], evt_field+str_type[val])
+        if evt_field.label != 3: # save repeated fields for pixels
+            evt_containers[evt_field.name] = np.zeros(1,dtype=type(val))
+            events.Branch(evt_field.name, evt_containers[evt_field.name], evt_field.name+str_type[val])
 
     for pix_field,val in dc.exposure_blocks[0].events[0].pixels[0].ListFields():
-        pix_containers[pix_field] = r.vector(full_type[type(val)])()
-        events.Branch('pix_'+pix_field, pix_containers[pix_field])
+        pix_containers[pix_field.name] = r.vector(full_type[type(val)])()
+        events.Branch('pix_'+pix_field.name, pix_containers[pix_field.name])
 
     events.Branch('pix_n', pix_n, 'pix_n/I')
     
     
     # fill tree
-    for xb in dc.exposure_blocks:
+    total_xb = len(dc.exposure_blocks)
+    for ixb,xb in enumerate(dc.exposure_blocks):
+
+        if ixb % (total_xb/10) == 0:
+            print "%d/%d (%0.2f)" % (ixb, total_xb, 100.*ixb/total_xb)
         
         for xb_field,val in xb.ListFields():
-            if xb_field == 'daq_state' or xb_field == 'events': continue
+            if xb_field.label == 3: continue
             xb_containers[xb_field][0] = val
         exposure.Fill()
         
         for evt in xb.events:
             pix_n[0] = len(evt.pixels)
             for evt_field,val in evt.ListFields():
-                if evt_field == 'pixels': continue
+                if xb_field.label == 3: continue
                 evt_containers[evt_field][0] = val
                 
             # reset pixel vectors
