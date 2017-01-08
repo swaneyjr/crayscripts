@@ -35,18 +35,18 @@ def pb_to_trees(fname):
     pix_containers = {}
     pix_n = np.zeros(1, dtype=int)
 
-    for xb_field,val in dc.exposure[0].ListFields():
+    for xb_field,val in dc.exposure_blocks[0].ListFields():
         if xb_field != 'events' and xb_field != 'daq_state':
             xb_containers[xb_field]= np.zeros(1,dtype=type(val))
             exposure.TBranch(xb_field, xb_containers[xb_field], xb_field+str_type[val])
         
 
-    for evt_field,val in dc.exposure[0].events[0].ListFields():
+    for evt_field,val in dc.exposure_blocks[0].events[0].ListFields():
         if evt_field != 'pixels':
             evt_containers[evt_field] = np.zeros(1,dtype=type(val))
             events.TBranch(evt_field, evt_containers[evt_field], evt_field+str_type[val])
 
-    for pix_field,val in dc.exposure[0].events[0].pixels[0].ListFields():
+    for pix_field,val in dc.exposure_blocks[0].events[0].pixels[0].ListFields():
         pix_containers[pix_field] = r.vector(full_type[type(val)])()
         events.TBranch('pix_'+pix_field, pix_containers[pix_field])
 
@@ -54,7 +54,7 @@ def pb_to_trees(fname):
     
     
     # fill tree
-    for xb in dc.exposure:
+    for xb in dc.exposure_blocks:
         
         for xb_field,val in xb.ListFields():
             if xb_field == 'daq_state' or xb_field == 'events': continue
