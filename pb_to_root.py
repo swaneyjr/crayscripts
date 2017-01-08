@@ -15,7 +15,7 @@ def merge_pb(infiles):
     return merge_name
 
 
-def pb_to_tree(fname):
+def pb_to_trees(fname):
     dc = pb.DataChunk()
     f = open(fname)
     dc.ParseFromString(fname)
@@ -93,6 +93,6 @@ if __name__ == "__main__":
     else:
         fname = args.infiles[0]
     outfile = r.TFile(args.out, "recreate")
-    exposure, events = pb_to_events(fname)
+    exposure, events = pb_to_trees(fname)
     outfile.Write()
     outfile.Close()
