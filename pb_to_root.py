@@ -58,24 +58,26 @@ def pb_to_trees(fname):
     
     
     # fill tree
+    print "Filling tree"
+    
     total_xb = len(dc.exposure_blocks)
     for ixb,xb in enumerate(dc.exposure_blocks):
 
         if ixb % (total_xb/10) == 0:
-            print "%d/%d (%0.2f)" % (ixb, total_xb, 100.*ixb/total_xb)
+            print " %d/%d (%0.2f)" % (ixb, total_xb, 100.*ixb/total_xb)
         
         for xb_field,val in xb.ListFields():
             if xb_field.label == 3: continue
-            xb_containers[xb_field][0] = val
+            xb_containers[xb_field.name][0] = val
             if type(val) == unicode:
-                xb_containers[xb_field][0] += '\0'
+                xb_containers[xb_field.name][0] += '\0'
         exposure.Fill()
         
         for evt in xb.events:
             pix_n[0] = len(evt.pixels)
             for evt_field,val in evt.ListFields():
                 if xb_field.label == 3: continue
-                evt_containers[evt_field][0] = val
+                evt_containers[evt_field.name][0] = val
                 
             # reset pixel vectors
             for v in pix_containers.itervalues():
@@ -83,7 +85,7 @@ def pb_to_trees(fname):
                 
             for pix in evt.pixels:
                 for pix_field,val in pix.ListFields():
-                    evt_containers[pix_field].push_back(val)
+                    evt_containers[pix_field.name].push_back(val)
                 
                 
             events.Fill()
