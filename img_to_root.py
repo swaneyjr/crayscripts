@@ -71,7 +71,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
     t.Branch('name', name, 'name/C') 
     
     if rawcam_format:
-        time = np.array([0], dtype=int)
+        time = np.array([0], dtype=long)
         t.Branch('t', time, 't/L')
         im_split = (infiles[0].split('.')[0]).split('_')
         if len(im_split) > 2:

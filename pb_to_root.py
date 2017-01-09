@@ -27,8 +27,8 @@ def pb_to_trees(fname):
     exposure = r.TTree('exposure', 'Exposure from protobuf data')
     events = r.TTree('events', 'Events from protobuf data')
 
-    short_type = {int:'/i', long:'/l',float:'/D',bool:'/O',str:'/C'}
-    full_type = {int:'int', long:'long',float:'double',bool:'bool',str:'char'}
+    short_type = {int:'/i', long:'/l',float:'/D',bool:'/O',unicode:'/C'}
+    full_type = {int:'int', long:'long',float:'double',bool:'bool',unicode:'char'}
 
     # assign appropriate branches to trees
 
@@ -67,6 +67,8 @@ def pb_to_trees(fname):
         for xb_field,val in xb.ListFields():
             if xb_field.label == 3: continue
             xb_containers[xb_field][0] = val
+            if type(val) == unicode:
+                xb_containers[xb_field][0] += '\0'
         exposure.Fill()
         
         for evt in xb.events:
