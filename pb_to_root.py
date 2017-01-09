@@ -83,7 +83,7 @@ def pb_to_trees(fname):
             for evt_field,val in evt.ListFields():
                 if evt_field.label == 3: continue
                 if not evt_field.name in evt_containers.iterkeys():
-                    evt_containers[xb_field.name] = np.zeros(1,dtype=object)
+                    evt_containers[evt_field.name] = np.zeros(1,dtype=object)
                     events.Branch(evt_field.name, evt_containers[evt_field.name], \
                                   evt_field.name + short_type[type(val)])
                 evt_containers[evt_field.name][0] = val
