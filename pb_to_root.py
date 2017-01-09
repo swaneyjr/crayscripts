@@ -76,7 +76,7 @@ def pb_to_trees(fname):
         for evt in xb.events:
             pix_n[0] = len(evt.pixels)
             for evt_field,val in evt.ListFields():
-                if xb_field.label == 3: continue
+                if evt_field.label == 3: continue
                 evt_containers[evt_field.name][0] = val
                 
             # reset pixel vectors
