@@ -96,6 +96,9 @@ def pb_to_trees(fname):
                 
             for pix in evt.pixels:
                 for pix_field,val in pix.ListFields():
+                    if not pix_field.name in pix_containers.iterkeys():
+                        pix_containers[pix_field.name] = r.vector(full_type[type(val)])()
+                        events.Branch('pix_'+pix_field.name, pix_containers[pix_field.name])
                     pix_containers[pix_field.name].push_back(val)
                 
                 
