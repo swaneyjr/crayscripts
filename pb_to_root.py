@@ -85,7 +85,7 @@ def pb_to_trees(fname):
                 
             for pix in evt.pixels:
                 for pix_field,val in pix.ListFields():
-                    evt_containers[pix_field.name].push_back(val)
+                    pix_containers[pix_field.name].push_back(val)
                 
                 
             events.Fill()
