@@ -40,13 +40,13 @@ def pb_to_trees(fname):
     for xb_field,val in dc.exposure_blocks[0].ListFields():
         if xb_field.label != 3: # save repeated fields for events
             xb_containers[xb_field.name]= np.zeros(1,dtype=type(val))
-            exposure.Branch(xb_field.name, xb_containers[xb_field.name], xb_field.name+str_type[val])
+            exposure.Branch(xb_field.name, xb_containers[xb_field.name])
         
 
     for evt_field,val in dc.exposure_blocks[0].events[0].ListFields():
         if evt_field.label != 3: # save repeated fields for pixels
             evt_containers[evt_field.name] = np.zeros(1,dtype=type(val))
-            events.Branch(evt_field.name, evt_containers[evt_field.name], evt_field.name+str_type[val])
+            events.Branch(evt_field.name, evt_containers[evt_field.name]])
 
     for pix_field,val in dc.exposure_blocks[0].events[0].pixels[0].ListFields():
         pix_containers[pix_field.name] = r.vector(full_type[type(val)])()
