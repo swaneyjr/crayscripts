@@ -36,25 +36,26 @@ def pb_to_trees(fname):
     evt_containers = {}
     pix_containers = {}
     pix_n = np.zeros(1, dtype=int)
+    events.Branch('pix_n', pix_n, 'pix_n/I')
 
-    for xb_field,val in dc.exposure_blocks[0].ListFields():
-        if xb_field.label != 3: # save repeated fields for events
-            xb_containers[xb_field.name]= np.zeros(1,dtype=object)
-            exposure.Branch(xb_field.name, xb_containers[xb_field.name], \
-                            xb_field.name+short_type[type(val)])
+    #for xb_field,val in dc.exposure_blocks[0].ListFields():
+    #    if xb_field.label != 3: # save repeated fields for events
+    #        xb_containers[xb_field.name]= np.zeros(1,dtype=object)
+    #        exposure.Branch(xb_field.name, xb_containers[xb_field.name], \
+    #                        xb_field.name+short_type[type(val)])
         
 
-    for evt_field,val in dc.exposure_blocks[0].events[0].ListFields():
-        if evt_field.label != 3: # save repeated fields for pixels
-            evt_containers[evt_field.name] = np.zeros(1,dtype=object)
-            events.Branch(evt_field.name, evt_containers[evt_field.name], \
-                          evt_field.name+short_type[type(val)])
+    #for evt_field,val in dc.exposure_blocks[0].events[0].ListFields():
+    #    if evt_field.label != 3: # save repeated fields for pixels
+    #        evt_containers[evt_field.name] = np.zeros(1,dtype=object)
+    #        events.Branch(evt_field.name, evt_containers[evt_field.name], \
+    #                      evt_field.name+short_type[type(val)])
 
-    for pix_field,val in dc.exposure_blocks[0].events[0].pixels[0].ListFields():
-        pix_containers[pix_field.name] = r.vector(full_type[type(val)])()
-        events.Branch('pix_'+pix_field.name, pix_containers[pix_field.name])
+    #for pix_field,val in dc.exposure_blocks[0].events[0].pixels[0].ListFields():
+    #    pix_containers[pix_field.name] = r.vector(full_type[type(val)])()
+    #    events.Branch('pix_'+pix_field.name, pix_containers[pix_field.name])
 
-    events.Branch('pix_n', pix_n, 'pix_n/I')
+    
     
     
     # fill tree
@@ -68,6 +69,10 @@ def pb_to_trees(fname):
         
         for xb_field,val in xb.ListFields():
             if xb_field.label == 3: continue
+            if not xb_field.name in xb_containers.iterkeys():
+                xb_containers[xb_field.name] = np.zeros(1,dtype=object)
+                exposure.Branch(xb_field.name, xb_containers[xb_field.name], \
+                                xb_field.name+short_type[type(val)])
             xb_containers[xb_field.name][0] = val
             if type(val) == unicode:
                 xb_containers[xb_field.name][0] += '\0'
@@ -77,7 +82,13 @@ def pb_to_trees(fname):
             pix_n[0] = len(evt.pixels)
             for evt_field,val in evt.ListFields():
                 if evt_field.label == 3: continue
+                if not evt_field.name in evt_containers.iterkeys():
+                    evt_containers[xb_field.name] = np.zeros(1,dtype=object)
+                    events.Branch(evt_field.name, evt_containers[evt_field.name], \
+                                  evt_field.name + short_type[type(val)])
                 evt_containers[evt_field.name][0] = val
+                if type(val) == unicode:
+                    evt_containers[evt_field.name][0] += '\0'
                 
             # reset pixel vectors
             for v in pix_containers.itervalues():
