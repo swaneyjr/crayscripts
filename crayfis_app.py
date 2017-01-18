@@ -6,7 +6,7 @@ def crayfis_app(vid):
     vid_name = vid.split('/')[-1].split('.')[0]
     os.mkdir(vid_name)
     os.chdir(vid_name)
-    save_frames(vid, l1thresh=0)
+    save_frames([vid], l1thresh=0)
     os.chdir(os.pardir)
     convert_to_root(os.listdir(vid_name), vid_name+'.root')
     
