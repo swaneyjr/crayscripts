@@ -7,7 +7,7 @@ def crayfis_app(vid, l1rate=0.1, spatial_thresh=False):
     os.mkdir(vid_name)
     os.chdir(vid_name)
     save_frames([os.getcwd()+'/../'+vid], l1thresh=0)
-    convert_to_root(os.listdir(os.getcwd()), vid_name+'.root', l1_rate, s_thresh=spatial_thresh)
+    convert_to_root(os.listdir(os.getcwd()), vid_name+'.root', l1rate, s_thresh=spatial_thresh)
     
     
 if __name__ == "__main__":
