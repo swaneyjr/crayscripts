@@ -50,8 +50,6 @@ def find_bg(images, out=None, conv_len=2, bg_img=50, l1cal=False, clear_hotpix=F
         w,h = im_grid.width, im_grid.height
         bands = im_grid.bands
         n_bands = im_grid.n_bands
-        if bg_cutoff:
-            cutoff = imtools.outlier_cutoff(im_grid, 2)
  
         max_grid = np.zeros((n_bands,h,w), dtype=int)
         s_grid = np.zeros((n_bands,h,w), dtype=int)
