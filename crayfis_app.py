@@ -19,6 +19,6 @@ if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser(description = '')
     parser.add_argument("vid", help='Video to be converted')
-    parser.parse_args()
+    args = parser.parse_args()
 
     crayfis_app(args.vid)
