@@ -8,7 +8,7 @@ import imtools
 from cv2 import VideoCapture
 
 # uses an image to create a grid of background values
-def find_bg(images, out=None, conv_len=2, bg_cutoff=False, bg_img=50, l1cal=False):
+def find_bg(images, out=None, conv_len=2, bg_img=50, l1cal=False, clear_hotpix=False):
 
     vid = False
     
@@ -100,26 +100,6 @@ def find_bg(images, out=None, conv_len=2, bg_cutoff=False, bg_img=50, l1cal=Fals
 
     s_grid = np.mean([s_grid[:,x::sample_block,y::sample_block] for x,y in np.ndindex(sample_block,sample_block)], axis=0)
     
-    # remove hot pixels and tracks
-    if bg_cutoff:
-        print "Removing thresholds above ",
-        for cval in xrange(n_bands-1):
-            print "%d," % cutoff[cval],
-        print "%d" % cutoff[n_bands-1]
-          
-        mask_kernel = np.array([[1,1,1,1,1,1,1],[1,0,0,0,0,0,1],[1,0,0,0,0,0,1],[1,0,0,0,0,0,1],[1,0,0,0,0,0,1],\
-                                [1,0,0,0,0,0,1],[1,1,1,1,1,1,1]],dtype=float)/24.
-        masked_grid = 0*s_grid
-        cutoff = cutoff.reshape(n_bands,1,1)
-        n_iter = 0
-        print "Iter0: %d" % np.amax(s_grid) 
-        while np.any(np.amax(np.amax(s_grid, axis=1), axis=1) > cutoff):
-            for cval in xrange(n_bands):
-                masked_grid[cval] = convolve2d(s_grid[cval], mask_kernel, mode='same', boundary='symm')
-            s_grid = np.where(s_grid <= cutoff, s_grid, cutoff)
-            n_iter += 1
-            print "Iter%d: %d" % (n_iter, np.amax(s_grid))
-    
     if conv_len:
         print "Applying convolution kernel..."
 
@@ -129,7 +109,10 @@ def find_bg(images, out=None, conv_len=2, bg_cutoff=False, bg_img=50, l1cal=Fals
         convolved_grid = np.array([convolve2d(s_grid[cval], s_kernel, mode='same', boundary='symm') for cval in xrange(n_bands)])
 	hot_pix = (s_grid - convolved_grid >= hot_pix_cutoff)
 	print "%d hot pixels found" % np.sum(hot_pix)
-	s_grid = np.where(hot_pix, 256, convolved_grid)
+	if clear_hotpix:
+            s_grid = np.where(hot_pix, 256, convolved_grid)
+        else:
+            s_grid = convolved_grid
 
     # resize
     s_grid = np.repeat(np.repeat(s_grid, sample_block, axis=1), sample_block, axis=2)
@@ -206,16 +189,16 @@ if __name__ == '__main__':
     parser.add_argument('--in', required=True, dest='infiles', nargs='+', help='Images used to set thresholds')
     parser.add_argument('--out', default='bg.png', help='Output file name')
     parser.add_argument("--conv_len", type=int, default=0, help='Distance to which pixels are included in averaging')
-    parser.add_argument("--bg_cutoff", action='store_true', help='Removes tracks during sauto processing.')
     parser.add_argument('--show', action='store_true', help='Display resulting threshold image')
     parser.add_argument('--bg_img', type=int, default=0, help='Limits number of images to be processed')
     parser.add_argument('--l1cal', type=float, help='Target rate of passing L1 threshold')
+    parser.add_argument('--clear_hotpix', action='store_true', help='If convolved, raise hot pixel thresholds to 256')
     
     args = parser.parse_args()
     
     if args.l1cal and args.bg_img==0:
         args.bg_img = 50
-    bg = find_bg(args.infiles, args.out, args.conv_len, args.bg_cutoff, args.bg_img, args.l1cal)
+    bg = find_bg(args.infiles, args.out, args.conv_len, args.bg_img, args.l1cal, args.clear_hotpix)
     if args.show:
        import imshow
        imshow.imshow(args.out)

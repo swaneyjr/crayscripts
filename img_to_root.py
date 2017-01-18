@@ -27,12 +27,12 @@ def set_thresh(imarray, thresh):
 
     return thresh_array
 
-def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0, sauto=True, smanual=False, max_img=0, rawcam_format=False):
+def convert_to_root(infiles, out, l1thresh=0, l2auto=0, l2manual=0, l2plus=0, sauto=True, smanual=False, max_img=0, rawcam_format=False):
  
     avg3_kernel = np.array([[1,1,1],[1,0,1],[1,1,1]])/8.0
     avg5_kernel = np.array([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]])/16.0
     
-    n_images_auto = 50
+    n_images_auto = 1050
     
     saved_pix = 0
     total_pix = 0
@@ -85,7 +85,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
     vbranch(t, 'pix_val', btype=int)
     vbranch(t, 'pix_avg3', btype=float)
     vbranch(t, 'pix_avg5', btype=float)
-    vbranch(t, 'l2s', btype=float)
+    vbranch(t, 'pix_bg', btype=float)
     
 
 
@@ -147,7 +147,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
             t.pix_val.clear()
             t.pix_avg3.clear()
             t.pix_avg5.clear()
-            t.l2s.clear()
+            t.pix_bg.clear()
             
             for y,x in np.argwhere(imarray[cval] >= s_grid[cval]+l2diff[cval]):
                 t.pix_x.push_back(x)
@@ -155,7 +155,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=True, l2manual=0, l2plus=0,
                 t.pix_val.push_back(imarray[cval][y,x])
                 t.pix_avg3.push_back(avg3_array[cval][y,x])
                 t.pix_avg5.push_back(avg5_array[cval][y,x])
-                t.l2s.push_back(s_grid[cval][y,x]+l2diff[cval])
+                t.pix_bg.push_back(s_grid[cval][y,x]+l2diff[cval])
             
             color = np.array(c+'\0')
             name = np.array(im_base[0]+'\0')
