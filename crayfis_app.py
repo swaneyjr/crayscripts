@@ -8,7 +8,7 @@ def crayfis_app(vid):
     os.chdir(vid_name)
     save_frames(vid, l1thresh=0)
     os.chdir(os.pardir)
-    convert_to_root(listdir(vid_name), vid_name+'.root')
+    convert_to_root(os.listdir(vid_name), vid_name+'.root')
     
     
     
