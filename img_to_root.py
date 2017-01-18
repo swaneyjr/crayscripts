@@ -94,7 +94,7 @@ def convert_to_root(infiles, out, l1_target_rate=None, l2auto=0, l2manual=0, s_t
     vbranch(t, 'pix_avg5', btype=float)
     vbranch(t, 'pix_bg', btype=float)
 
-    if l1_rate:
+    if l1_target_rate:
         l1array = find_l1(infiles, l1_target_rate, bg_grid, dev_grid)
     else:
         l1array = np.zeros(bg_grid.shape[0])
