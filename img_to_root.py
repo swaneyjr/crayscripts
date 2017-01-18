@@ -10,10 +10,22 @@ import imtools
 from hotcell import vbranch
 from bg_threshold import find_bg
 
-matplotlib.use('tkagg')
+# find appropriate L1 thresholds for a given target rate
+def find_L1(imlist, l1_target_rate, s_grid, dev_grid):
+    
+    # we don't need to survey the whole video
+    if len(imlist) > 10/l1_target_rate:
+        imlist = imlist[:10*target_saved]
+    target_saved = int(l1_target_rate*len(imlist))
+    max_vals = np.zeros(len(imlist), s_grid.shape[0])
+    for i,im in enumerate(imlist):
+        max_vals[i] = np.amax(np.amax((imtools.ImGrid(im)-bg_grid)/dev_grid, axis=1), axis=1)
+    l1array = np.sort(max_vals)[:,target_saved]
+    
+    return l1array
 
 # given an ImGrid object and a threshold of pixels to keep, returns L2 values
-def set_thresh(imarray, thresh):
+def set_L2_thresh(imarray, thresh):
 
     thresh_array = np.repeat(-1, imarray.n_bands)
     target_pix = thresh*imarray.size
@@ -27,30 +39,25 @@ def set_thresh(imarray, thresh):
 
     return thresh_array
 
-def convert_to_root(infiles, out, l1thresh=0, l2auto=0, l2manual=0, l2plus=0, sauto=True, smanual=False, max_img=0, rawcam_format=False):
+def convert_to_root(infiles, out, l1_target_rate=None, l2auto=0, l2manual=0, s_thresh=True, max_img=0, rawcam_format=False):
  
     avg3_kernel = np.array([[1,1,1],[1,0,1],[1,1,1]])/8.0
     avg5_kernel = np.array([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]])/16.0
     
-    n_images_auto = 1050
+    n_images_auto = 50
     
     saved_pix = 0
     total_pix = 0
 
     # handle S threshold settings
-    if sauto:
-        s_grid = find_bg(infiles[:n_images_auto])
-    elif smanual:
-        with Image.open(smanual) as im:
-            if len(im.mode) > 1:
-                s_grid = np.array(im).astype(int).transpose(2,0,1)
-            else:
-                s_grid = np.array([np.array(im)]).astype(int)
+    if s_thresh:
+        bg_grid = find_bg(infiles[:n_images_auto])
+        infiles = infiles[n_images_auto:]
+        dev_grid = np.sqrt(bg_grid)
     else:
-        s_grid = 0*imtools.ImGrid(infiles[0])
+        bg_grid = np.zeros(imtools.ImGrid(infiles[0]).shape)
+        dev_grid = np.ones(s_grid.shape)
         
-    if l2plus:
-        s_grid += l2plus
 
 
     # create TTree
@@ -86,6 +93,11 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=0, l2manual=0, l2plus=0, sa
     vbranch(t, 'pix_avg3', btype=float)
     vbranch(t, 'pix_avg5', btype=float)
     vbranch(t, 'pix_bg', btype=float)
+
+    if l1_rate:
+        l1array = find_l1(infiles, l1_target_rate, s_grid, dev_grid)
+    else:
+        l1array = np.zeros(s_grid.shape[0])
     
 
 
@@ -102,12 +114,12 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=0, l2manual=0, l2plus=0, sa
 
         # set L2 threshold
         if l2auto:
-            if sauto or smanual:
+            if s_thresh:
                 cx, cy = imarray.width/2, imarray.height/2
                 c_side_half = int(imarray.height/2/math.sqrt(2))
-                l2array = set_thresh(imarray[cx-c_side_half:cx+c_side_half,cy-c_side_half:cy+c_side_half], l2auto)
+                l2array = set_L2_thresh(imarray[cx-c_side_half:cx+c_side_half,cy-c_side_half:cy+c_side_half], l2auto)
             else:
-                l2array = set_thresh(imarray, l2auto)
+                l2array = set_L2_thresh(imarray, l2auto)
             
                 
         elif l2manual:
@@ -116,9 +128,7 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=0, l2manual=0, l2plus=0, sa
                 l2array[i] = v
 
         else:
-            l2array = np.ceil(np.amin(np.amin(s_grid, axis=1), axis=1))                   
-            
-        minl2thresh = np.amin(l2array)
+            l2array = 0.9*l1array                   
         
             
         print "L2 threshold: \t",
@@ -126,13 +136,11 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=0, l2manual=0, l2plus=0, sa
             print "%s: %d" % (c, l2array[cval]),
         print
 
-        # determine relevant S thresholds    
-        grid_min = np.amin(np.amin(s_grid,axis=1),axis=1)
-        l1diff = np.repeat(l1thresh,3)-grid_min
-        l2diff = l2array-grid_min
+        l1_grid = l1array.reshape(3,1,1)*dev_grid + bg_grid
+        l2_grid = l2array.reshape(3,1,1)*dev_grid + bg_grid
 
         # enforce L1S
-        if np.count_nonzero(imarray>=s_grid+l1diff.reshape(3,1,1)) == 0: continue
+        if np.count_nonzero(imarray >= l1_grid) == 0: continue
         if im_base[0] != prev_name:
             n_img[0] += 1
 
@@ -149,13 +157,13 @@ def convert_to_root(infiles, out, l1thresh=0, l2auto=0, l2manual=0, l2plus=0, sa
             t.pix_avg5.clear()
             t.pix_bg.clear()
             
-            for y,x in np.argwhere(imarray[cval] >= s_grid[cval]+l2diff[cval]):
+            for y,x in np.argwhere(imarray[cval] >= l2_grid[cval]):
                 t.pix_x.push_back(x)
                 t.pix_y.push_back(y)
                 t.pix_val.push_back(imarray[cval][y,x])
                 t.pix_avg3.push_back(avg3_array[cval][y,x])
                 t.pix_avg5.push_back(avg5_array[cval][y,x])
-                t.pix_bg.push_back(s_grid[cval][y,x]+l2diff[cval])
+                t.pix_bg.push_back(bg_grid[cval][y,x])
             
             color = np.array(c+'\0')
             name = np.array(im_base[0]+'\0')
@@ -195,27 +203,23 @@ if __name__ == '__main__':
     parser = ArgumentParser(description = 'Converts JPEG files to a ROOT file')
     parser.add_argument("--in", required=True, dest='infiles', nargs='+', help='Images to be converted to a ROOT file')
     parser.add_argument("--out", default='images.root', help='Output file name')
-    parser.add_argument("--l1", type=int, default=0, help='L1 threshold for highest band')
+    parser.add_argument("--l1rate", type=float, default=None, help='L1 threshold for highest band')
     
     l2option = parser.add_mutually_exclusive_group()
     l2option.add_argument("--l2auto", type=float, help='Target fraction of pixels kept after configuring L2 threshold')
     l2option.add_argument("--l2manual", nargs='+', type=int, help='L2 threshold for each band')
-    l2option.add_argument("--l2plus", nargs='+', type=int, help='Increase the S thresholds by fixed amounts for each band.') 
-
-    soption = parser.add_mutually_exclusive_group()
-    soption.add_argument("--sauto", action='store_true', help='Add a spatially dependent threshold gradient.')
-    soption.add_argument("--smanual", help='Manually add a threshold function. Input is an image of the same mode as those processed.')
 
     parser.add_argument("--max_img", type=int, help='Maximum number of images to convert')
     parser.add_argument('-r', "--rawcam_format", action='store_true', help='Creates branches from image name: name_t_(bname val)_(bname val)...')
     parser.add_argument('-s', "--show", action='store_true', help='Generate graphs of background thresholds and saved pixels')
-    
+    parser.add_argument('-S',"--s_thresh", action='store_true', help='Add a spatially dependent threshold gradient.')
+
     args = parser.parse_args()
 
     outfile = r.TFile(args.out, "recreate")        
         
     ti = time.clock()
-    t = convert_to_root(args.infiles, args.out, args.l1, args.l2auto, args.l2manual, args.l2plus, args.sauto, args.smanual, \
+    t = convert_to_root(args.infiles, args.out, args.l1rate, args.l2auto, args.l2manual, args.sauto, args.smanual, \
                         args.max_img, args.rawcam_format)
 
     tf = time.clock()
@@ -224,6 +228,8 @@ if __name__ == '__main__':
     outfile.Write()
     
     if args.show:
+
+        matplotlib.use('tkagg')                           
         
         print "Drawing saved pixels..."
         im = imtools.ImGrid(args.infiles[0])

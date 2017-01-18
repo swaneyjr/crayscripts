@@ -54,7 +54,8 @@ def save_frames(vids, l1thresh=None):
     ret, frame = cap.read()
     
     while ret and cap.isOpened():
-    
+
+      frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
       if np.amax(frame) >= l1thresh:
         imname = fbase + '_f' + str(iframe) + '.jpg'
         print "Writing to %s" % imname
