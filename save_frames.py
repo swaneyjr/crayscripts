@@ -48,7 +48,7 @@ def save_frames(vids, l1thresh=None):
   for fname in vids:
     print fname
       
-    fbase = fname.split('.')[0]
+    fbase = fname.split('/')[-1].split('.')[0]
     cap = cv2.VideoCapture(fname)
     iframe = 0
     ret, frame = cap.read()
