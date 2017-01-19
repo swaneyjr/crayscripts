@@ -41,11 +41,7 @@ def find_bg(images, out=None, conv_len=2, bg_img=50, clear_hotpix=False):
         
     else:
         if bg_img and (len(images) > bg_img):
-            l1test = images[bg_img:]
-	    images = images[:bg_img]
-        elif l1cal:
-            l1cal = None
-            print "Unable to perform L1 Calibration: too few images"
+            images = images[bg_img:]
         im_grid = imtools.ImGrid(images[0])
         w,h = im_grid.width, im_grid.height
         bands = im_grid.bands
@@ -142,13 +138,11 @@ if __name__ == '__main__':
     parser.add_argument('--out', default='bg.png', help='Output file name')
     parser.add_argument("--conv_len", type=int, default=0, help='Distance to which pixels are included in averaging')
     parser.add_argument('--show', action='store_true', help='Display resulting threshold image')
-    parser.add_argument('--bg_img', type=int, default=0, help='Limits number of images to be processed')
+    parser.add_argument('--bg_img', type=int, help='Limits number of images to be processed')
     parser.add_argument('--clear_hotpix', action='store_true', help='If convolved, raise hot pixel thresholds to 256')
     
     args = parser.parse_args()
     
-    if args.l1cal and args.bg_img==0:
-        args.bg_img = 50
     bg = find_bg(args.infiles, args.out, args.conv_len, args.bg_img, args.clear_hotpix)
     if args.show:
        import imshow
