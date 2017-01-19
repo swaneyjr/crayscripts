@@ -11,16 +11,16 @@ from hotcell import vbranch
 from bg_threshold import find_bg
 
 # find appropriate L1 thresholds for a given target rate
-def find_L1(imlist, l1_target_rate, bg_grid, dev_grid):
+def find_l1(imlist, l1_target_rate, bg_grid, dev_grid):
     
     # we don't need to survey the whole video
     if len(imlist) > 10/l1_target_rate:
         imlist = imlist[:10*target_saved]
     target_saved = int(l1_target_rate*len(imlist))
-    max_vals = np.zeros(len(imlist), bg_grid.shape[0])
+    max_vals = np.zeros((len(imlist), bg_grid.shape[0]))
     for i,im in enumerate(imlist):
         max_vals[i] = np.amax(np.amax((imtools.ImGrid(im)-bg_grid)/dev_grid, axis=1), axis=1)
-    l1array = np.sort(max_vals)[:,target_saved]
+    l1array = np.sort(max_vals,axis=0)[-target_saved]
     
     return l1array
 
@@ -39,7 +39,7 @@ def set_L2_thresh(imarray, thresh):
 
     return thresh_array
 
-def convert_to_root(infiles, out, l1_target_rate=None, l2auto=0, l2manual=0, s_thresh=True, max_img=0, rawcam_format=False):
+def convert_to_root(infiles, l1_target_rate=None, l2auto=0, l2manual=0, s_thresh=True, max_img=0, rawcam_format=False):
  
     avg3_kernel = np.array([[1,1,1],[1,0,1],[1,1,1]])/8.0
     avg5_kernel = np.array([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]])/16.0
@@ -94,12 +94,14 @@ def convert_to_root(infiles, out, l1_target_rate=None, l2auto=0, l2manual=0, s_t
     vbranch(t, 'pix_avg5', btype=float)
     vbranch(t, 'pix_bg', btype=float)
 
+    print "Finding L1 Threshold..."
+
     if l1_target_rate:
         l1array = find_l1(infiles, l1_target_rate, bg_grid, dev_grid)
     else:
         l1array = np.zeros(bg_grid.shape[0])
     
-
+    l1_grid = l1array.reshape(l1array.size,1,1) * dev_grid + bg_grid
 
     # fill TTree
     print "Starting loop..."
@@ -136,8 +138,7 @@ def convert_to_root(infiles, out, l1_target_rate=None, l2auto=0, l2manual=0, s_t
             print "%s: %d" % (c, l2array[cval]),
         print
 
-        l1_grid = l1array.reshape(3,1,1)*dev_grid + bg_grid
-        l2_grid = l2array.reshape(3,1,1)*dev_grid + bg_grid
+        l2_grid = l2array.reshape(imarray.n_bands,1,1)*dev_grid + bg_grid
 
         # enforce L1S
         if np.count_nonzero(imarray >= l1_grid) == 0: continue
@@ -219,8 +220,7 @@ if __name__ == '__main__':
     outfile = r.TFile(args.out, "recreate")        
         
     ti = time.clock()
-    t = convert_to_root(args.infiles, args.out, args.l1rate, args.l2auto, args.l2manual, args.sauto, args.smanual, \
-                        args.max_img, args.rawcam_format)
+    t = convert_to_root(args.infiles, args.l1rate, args.l2auto, args.l2manual, args.s_thresh, args.max_img, args.rawcam_format)
 
     tf = time.clock()
       

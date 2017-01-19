@@ -35,7 +35,9 @@ class ImGrid(np.ndarray):
         else:
           imarray = np.array([imarray])
         
-          
+    else: # what kind of file is it?
+      return None
+
     f.close()
     
     obj = np.asarray(imarray).view(cls)
