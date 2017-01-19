@@ -107,12 +107,19 @@ def convert_to_root(infiles, l1_target_rate=None, l2auto=0, l2manual=0, s_thresh
     print "Starting loop..."
     prev_name = ''
     for i,im_name in enumerate(infiles):
-        
-        print
-        print "File %d/%d:" % (i+1,len(infiles))
 
         imarray = imtools.ImGrid(im_name)
         im_base = im_name.split('.')
+
+        l2_grid = l2array.reshape(imarray.n_bands,1,1)*dev_grid + bg_grid
+
+        # enforce L1S
+        if np.count_nonzero(imarray >= l1_grid) == 0: continue
+        if im_base[0] != prev_name:
+            n_img[0] += 1
+
+        print
+        print "File %d/%d:" % (i+1,len(infiles))
 
         # set L2 threshold
         if l2auto:
@@ -137,13 +144,6 @@ def convert_to_root(infiles, l1_target_rate=None, l2auto=0, l2manual=0, s_thresh
         for cval, c in enumerate(imarray.bands):
             print "%s: %d" % (c, l2array[cval]),
         print
-
-        l2_grid = l2array.reshape(imarray.n_bands,1,1)*dev_grid + bg_grid
-
-        # enforce L1S
-        if np.count_nonzero(imarray >= l1_grid) == 0: continue
-        if im_base[0] != prev_name:
-            n_img[0] += 1
 
         avg3_array = [convolve2d(imarray[cval], avg3_kernel, mode='same', boundary='symm') for cval in xrange(imarray.n_bands)]
         avg5_array = [convolve2d(imarray[cval], avg5_kernel, mode='same', boundary='symm') for cval in xrange(imarray.n_bands)]
