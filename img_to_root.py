@@ -134,8 +134,11 @@ def convert_to_root(infiles, l1_target_rate=None, l2auto=0, l2manual=0, s_thresh
             for i,v in enumerate(l2manual):
                 l2array[i] = v
 
-        else:
+        elif s_thresh:
             l2array = 0.9*l1array
+
+        else:
+            l2array = l1array-1
 
         l2_grid = l2array.reshape(imarray.n_bands,1,1)*dev_grid + bg_grid    
         
