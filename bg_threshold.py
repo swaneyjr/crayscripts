@@ -8,7 +8,7 @@ import imtools
 from cv2 import VideoCapture
 
 # uses an image to create a grid of background values
-def find_bg(images, out=None, conv_len=2, bg_img=50, l1cal=False, clear_hotpix=False):
+def find_bg(images, out=None, conv_len=2, bg_img=50, clear_hotpix=False):
 
     vid = False
     
@@ -52,7 +52,7 @@ def find_bg(images, out=None, conv_len=2, bg_img=50, l1cal=False, clear_hotpix=F
         n_bands = im_grid.n_bands
  
         max_grid = np.zeros((n_bands,h,w), dtype=int)
-        s_grid = np.zeros((n_bands,h,w), dtype=int)
+        s_grid = np.zeros((n_bands,h,w), dtype=float)
     
 
     # determine sampling resolution
@@ -77,8 +77,8 @@ def find_bg(images, out=None, conv_len=2, bg_img=50, l1cal=False, clear_hotpix=F
         iframe = 0
         ret, frame = cap.read()
         while ret and cap.isOpened(): 
-            s_grid = np.median([max_grid, s_grid, frame], axis=0).astype(int)
-            max_grid = np.amax([max_grid, s_grid, frame], axis=0).astype(int)
+            s_grid = np.median([max_grid, s_grid, frame], axis=0)
+            max_grid = np.amax([max_grid, s_grid, frame], axis=0)
             if (iframe+1) % 100 == 0:
                 print " %d" % (iframe+1)
             iframe += 1
@@ -91,8 +91,8 @@ def find_bg(images, out=None, conv_len=2, bg_img=50, l1cal=False, clear_hotpix=F
             if (i+1) % 10 == 0:
                 print " %d/%d" % (i+1,n_img_bg)
             im_grid = imtools.ImGrid(im)
-            s_grid = np.median([max_grid, s_grid, im_grid], axis=0).astype(int)
-            max_grid = np.amax([max_grid, s_grid, im_grid], axis=0).astype(int)
+            s_grid = np.median([max_grid, s_grid, im_grid], axis=0)
+            max_grid = np.amax([max_grid, s_grid, im_grid], axis=0)
 
     print "Downsampling image..."
 
@@ -115,53 +115,6 @@ def find_bg(images, out=None, conv_len=2, bg_img=50, l1cal=False, clear_hotpix=F
 
     # resize
     s_grid = np.repeat(np.repeat(s_grid, sample_block, axis=1), sample_block, axis=2)
-    
-    # calibrate L1
-    if l1cal:
-	print "Calibrating L1 threshold..."
-	l1thresh = 256
-	n_bins = 20
-	failed = False
-	
-	while l1thresh > 3:
-            if failed:
-                s_grid *= 1.1
-            max_array = np.zeros(n_bins)
-            if vid:
-                test_frames = 10/l1cal
-                frames_passed = test_frames
-                ret, frame = cap.read()
-                iframe = 0
-                while ret and cap.isOpened():
-                    iframe += 1
-                    max_minus_bg = np.amax(frame-s_grid)
-                    if max_minus_bg >= n_bins-1:
-                        max_array[n_bins-1] += 1
-                    elif max_minus_bg >= 0:
-                        max_array[int(max_minus_bg)] += 1
-                    if iframe >= test_frames: break
-                    ret, frame = cap.read()
-            else:
-                frames_passed = len(l1test)
-                for i,im in enumerate(l1test):
-                    if i%100==0:
-                        print " %d/%d" % (i, len(l1test))
-                    im_grid = imtools.ImGrid(im)
-                    max_minus_bg = np.amax(im_grid-s_grid)
-                    if max_minus_bg >= n_bins-1:
-                        max_array[n_bins-1] += 1
-                    elif max_minus_bg >= 0:
-                        max_array[int(max_minus_bg)] += 1
-            l1thresh = 0
-            target_passed = frames_passed*l1cal
-            frames_passed = np.sum(max_array)
-            while frames_passed > target_passed:
-                l1thresh += 1
-                frames_passed -= max_array[l1thresh-1]
-            print "L1 threshold = %d" % l1thresh
-            failed = True
-	s_grid += l1thresh
-	
 
     
     if out:
@@ -190,14 +143,13 @@ if __name__ == '__main__':
     parser.add_argument("--conv_len", type=int, default=0, help='Distance to which pixels are included in averaging')
     parser.add_argument('--show', action='store_true', help='Display resulting threshold image')
     parser.add_argument('--bg_img', type=int, default=0, help='Limits number of images to be processed')
-    parser.add_argument('--l1cal', type=float, help='Target rate of passing L1 threshold')
     parser.add_argument('--clear_hotpix', action='store_true', help='If convolved, raise hot pixel thresholds to 256')
     
     args = parser.parse_args()
     
     if args.l1cal and args.bg_img==0:
         args.bg_img = 50
-    bg = find_bg(args.infiles, args.out, args.conv_len, args.bg_img, args.l1cal, args.clear_hotpix)
+    bg = find_bg(args.infiles, args.out, args.conv_len, args.bg_img, args.clear_hotpix)
     if args.show:
        import imshow
        imshow.imshow(args.out)

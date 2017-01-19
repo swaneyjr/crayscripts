@@ -145,7 +145,7 @@ def convert_to_root(infiles, l1_target_rate=None, l2auto=0, l2manual=0, s_thresh
             
         print "L2 threshold: \t",
         for cval, c in enumerate(imarray.bands):
-            print "%s: %d" % (c, l2array[cval]),
+            print "%s: %1.1f" % (c, l2array[cval]),
         print
 
         avg3_array = [convolve2d(imarray[cval], avg3_kernel, mode='same', boundary='symm') for cval in xrange(imarray.n_bands)]
