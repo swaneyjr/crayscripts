@@ -111,8 +111,6 @@ def convert_to_root(infiles, l1_target_rate=None, l2auto=0, l2manual=0, s_thresh
         imarray = imtools.ImGrid(im_name)
         im_base = im_name.split('.')
 
-        l2_grid = l2array.reshape(imarray.n_bands,1,1)*dev_grid + bg_grid
-
         # enforce L1S
         if np.count_nonzero(imarray >= l1_grid) == 0: continue
         if im_base[0] != prev_name:
@@ -137,7 +135,9 @@ def convert_to_root(infiles, l1_target_rate=None, l2auto=0, l2manual=0, s_thresh
                 l2array[i] = v
 
         else:
-            l2array = 0.9*l1array                   
+            l2array = 0.9*l1array
+
+        l2_grid = l2array.reshape(imarray.n_bands,1,1)*dev_grid + bg_grid    
         
             
         print "L2 threshold: \t",
