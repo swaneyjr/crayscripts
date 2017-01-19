@@ -15,7 +15,7 @@ def find_l1(imlist, l1_target_rate, bg_grid, dev_grid):
     
     # we don't need to survey the whole video
     if len(imlist) > 10/l1_target_rate:
-        imlist = imlist[:10*target_saved]
+        imlist = imlist[:int(10/l1_target_rate)]
     target_saved = int(l1_target_rate*len(imlist))
     max_vals = np.zeros((len(imlist), bg_grid.shape[0]))
     for i,im in enumerate(imlist):
