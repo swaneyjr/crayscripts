@@ -11,7 +11,7 @@ from hotcell import vbranch
 from bg_threshold import find_bg
 
 # find appropriate L1 thresholds for a given target rate
-def find_l1(imlist, l1_target_rate, bg_grid, dev_grid):
+def find_l1(imlist, l1_target_rate, bg_grid, dev_grid, b=0):
     
     # we don't need to survey the whole video
     if len(imlist) > 10/l1_target_rate:
@@ -19,7 +19,7 @@ def find_l1(imlist, l1_target_rate, bg_grid, dev_grid):
     target_saved = int(l1_target_rate*len(imlist))
     max_vals = np.zeros((len(imlist), bg_grid.shape[0]))
     for i,im in enumerate(imlist):
-        max_vals[i] = np.amax(np.amax((imtools.ImGrid(im)-bg_grid)/dev_grid, axis=1), axis=1)
+        max_vals[i] = np.amax(np.amax((imtools.ImGrid(im)[:,b:-b,b:-b]-bg_grid)/dev_grid, axis=1), axis=1)
     l1array = np.sort(max_vals,axis=0)[-target_saved]
     
     return l1array
