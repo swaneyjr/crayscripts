@@ -20,7 +20,7 @@ def find_l1(imlist, l1_target_rate, bg_grid, dev_grid, border=0):
     max_vals = np.zeros((len(imlist), bg_grid.shape[0]))
     for i,im in enumerate(imlist):
         imarray = imtools.ImGrid(im)
-        if b: imarray = imarray[:,border:-border,border:-border]
+        if border: imarray = imarray[:,border:-border,border:-border]
         max_vals[i] = np.amax(np.amax(imarray-bg_grid)/dev_grid, axis=1), axis=1)
     l1array = np.sort(max_vals,axis=0)[-target_saved]
     
