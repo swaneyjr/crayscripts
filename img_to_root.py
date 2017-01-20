@@ -52,10 +52,12 @@ def convert_to_root(infiles, l1_target_rate=None, l2auto=0, l2manual=0, s_thresh
     # handle S threshold settings
     if s_thresh:
         bg_grid = find_bg(infiles[:n_images_auto])
+        if border: bg_grid = bg_grid[:,border:-border,border:-border]
         infiles = infiles[n_images_auto:]
         dev_grid = np.sqrt(bg_grid)
     else:
         bg_grid = np.zeros(imtools.ImGrid(infiles[0]).shape)
+        if border: bg_grid = bg_grid[:,border:-border,border:-border]
         dev_grid = np.ones(bg_grid.shape)
         
 
