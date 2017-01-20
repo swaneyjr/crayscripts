@@ -39,7 +39,7 @@ def set_L2_thresh(imarray, thresh):
 
     return thresh_array
 
-def convert_to_root(infiles, l1_target_rate=None, l2auto=0, l2manual=0, s_thresh=True, max_img=0, rawcam_format=False):
+def convert_to_root(infiles, l1_target_rate=None, l2auto=0, l2manual=0, s_thresh=True, border=0, max_img=0, rawcam_format=False):
  
     avg3_kernel = np.array([[1,1,1],[1,0,1],[1,1,1]])/8.0
     avg5_kernel = np.array([[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1]])/16.0
@@ -109,6 +109,8 @@ def convert_to_root(infiles, l1_target_rate=None, l2auto=0, l2manual=0, s_thresh
     for i,im_name in enumerate(infiles):
 
         imarray = imtools.ImGrid(im_name)
+        if border:
+            imarray = imarray[:,border:-border,border:-border]
         im_base = im_name.split('.')
 
         # enforce L1S
@@ -207,12 +209,13 @@ if __name__ == '__main__':
     parser = ArgumentParser(description = 'Converts JPEG files to a ROOT file')
     parser.add_argument("--in", required=True, dest='infiles', nargs='+', help='Images to be converted to a ROOT file')
     parser.add_argument("--out", default='images.root', help='Output file name')
-    parser.add_argument("--l1rate", type=float, default=None, help='L1 threshold for highest band')
+    parser.add_argument("--l1_rate", type=float, default=None, help='L1 threshold for highest band')
     
     l2option = parser.add_mutually_exclusive_group()
     l2option.add_argument("--l2auto", type=float, help='Target fraction of pixels kept after configuring L2 threshold')
     l2option.add_argument("--l2manual", nargs='+', type=int, help='L2 threshold for each band')
 
+    parser.add_argument("--border", type=int, help="Number of pixels to discard around edges")
     parser.add_argument("--max_img", type=int, help='Maximum number of images to convert')
     parser.add_argument('-r', "--rawcam_format", action='store_true', help='Creates branches from image name: name_t_(bname val)_(bname val)...')
     parser.add_argument('-s', "--show", action='store_true', help='Generate graphs of background thresholds and saved pixels')
@@ -223,7 +226,8 @@ if __name__ == '__main__':
     outfile = r.TFile(args.out, "recreate")        
         
     ti = time.clock()
-    t = convert_to_root(args.infiles, args.l1rate, args.l2auto, args.l2manual, args.s_thresh, args.max_img, args.rawcam_format)
+    t = convert_to_root(args.infiles, args.l1_rate, args.l2auto, args.l2manual,
+                        args.s_thresh, args.border, args.max_img, args.rawcam_format)
 
     tf = time.clock()
       
