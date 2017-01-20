@@ -11,7 +11,7 @@ from hotcell import vbranch
 from bg_threshold import find_bg
 
 # find appropriate L1 thresholds for a given target rate
-def find_l1(imlist, l1_target_rate, bg_grid, dev_grid, b=0):
+def find_l1(imlist, l1_target_rate, bg_grid, dev_grid, border=0):
     
     # we don't need to survey the whole video
     if len(imlist) > 10/l1_target_rate:
@@ -19,7 +19,9 @@ def find_l1(imlist, l1_target_rate, bg_grid, dev_grid, b=0):
     target_saved = int(l1_target_rate*len(imlist))
     max_vals = np.zeros((len(imlist), bg_grid.shape[0]))
     for i,im in enumerate(imlist):
-        max_vals[i] = np.amax(np.amax((imtools.ImGrid(im)[:,b:-b,b:-b]-bg_grid)/dev_grid, axis=1), axis=1)
+        imarray = imtools.ImGrid(im)
+        if b: imarray = imarray[:,border:-border,border:-border]
+        max_vals[i] = np.amax(np.amax(imarray-bg_grid)/dev_grid, axis=1), axis=1)
     l1array = np.sort(max_vals,axis=0)[-target_saved]
     
     return l1array
@@ -99,7 +101,7 @@ def convert_to_root(infiles, l1_target_rate=None, l2auto=0, l2manual=0, s_thresh
     print "Finding L1 Threshold..."
 
     if l1_target_rate:
-        l1array = find_l1(infiles, l1_target_rate, bg_grid, dev_grid)
+        l1array = find_l1(infiles, l1_target_rate, bg_grid, dev_grid, border)
     else:
         l1array = np.zeros(bg_grid.shape[0])
     
