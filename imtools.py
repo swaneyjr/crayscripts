@@ -60,8 +60,8 @@ class ImGrid(np.ndarray):
 def spectrum(imarray, counts=1024, region=None):
   if not region:
     region = (0,0,imarray.width, imarray.height)
-  return np.array([np.bincount(imarray[region[1]:region[3],region[0]:region[2], cval].flatten(), minlength=counts) \
-                   for cval in xrange(imarray.shape[2])])
+  return np.array([np.bincount(imarray[cval, region[1]:region[3],region[0]:region[2]].flatten(), minlength=counts) \
+                   for cval in xrange(imarray.n_bands)])
 
 def unzipped_ext(file):
   zip_types = ['gz','tar']
