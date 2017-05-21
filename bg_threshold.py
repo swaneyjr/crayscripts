@@ -41,7 +41,7 @@ def find_bg(images, out=None, conv_len=2, bg_img=50, clear_hotpix=False):
         
     else:
         if bg_img and (len(images) > bg_img):
-            images = images[bg_img:]
+            images = images[:bg_img]
         im_grid = imtools.ImGrid(images[0])
         w,h = im_grid.width, im_grid.height
         bands = im_grid.bands
