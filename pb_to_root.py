@@ -1,4 +1,4 @@
-import bgThresh_pb2 as pb
+import crayfis_data_pb2 as pb
 import ROOT as r
 import numpy as np
 
