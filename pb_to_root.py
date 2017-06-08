@@ -69,8 +69,7 @@ def pb_to_trees(fname):
         
         for xb_field,val in xb.ListFields():
             if xb_field.label == 3: continue
-            if not xb_field.name in xb_containers.iterkeys():
-                print " Creating exposure field %s" % xb_field.name 
+            if not xb_field.name in xb_containers.iterkeys(): 
                 xb_containers[xb_field.name] = np.zeros(1,dtype=object)
                 exposure.Branch(xb_field.name, xb_containers[xb_field.name], \
                                 xb_field.name+short_type[type(val)])
@@ -84,7 +83,6 @@ def pb_to_trees(fname):
             for evt_field,val in evt.ListFields():
                 if evt_field.label == 3: continue
                 if not evt_field.name in evt_containers.iterkeys():
-                    print " Creating event field %s" % evt_field.name
                     evt_containers[evt_field.name] = np.zeros(1,dtype=object)
                     events.Branch(evt_field.name, evt_containers[evt_field.name], \
                                   evt_field.name + short_type[type(val)])
@@ -99,7 +97,6 @@ def pb_to_trees(fname):
             for pix in evt.pixels:
                 for pix_field,val in pix.ListFields():
                     if not pix_field.name in pix_containers.iterkeys():
-                        print "Creating pix field %s" % pix_field.name
                         pix_containers[pix_field.name] = r.vector(full_type[type(val)])()
                         events.Branch('pix_'+pix_field.name, pix_containers[pix_field.name])
                     pix_containers[pix_field.name].push_back(val)
