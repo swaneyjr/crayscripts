@@ -18,7 +18,7 @@ _sym_db = _symbol_database.Default()
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='home/jswaney/crayon/crayfis_data.proto',
   package='crayfis',
-  serialized_pb=_b('\n&home/jswaney/crayon/crayfis_data.proto\x12\x07\x63rayfis\"\xdd\x01\n\tDataChunk\x12\'\n\x0brun_configs\x18\x01 \x03(\x0b\x32\x12.crayfis.RunConfig\x12/\n\x0f\x65xposure_blocks\x18\x02 \x03(\x0b\x32\x16.crayfis.ExposureBlock\x12\x37\n\x13\x63\x61libration_results\x18\x03 \x03(\x0b\x32\x1a.crayfis.CalibrationResult\x12=\n\x16precalibration_results\x18\x04 \x03(\x0b\x32\x1d.crayfis.PreCalibrationResult\"\xa4\x01\n\tRunConfig\x12\r\n\x05id_hi\x18\x01 \x01(\x04\x12\r\n\x05id_lo\x18\x02 \x01(\x04\x12\x12\n\nstart_time\x18\x03 \x01(\x04\x12\x15\n\rcrayfis_build\x18\x04 \x01(\t\x12\x11\n\thw_params\x18\x05 \x01(\t\x12\x11\n\tos_params\x18\x06 \x01(\t\x12\x15\n\rcamera_params\x18\x07 \x01(\t\x12\x11\n\tcamera_id\x18\x08 \x01(\r\"\xe5\x05\n\rExposureBlock\x12\x0e\n\x06run_id\x18\x01 \x01(\x04\x12\x12\n\nstart_time\x18\x02 \x01(\x04\x12\x10\n\x08\x65nd_time\x18\x03 \x01(\x04\x12\x17\n\x0fstart_time_nano\x18\x16 \x01(\x04\x12\x15\n\rend_time_nano\x18\x17 \x01(\x04\x12\x16\n\x0estart_time_ntp\x18\x18 \x01(\x04\x12\x14\n\x0c\x65nd_time_ntp\x18\x19 \x01(\x04\x12\x0f\n\x07gps_lat\x18\x04 \x01(\x01\x12\x0f\n\x07gps_lon\x18\x05 \x01(\x01\x12\x14\n\x0cgps_altitude\x18\x13 \x01(\x01\x12\x14\n\x0cgps_accuracy\x18\x14 \x01(\x02\x12\x13\n\x0bgps_fixtime\x18\x15 \x01(\x04\x12\x18\n\x10gps_fixtime_nano\x18\x1c \x01(\x04\x12\x14\n\x0c\x62\x61ttery_temp\x18  \x01(\r\x12/\n\tdaq_state\x18\x06 \x01(\x0e\x32\x1c.crayfis.ExposureBlock.State\x12\r\n\x05res_x\x18\x1a \x01(\r\x12\r\n\x05res_y\x18\x1b \x01(\r\x12\x1e\n\x06\x65vents\x18\x07 \x03(\x0b\x32\x0e.crayfis.Event\x12\x11\n\tL1_thresh\x18\x08 \x01(\x05\x12\x11\n\tL2_thresh\x18\t \x01(\x05\x12\x0f\n\x07L1_conf\x18\x1d \x01(\t\x12\x0f\n\x07L2_conf\x18\x1e \x01(\t\x12\x14\n\x0cL1_processed\x18\n \x01(\r\x12\x14\n\x0cL2_processed\x18\x0b \x01(\r\x12\x16\n\x0e\x66rames_dropped\x18\x0c \x01(\r\x12\x0f\n\x07L1_pass\x18\r \x01(\r\x12\x0f\n\x07L1_skip\x18\x0e \x01(\r\x12\x0f\n\x07L2_pass\x18\x0f \x01(\r\x12\x0f\n\x07L2_skip\x18\x10 \x01(\r\x12\x0e\n\x06\x62g_avg\x18\x1f \x01(\x01\x12\x0b\n\x03xbn\x18\x11 \x01(\r\x12\x0f\n\x07\x61\x62orted\x18\x12 \x01(\x08\"@\n\x05State\x12\x08\n\x04INIT\x10\x00\x12\x12\n\x0ePRECALIBRATION\x10\x03\x12\x0f\n\x0b\x43\x41LIBRATION\x10\x01\x12\x08\n\x04\x44\x41TA\x10\x02\"\xeb\x02\n\x05\x45vent\x12\x11\n\ttimestamp\x18\x01 \x01(\x04\x12\x16\n\x0etimestamp_nano\x18\x0e \x01(\x04\x12\x15\n\rtimestamp_ntp\x18\x0f \x01(\x04\x12\x0f\n\x07gps_lat\x18\x02 \x01(\x01\x12\x0f\n\x07gps_lon\x18\x03 \x01(\x01\x12\x14\n\x0cgps_altitude\x18\x0b \x01(\x01\x12\x14\n\x0cgps_accuracy\x18\x0c \x01(\x02\x12\x13\n\x0bgps_fixtime\x18\r \x01(\x04\x12\x18\n\x10gps_fixtime_nano\x18\x10 \x01(\x04\x12\x14\n\x0c\x62\x61ttery_temp\x18\x11 \x01(\r\x12\x1e\n\x06pixels\x18\x04 \x03(\x0b\x32\x0e.crayfis.Pixel\x12\x0b\n\x03\x61vg\x18\x05 \x01(\x01\x12\x0b\n\x03std\x18\x06 \x01(\x01\x12\x0b\n\x03xbn\x18\x07 \x01(\r\x12\x10\n\x08orient_x\x18\x08 \x01(\x02\x12\x10\n\x08orient_y\x18\t \x01(\x02\x12\x10\n\x08orient_z\x18\n \x01(\x02\x12\x10\n\x08pressure\x18\x12 \x01(\x02\"p\n\x05Pixel\x12\t\n\x01x\x18\x01 \x01(\r\x12\t\n\x01y\x18\x02 \x01(\r\x12\x0b\n\x03val\x18\x03 \x01(\r\x12\x14\n\x0c\x61\x64justed_val\x18\x07 \x01(\r\x12\x10\n\x08near_max\x18\x04 \x01(\r\x12\r\n\x05\x61vg_3\x18\x05 \x01(\x02\x12\r\n\x05\x61vg_5\x18\x06 \x01(\x02\"\xa1\x01\n\x11\x43\x61librationResult\x12\x0e\n\x06run_id\x18\x01 \x01(\x04\x12\x12\n\nstart_time\x18\x02 \x01(\x04\x12\x10\n\x08\x65nd_time\x18\x03 \x01(\x04\x12\x12\n\nhist_pixel\x18\x04 \x03(\r\x12\x14\n\x0chist_l2pixel\x18\x05 \x03(\r\x12\x15\n\rhist_maxpixel\x18\x06 \x03(\r\x12\x15\n\rhist_numpixel\x18\x07 \x03(\r\"\x89\x01\n\x14PreCalibrationResult\x12\x0e\n\x06run_id\x18\x01 \x01(\x04\x12\x12\n\nstart_time\x18\x02 \x01(\x04\x12\x10\n\x08\x65nd_time\x18\x03 \x01(\x04\x12\x0f\n\x07weights\x18\x06 \x03(\x02\x12\x14\n\x0csample_res_x\x18\x07 \x01(\r\x12\x14\n\x0csample_res_y\x18\x08 \x01(\r\"\x90\x01\n\rCrayonMessage\x12\x0f\n\x07payload\x18\x01 \x01(\x0c\x12\x0e\n\x06run_id\x18\x02 \x01(\t\x12\x11\n\tdevice_id\x18\x03 \x01(\t\x12\x0f\n\x07user_id\x18\x04 \x01(\r\x12\x10\n\x08\x61pp_code\x18\x05 \x01(\t\x12\x13\n\x0bremote_addr\x18\x06 \x01(\t\x12\x13\n\x0bsubmit_time\x18\x07 \x01(\rB\x1d\n\x0f\x65\x64u.uci.crayfisB\nDataProtos')
+  serialized_pb=_b('\n&home/jswaney/crayon/crayfis_data.proto\x12\x07\x63rayfis\"\xdd\x01\n\tDataChunk\x12\'\n\x0brun_configs\x18\x01 \x03(\x0b\x32\x12.crayfis.RunConfig\x12/\n\x0f\x65xposure_blocks\x18\x02 \x03(\x0b\x32\x16.crayfis.ExposureBlock\x12\x37\n\x13\x63\x61libration_results\x18\x03 \x03(\x0b\x32\x1a.crayfis.CalibrationResult\x12=\n\x16precalibration_results\x18\x04 \x03(\x0b\x32\x1d.crayfis.PreCalibrationResult\"\xa4\x01\n\tRunConfig\x12\r\n\x05id_hi\x18\x01 \x01(\x04\x12\r\n\x05id_lo\x18\x02 \x01(\x04\x12\x12\n\nstart_time\x18\x03 \x01(\x04\x12\x15\n\rcrayfis_build\x18\x04 \x01(\t\x12\x11\n\thw_params\x18\x05 \x01(\t\x12\x11\n\tos_params\x18\x06 \x01(\t\x12\x15\n\rcamera_params\x18\x07 \x01(\t\x12\x11\n\tcamera_id\x18\x08 \x01(\r\"\xf8\x05\n\rExposureBlock\x12\x0e\n\x06run_id\x18\x01 \x01(\x04\x12\x11\n\tprecal_id\x18! \x01(\x04\x12\x12\n\nstart_time\x18\x02 \x01(\x04\x12\x10\n\x08\x65nd_time\x18\x03 \x01(\x04\x12\x17\n\x0fstart_time_nano\x18\x16 \x01(\x04\x12\x15\n\rend_time_nano\x18\x17 \x01(\x04\x12\x16\n\x0estart_time_ntp\x18\x18 \x01(\x04\x12\x14\n\x0c\x65nd_time_ntp\x18\x19 \x01(\x04\x12\x0f\n\x07gps_lat\x18\x04 \x01(\x01\x12\x0f\n\x07gps_lon\x18\x05 \x01(\x01\x12\x14\n\x0cgps_altitude\x18\x13 \x01(\x01\x12\x14\n\x0cgps_accuracy\x18\x14 \x01(\x02\x12\x13\n\x0bgps_fixtime\x18\x15 \x01(\x04\x12\x18\n\x10gps_fixtime_nano\x18\x1c \x01(\x04\x12\x14\n\x0c\x62\x61ttery_temp\x18  \x01(\r\x12/\n\tdaq_state\x18\x06 \x01(\x0e\x32\x1c.crayfis.ExposureBlock.State\x12\r\n\x05res_x\x18\x1a \x01(\r\x12\r\n\x05res_y\x18\x1b \x01(\r\x12\x1e\n\x06\x65vents\x18\x07 \x03(\x0b\x32\x0e.crayfis.Event\x12\x11\n\tL1_thresh\x18\x08 \x01(\x05\x12\x11\n\tL2_thresh\x18\t \x01(\x05\x12\x0f\n\x07L1_conf\x18\x1d \x01(\t\x12\x0f\n\x07L2_conf\x18\x1e \x01(\t\x12\x14\n\x0cL1_processed\x18\n \x01(\r\x12\x14\n\x0cL2_processed\x18\x0b \x01(\r\x12\x16\n\x0e\x66rames_dropped\x18\x0c \x01(\r\x12\x0f\n\x07L1_pass\x18\r \x01(\r\x12\x0f\n\x07L1_skip\x18\x0e \x01(\r\x12\x0f\n\x07L2_pass\x18\x0f \x01(\r\x12\x0f\n\x07L2_skip\x18\x10 \x01(\r\x12\x0e\n\x06\x62g_avg\x18\x1f \x01(\x01\x12\x0b\n\x03xbn\x18\x11 \x01(\r\x12\x0f\n\x07\x61\x62orted\x18\x12 \x01(\x08\"@\n\x05State\x12\x08\n\x04INIT\x10\x00\x12\x12\n\x0ePRECALIBRATION\x10\x03\x12\x0f\n\x0b\x43\x41LIBRATION\x10\x01\x12\x08\n\x04\x44\x41TA\x10\x02\"\xeb\x02\n\x05\x45vent\x12\x11\n\ttimestamp\x18\x01 \x01(\x04\x12\x16\n\x0etimestamp_nano\x18\x0e \x01(\x04\x12\x15\n\rtimestamp_ntp\x18\x0f \x01(\x04\x12\x0f\n\x07gps_lat\x18\x02 \x01(\x01\x12\x0f\n\x07gps_lon\x18\x03 \x01(\x01\x12\x14\n\x0cgps_altitude\x18\x0b \x01(\x01\x12\x14\n\x0cgps_accuracy\x18\x0c \x01(\x02\x12\x13\n\x0bgps_fixtime\x18\r \x01(\x04\x12\x18\n\x10gps_fixtime_nano\x18\x10 \x01(\x04\x12\x14\n\x0c\x62\x61ttery_temp\x18\x11 \x01(\r\x12\x1e\n\x06pixels\x18\x04 \x03(\x0b\x32\x0e.crayfis.Pixel\x12\x0b\n\x03\x61vg\x18\x05 \x01(\x01\x12\x0b\n\x03std\x18\x06 \x01(\x01\x12\x0b\n\x03xbn\x18\x07 \x01(\r\x12\x10\n\x08orient_x\x18\x08 \x01(\x02\x12\x10\n\x08orient_y\x18\t \x01(\x02\x12\x10\n\x08orient_z\x18\n \x01(\x02\x12\x10\n\x08pressure\x18\x12 \x01(\x02\"p\n\x05Pixel\x12\t\n\x01x\x18\x01 \x01(\r\x12\t\n\x01y\x18\x02 \x01(\r\x12\x0b\n\x03val\x18\x03 \x01(\r\x12\x14\n\x0c\x61\x64justed_val\x18\x07 \x01(\r\x12\x10\n\x08near_max\x18\x04 \x01(\r\x12\r\n\x05\x61vg_3\x18\x05 \x01(\x02\x12\r\n\x05\x61vg_5\x18\x06 \x01(\x02\"\xa1\x01\n\x11\x43\x61librationResult\x12\x0e\n\x06run_id\x18\x01 \x01(\x04\x12\x12\n\nstart_time\x18\x02 \x01(\x04\x12\x10\n\x08\x65nd_time\x18\x03 \x01(\x04\x12\x12\n\nhist_pixel\x18\x04 \x03(\r\x12\x14\n\x0chist_l2pixel\x18\x05 \x03(\r\x12\x15\n\rhist_maxpixel\x18\x06 \x03(\r\x12\x15\n\rhist_numpixel\x18\x07 \x03(\r\"\xe1\x01\n\x14PreCalibrationResult\x12\x0e\n\x06run_id\x18\x01 \x01(\x04\x12\x12\n\nstart_time\x18\x02 \x01(\x04\x12\x10\n\x08\x65nd_time\x18\x03 \x01(\x04\x12\x14\n\x0c\x62\x61ttery_temp\x18\x0c \x01(\r\x12\x0f\n\x07weights\x18\x06 \x03(\x02\x12\x14\n\x0csample_res_x\x18\x07 \x01(\r\x12\x14\n\x0csample_res_y\x18\x08 \x01(\r\x12\x11\n\thotcell_x\x18\t \x03(\r\x12\x11\n\thotcell_y\x18\n \x03(\r\x12\x1a\n\x12resample_algorithm\x18\x0b \x01(\r\"\x90\x01\n\rCrayonMessage\x12\x0f\n\x07payload\x18\x01 \x01(\x0c\x12\x0e\n\x06run_id\x18\x02 \x01(\t\x12\x11\n\tdevice_id\x18\x03 \x01(\t\x12\x0f\n\x07user_id\x18\x04 \x01(\r\x12\x10\n\x08\x61pp_code\x18\x05 \x01(\t\x12\x13\n\x0bremote_addr\x18\x06 \x01(\t\x12\x13\n\x0bsubmit_time\x18\x07 \x01(\rB\x1d\n\x0f\x65\x64u.uci.crayfisB\nDataProtos')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -49,8 +49,8 @@ _EXPOSUREBLOCK_STATE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=1120,
-  serialized_end=1184,
+  serialized_start=1139,
+  serialized_end=1203,
 )
 _sym_db.RegisterEnumDescriptor(_EXPOSUREBLOCK_STATE)
 
@@ -200,217 +200,224 @@ _EXPOSUREBLOCK = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='start_time', full_name='crayfis.ExposureBlock.start_time', index=1,
+      name='precal_id', full_name='crayfis.ExposureBlock.precal_id', index=1,
+      number=33, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='start_time', full_name='crayfis.ExposureBlock.start_time', index=2,
       number=2, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='end_time', full_name='crayfis.ExposureBlock.end_time', index=2,
+      name='end_time', full_name='crayfis.ExposureBlock.end_time', index=3,
       number=3, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='start_time_nano', full_name='crayfis.ExposureBlock.start_time_nano', index=3,
+      name='start_time_nano', full_name='crayfis.ExposureBlock.start_time_nano', index=4,
       number=22, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='end_time_nano', full_name='crayfis.ExposureBlock.end_time_nano', index=4,
+      name='end_time_nano', full_name='crayfis.ExposureBlock.end_time_nano', index=5,
       number=23, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='start_time_ntp', full_name='crayfis.ExposureBlock.start_time_ntp', index=5,
+      name='start_time_ntp', full_name='crayfis.ExposureBlock.start_time_ntp', index=6,
       number=24, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='end_time_ntp', full_name='crayfis.ExposureBlock.end_time_ntp', index=6,
+      name='end_time_ntp', full_name='crayfis.ExposureBlock.end_time_ntp', index=7,
       number=25, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='gps_lat', full_name='crayfis.ExposureBlock.gps_lat', index=7,
+      name='gps_lat', full_name='crayfis.ExposureBlock.gps_lat', index=8,
       number=4, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='gps_lon', full_name='crayfis.ExposureBlock.gps_lon', index=8,
+      name='gps_lon', full_name='crayfis.ExposureBlock.gps_lon', index=9,
       number=5, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='gps_altitude', full_name='crayfis.ExposureBlock.gps_altitude', index=9,
+      name='gps_altitude', full_name='crayfis.ExposureBlock.gps_altitude', index=10,
       number=19, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='gps_accuracy', full_name='crayfis.ExposureBlock.gps_accuracy', index=10,
+      name='gps_accuracy', full_name='crayfis.ExposureBlock.gps_accuracy', index=11,
       number=20, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='gps_fixtime', full_name='crayfis.ExposureBlock.gps_fixtime', index=11,
+      name='gps_fixtime', full_name='crayfis.ExposureBlock.gps_fixtime', index=12,
       number=21, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='gps_fixtime_nano', full_name='crayfis.ExposureBlock.gps_fixtime_nano', index=12,
+      name='gps_fixtime_nano', full_name='crayfis.ExposureBlock.gps_fixtime_nano', index=13,
       number=28, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='battery_temp', full_name='crayfis.ExposureBlock.battery_temp', index=13,
+      name='battery_temp', full_name='crayfis.ExposureBlock.battery_temp', index=14,
       number=32, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='daq_state', full_name='crayfis.ExposureBlock.daq_state', index=14,
+      name='daq_state', full_name='crayfis.ExposureBlock.daq_state', index=15,
       number=6, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='res_x', full_name='crayfis.ExposureBlock.res_x', index=15,
+      name='res_x', full_name='crayfis.ExposureBlock.res_x', index=16,
       number=26, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='res_y', full_name='crayfis.ExposureBlock.res_y', index=16,
+      name='res_y', full_name='crayfis.ExposureBlock.res_y', index=17,
       number=27, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='events', full_name='crayfis.ExposureBlock.events', index=17,
+      name='events', full_name='crayfis.ExposureBlock.events', index=18,
       number=7, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='L1_thresh', full_name='crayfis.ExposureBlock.L1_thresh', index=18,
+      name='L1_thresh', full_name='crayfis.ExposureBlock.L1_thresh', index=19,
       number=8, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='L2_thresh', full_name='crayfis.ExposureBlock.L2_thresh', index=19,
+      name='L2_thresh', full_name='crayfis.ExposureBlock.L2_thresh', index=20,
       number=9, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='L1_conf', full_name='crayfis.ExposureBlock.L1_conf', index=20,
+      name='L1_conf', full_name='crayfis.ExposureBlock.L1_conf', index=21,
       number=29, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='L2_conf', full_name='crayfis.ExposureBlock.L2_conf', index=21,
+      name='L2_conf', full_name='crayfis.ExposureBlock.L2_conf', index=22,
       number=30, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='L1_processed', full_name='crayfis.ExposureBlock.L1_processed', index=22,
+      name='L1_processed', full_name='crayfis.ExposureBlock.L1_processed', index=23,
       number=10, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='L2_processed', full_name='crayfis.ExposureBlock.L2_processed', index=23,
+      name='L2_processed', full_name='crayfis.ExposureBlock.L2_processed', index=24,
       number=11, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='frames_dropped', full_name='crayfis.ExposureBlock.frames_dropped', index=24,
+      name='frames_dropped', full_name='crayfis.ExposureBlock.frames_dropped', index=25,
       number=12, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='L1_pass', full_name='crayfis.ExposureBlock.L1_pass', index=25,
+      name='L1_pass', full_name='crayfis.ExposureBlock.L1_pass', index=26,
       number=13, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='L1_skip', full_name='crayfis.ExposureBlock.L1_skip', index=26,
+      name='L1_skip', full_name='crayfis.ExposureBlock.L1_skip', index=27,
       number=14, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='L2_pass', full_name='crayfis.ExposureBlock.L2_pass', index=27,
+      name='L2_pass', full_name='crayfis.ExposureBlock.L2_pass', index=28,
       number=15, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='L2_skip', full_name='crayfis.ExposureBlock.L2_skip', index=28,
+      name='L2_skip', full_name='crayfis.ExposureBlock.L2_skip', index=29,
       number=16, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='bg_avg', full_name='crayfis.ExposureBlock.bg_avg', index=29,
+      name='bg_avg', full_name='crayfis.ExposureBlock.bg_avg', index=30,
       number=31, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='xbn', full_name='crayfis.ExposureBlock.xbn', index=30,
+      name='xbn', full_name='crayfis.ExposureBlock.xbn', index=31,
       number=17, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='aborted', full_name='crayfis.ExposureBlock.aborted', index=31,
+      name='aborted', full_name='crayfis.ExposureBlock.aborted', index=32,
       number=18, type=8, cpp_type=7, label=1,
       has_default_value=False, default_value=False,
       message_type=None, enum_type=None, containing_type=None,
@@ -429,7 +436,7 @@ _EXPOSUREBLOCK = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=443,
-  serialized_end=1184,
+  serialized_end=1203,
 )
 
 
@@ -577,8 +584,8 @@ _EVENT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1187,
-  serialized_end=1550,
+  serialized_start=1206,
+  serialized_end=1569,
 )
 
 
@@ -649,8 +656,8 @@ _PIXEL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1552,
-  serialized_end=1664,
+  serialized_start=1571,
+  serialized_end=1683,
 )
 
 
@@ -721,8 +728,8 @@ _CALIBRATIONRESULT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1667,
-  serialized_end=1828,
+  serialized_start=1686,
+  serialized_end=1847,
 )
 
 
@@ -755,22 +762,50 @@ _PRECALIBRATIONRESULT = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='weights', full_name='crayfis.PreCalibrationResult.weights', index=3,
+      name='battery_temp', full_name='crayfis.PreCalibrationResult.battery_temp', index=3,
+      number=12, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='weights', full_name='crayfis.PreCalibrationResult.weights', index=4,
       number=6, type=2, cpp_type=6, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='sample_res_x', full_name='crayfis.PreCalibrationResult.sample_res_x', index=4,
+      name='sample_res_x', full_name='crayfis.PreCalibrationResult.sample_res_x', index=5,
       number=7, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='sample_res_y', full_name='crayfis.PreCalibrationResult.sample_res_y', index=5,
+      name='sample_res_y', full_name='crayfis.PreCalibrationResult.sample_res_y', index=6,
       number=8, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='hotcell_x', full_name='crayfis.PreCalibrationResult.hotcell_x', index=7,
+      number=9, type=13, cpp_type=3, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='hotcell_y', full_name='crayfis.PreCalibrationResult.hotcell_y', index=8,
+      number=10, type=13, cpp_type=3, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='resample_algorithm', full_name='crayfis.PreCalibrationResult.resample_algorithm', index=9,
+      number=11, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -786,8 +821,8 @@ _PRECALIBRATIONRESULT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1831,
-  serialized_end=1968,
+  serialized_start=1850,
+  serialized_end=2075,
 )
 
 
@@ -858,8 +893,8 @@ _CRAYONMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1971,
-  serialized_end=2115,
+  serialized_start=2078,
+  serialized_end=2222,
 )
 
 _DATACHUNK.fields_by_name['run_configs'].message_type = _RUNCONFIG
