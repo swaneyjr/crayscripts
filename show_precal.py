@@ -4,18 +4,24 @@ import matplotlib
 import matplotlib.pyplot as plt
 import cv2
 
-def get_precal_array(fname, size=None):
+def get_precal(fname):
     dc = pb.DataChunk()
     f = open(fname)
     dc.ParseFromString(f.read())
     f.close()
+
+    return dc.precalibration_results[0]
+
+def get_weight_array(precal, size=None)
    
-    precal = dc.precalibration_results[0]
     res_x = precal.sample_res_x
     res_y = precal.sample_res_y
     downsample = np.array(precal.weights).reshape(res_y,res_x)
     if size:
-	return cv2.resize(downsample, size, interpolation=cv2.INTER_CUBIC)
+        resize = cv2.INTER_CUBIC
+        if precal.interpolation:
+            resize = precal.interpolation
+	return cv2.resize(downsample, size, interpolation=resize)
     return downsample
 
 
@@ -31,7 +37,7 @@ if __name__ == '__main__':
 
     matplotlib.use('tkagg')
     plt.figure(1)
-    plt.imshow(get_precal_array(args.precal, args.resample), cmap='plasma', interpolation='nearest')
+    plt.imshow(get_precal_array(args.precal, args.resample), cmap='RdYlBu', interpolation='nearest')
     plt.colorbar()
 
     plt.show()
