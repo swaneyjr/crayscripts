@@ -12,7 +12,7 @@ def get_precal(fname):
 
     return dc.precalibration_results[0]
 
-def get_weight_array(precal, size=None)
+def get_weight_array(precal, size=None):
    
     res_x = precal.sample_res_x
     res_y = precal.sample_res_y
@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
     matplotlib.use('tkagg')
     plt.figure(1)
-    plt.imshow(get_precal_array(args.precal, args.resample), cmap='RdYlBu', interpolation='nearest')
+    plt.imshow(get_weight_array(get_precal(args.precal), args.resample), cmap='plasma', interpolation='nearest')
     plt.colorbar()
 
     plt.show()
