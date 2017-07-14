@@ -1,6 +1,9 @@
 import crayfis_data_pb2 as pb
 import ROOT as r
 import numpy as np
+from collections import namedtuple
+
+type_set = namedtuple('type_set', ['full','short','numpy'])
 
 def merge_pb(infiles):
     dc = pb.DataChunk()
@@ -27,8 +30,13 @@ def pb_to_trees(fname):
     exposure = r.TTree('exposure', 'Exposure from protobuf data')
     events = r.TTree('events', 'Events from protobuf data')
 
-    short_type = {int:'/i', long:'/l',float:'/D',bool:'/O',unicode:'/C'}
-    full_type = {int:'int', long:'long',float:'double',bool:'bool',unicode:'char'}
+    
+    type_name = {int: type_set('UInt_t', '/i', np.uint32,), \
+	long: type_set('ULong64_t', '/l', np.uint64), \
+	float: type_set('Double_t', '/D', np.float64), \
+	bool: type_set('Bool_t', '/O', np.bool_), \
+	unicode: type_set('Char_t', '/C', unicode) }
+    
 
     # assign appropriate branches to trees
 
@@ -36,27 +44,7 @@ def pb_to_trees(fname):
     evt_containers = {}
     pix_containers = {}
     pix_n = np.zeros(1, dtype=int)
-    events.Branch('pix_n', pix_n, 'pix_n/I')
-
-    #for xb_field,val in dc.exposure_blocks[0].ListFields():
-    #    if xb_field.label != 3: # save repeated fields for events
-    #        xb_containers[xb_field.name]= np.zeros(1,dtype=object)
-    #        exposure.Branch(xb_field.name, xb_containers[xb_field.name], \
-    #                        xb_field.name+short_type[type(val)])
-        
-
-    #for evt_field,val in dc.exposure_blocks[0].events[0].ListFields():
-    #    if evt_field.label != 3: # save repeated fields for pixels
-    #        evt_containers[evt_field.name] = np.zeros(1,dtype=object)
-    #        events.Branch(evt_field.name, evt_containers[evt_field.name], \
-    #                      evt_field.name+short_type[type(val)])
-
-    #for pix_field,val in dc.exposure_blocks[0].events[0].pixels[0].ListFields():
-    #    pix_containers[pix_field.name] = r.vector(full_type[type(val)])()
-    #    events.Branch('pix_'+pix_field.name, pix_containers[pix_field.name])
-
-    
-    
+    events.Branch('pix_n', pix_n, 'pix_n/I')    
     
     # fill tree
     print "Filling tree"
@@ -70,10 +58,13 @@ def pb_to_trees(fname):
         for xb_field,val in xb.ListFields():
             if xb_field.label == 3: continue
             if not xb_field.name in xb_containers.iterkeys(): 
-                xb_containers[xb_field.name] = np.zeros(1,dtype=object)
+                xb_containers[xb_field.name] = np.zeros(1,dtype=type_name[type(val)].numpy)
                 exposure.Branch(xb_field.name, xb_containers[xb_field.name], \
-                                xb_field.name+short_type[type(val)])
-            xb_containers[xb_field.name][0] = val
+                                xb_field.name+type_name[type(val)].short)
+            try:
+		xb_containers[xb_field.name][0] = val
+	    except:
+		print val
             if type(val) == unicode:
                 xb_containers[xb_field.name][0] += '\0'
         exposure.Fill()
@@ -83,9 +74,9 @@ def pb_to_trees(fname):
             for evt_field,val in evt.ListFields():
                 if evt_field.label == 3: continue
                 if not evt_field.name in evt_containers.iterkeys():
-                    evt_containers[evt_field.name] = np.zeros(1,dtype=object)
+                    evt_containers[evt_field.name] = np.zeros(1,dtype=type_name[type(val)].numpy)
                     events.Branch(evt_field.name, evt_containers[evt_field.name], \
-                                  evt_field.name + short_type[type(val)])
+                                  evt_field.name + type_name[type(val)].short)
                 evt_containers[evt_field.name][0] = val
                 if type(val) == unicode:
                     evt_containers[evt_field.name][0] += '\0'
@@ -97,7 +88,7 @@ def pb_to_trees(fname):
             for pix in evt.pixels:
                 for pix_field,val in pix.ListFields():
                     if not pix_field.name in pix_containers.iterkeys():
-                        pix_containers[pix_field.name] = r.vector(full_type[type(val)])()
+                        pix_containers[pix_field.name] = r.vector(type_name[type(val)].full)()
                         events.Branch('pix_'+pix_field.name, pix_containers[pix_field.name])
                     pix_containers[pix_field.name].push_back(val)
                 
@@ -120,5 +111,7 @@ if __name__ == "__main__":
         fname = args.infiles[0]
     outfile = r.TFile(args.out, "recreate")
     exposure, events = pb_to_trees(fname)
+    exposure.Draw('L1_thresh')
     outfile.Write()
+    raw_input('Press any key to continue')
     outfile.Close()
