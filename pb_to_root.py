@@ -61,11 +61,8 @@ def pb_to_trees(fname):
                 xb_containers[xb_field.name] = np.zeros(1,dtype=type_name[type(val)].numpy)
                 exposure.Branch(xb_field.name, xb_containers[xb_field.name], \
                                 xb_field.name+type_name[type(val)].short)
-            try:
-		xb_containers[xb_field.name][0] = val
-	    except:
-		print val
-            if type(val) == unicode:
+            xb_containers[xb_field.name][0] = val
+	    if type(val) == unicode:
                 xb_containers[xb_field.name][0] += '\0'
         exposure.Fill()
         
@@ -111,7 +108,6 @@ if __name__ == "__main__":
         fname = args.infiles[0]
     outfile = r.TFile(args.out, "recreate")
     exposure, events = pb_to_trees(fname)
-    exposure.Draw('L1_thresh')
     outfile.Write()
     raw_input('Press any key to continue')
     outfile.Close()

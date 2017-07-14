@@ -16,8 +16,9 @@ def get_weight_array(precal, size=None, compressed=False):
     res_y = precal.sample_res_y
     
     if compressed:
-        compressed_array = np.array(precal.compressed_weights)
-        downsample,retval = cv2.imdecode(precal.compressed_format, compressed_array)
+	compressed_array = np.array(bytearray(precal.compressed_weights))
+
+        downsample = cv2.imdecode(compressed_array, 0)/255.
     else:
         downsample = np.array(precal.weights).reshape(res_y,res_x)
     
@@ -57,17 +58,17 @@ if __name__ == '__main__':
         compressed = get_weight_array(precal, args.resample, True)
         uncompressed = get_weight_array(precal, args.resample, False)
         
-        figure(1)
+        plt.figure(1)
         plt.title('Uncompressed')
         plt.imshow(uncompressed, cmap='plasma', interpolation='nearest')
         plt.colorbar()
 
-        figure(2)
+        plt.figure(2)
         plt.title('Compressed')
-        plt.imshow(uncompressed, cmap='plasma', interpolaion='nearest')
+        plt.imshow(uncompressed, cmap='plasma', interpolation='nearest')
         plt.colorbar()
 
-        figure(3)
+        plt.figure(3)
         plt.title('Compressed/Uncompressed')
         plt.imshow(compressed/uncompressed, cmap='coolwarm', interpolation='nearest')
         plt.colorbar()
