@@ -10,7 +10,7 @@ def get_precal(fname):
 
     return dc.precalibration_results[0]
 
-def get_weight_array(precal, size=None, compressed=False):
+def get_weight_array(precal, size=None, compressed=True):
    
     res_x = precal.sample_res_x
     res_y = precal.sample_res_y
