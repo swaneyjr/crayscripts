@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import crayfis_data_pb2 as pb
 import numpy as np
 import cv2

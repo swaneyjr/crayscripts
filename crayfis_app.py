@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import ROOT as r
 from save_frames import save_frames
