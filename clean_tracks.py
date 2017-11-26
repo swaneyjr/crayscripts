@@ -8,8 +8,8 @@ import math
 import cmath
 from hotcell import vbranch
 
-Pixel = namedtuple('Pixel',['x','y','val','avg3','avg5'])
-Clean_Pixel = namedtuple('Clean_Pixel',['x','y','val','avg3','avg5','freq','masked'])
+Pixel = namedtuple('Pixel',['x','y','val', 'adjusted_val', 'avg_3','avg_5'])
+Clean_Pixel = namedtuple('Clean_Pixel',['x','y','val', 'adjusted_val', 'avg_3','avg_5','freq','masked'])
 
 # finds the furthest two pixels in a list of pixels (or one such pair)
 def find_endpoints(pixels):
