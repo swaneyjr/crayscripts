@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import matplotlib
 import matplotlib.pyplot as plt
 from PIL import Image

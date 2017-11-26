@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import random
 import math
 from scipy.optimize import brentq
