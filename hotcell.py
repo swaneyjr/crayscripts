@@ -6,7 +6,7 @@ from itertools import starmap, product, izip
 from collections import namedtuple
 import sys
 
-Pixel = namedtuple('Pixel', ['x','y','val','avg3','avg5'])
+Pixel = namedtuple('Pixel', ['x','y','val','adjusted_val','avg_3','avg_5'])
 
 def pix_mask(p):
     for x,y in BAD_PIX:
@@ -86,14 +86,15 @@ def clean_pix(t0, thresh, mask=None, stats=None, keep_empty=False, bad_regions=N
         t1._pix_masked.clear()
 
         # first, load the pixel data out of the TTree vectors
-        pixels = list(starmap(Pixel, izip(evt.pix_x, evt.pix_y, evt.pix_val, evt.pix_avg3, evt.pix_avg5)))
+        pixels = list(starmap(Pixel, izip(evt.pix_x, evt.pix_y, evt.pix_val, evt.pix_adjusted_val, evt.pix_avg_3, evt.pix_avg_5)))
 
         # now clear the vectors so we can re-write them
         t1.pix_x.clear()
         t1.pix_y.clear()
         t1.pix_val.clear()
-        t1.pix_avg3.clear()
-        t1.pix_avg5.clear()
+	t1.pix_adjusted_val.clear()
+        t1.pix_avg_3.clear()
+        t1.pix_avg_5.clear()
 
         total_pix += len(pixels)
 
@@ -112,8 +113,9 @@ def clean_pix(t0, thresh, mask=None, stats=None, keep_empty=False, bad_regions=N
             t1.pix_x.push_back(p.x)
             t1.pix_y.push_back(p.y)
             t1.pix_val.push_back(p.val)
-            t1.pix_avg3.push_back(p.avg3)
-            t1.pix_avg5.push_back(p.avg5)
+	    t1.pix_adjusted_val.push_back(p.adjusted_val)
+            t1.pix_avg_3.push_back(p.avg_3)
+            t1.pix_avg_5.push_back(p.avg_5)
 
         if t1.pix_x.size() == 0 and not keep_empty: continue
         pix_n[0] = t1.pix_x.size()
