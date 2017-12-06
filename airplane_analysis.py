@@ -13,64 +13,86 @@ def get_hist(values, bins=None):
     hist,bins = np.histogram(values, bins)
     return hist
 
-def get_pix_val_rate(t):
+def get_pix_val_rate(t, bins=None):
     runtime = find_runtime([evt.timestamp for evt in t])
-    hist = get_hist([max(evt.pix_val) for evt in t])
+    print "Runtime: %f" % runtime
+    hist = get_hist([max(evt.pix_val) for evt in t], bins)
+    hist.resize(256)
     return hist/runtime, runtime
-
-def get_tree(filename):
-    f = r.TFile(filename)
-    return f.Get('events')
-
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser(description = '')
     parser.add_argument('--air', required='true', help='Name of TFile for airplane events')
-    parser.add_argument('--ground', help='Name of TFile for sea level events')
+    parser.add_argument('--ground', required='true', help='Name of TFile for sea level events')
     args = parser.parse_args()
 
-    air = get_tree(args.air)
-    ground = get_tree(args.ground)
+    fair = r.TFile(args.air)
+    fground = r.TFile(args.ground)
 
-    air_rate, airtime = get_pix_val_rate(air)
-    ground_rate, groundtime = get_pix_val_rate(ground)
+    air = fair.Get('events')
+    ground = fground.Get('events')
 
-    air_val = r.TH1F("air", "Airplane", 256, 0, 256)
-    ground_val = r.TH1F("ground", "Sea level", 256, 0, 256)
+    print "ROOT files successfully loaded"
+
+    bins = range(60)+range(60,90,2)+range(90,150,3)+range(150,256,5)
+
+    air_rate, airtime = get_pix_val_rate(air, bins)
+    ground_rate, groundtime = get_pix_val_rate(ground, bins)
+
+    air_val = r.TH1F("airhist", "Airplane", 256, 0, 256)
+    ground_val = r.TH1F("groundhist", "Sea level", 256, 0, 256)
 
     air_val.GetXaxis().SetTitle('pix_val')
-    ground_val.getXaxis().SetTitle('pix_val')
+    ground_val.GetXaxis().SetTitle('pix_val')
+
+    air_val.SetStats(False)
+    ground_val.SetStats(False)
+    
+    air_val.SetLineColor(2)
+    ground_val.SetLineColor(4)
+    print "Histograms created"
 
     for evt in air:
-        air_val.Fill(max(air.pix_val), 1./airtime)
+        for val in evt.pix_val:
+            air_val.Fill(val, 1./airtime)
 
     for evt in ground:
-        ground_val.Fill(max(ground.pix_val), 1./groundtime)
+        for val in evt.pix_val:
+            ground_val.Fill(val, 1./groundtime)
 
-    c = r.TCanvas()
+    ground_val.SetMaximum(10)
+    ground_val.Draw()
+    air_val.Draw('same')
 
-    air_val.Draw()
-    ground_val.Draw('same')
+    r.gPad.SetLogy()
+    r.gPad.BuildLegend()
 
-    raw_input('Press enter to continue')
+    import matplotlib.pyplot as plt
 
+    fig = plt.figure()
+    plt.ylim(1,100)
+    plt.yscale('log')
+    plt.title('Ratio of air to ground rates')
+    plt.xlabel('pix_val')
 
-    if ground:
-        import matplotlib.pyplot as plt
+    nonzero = np.logical_and(ground_rate != 0, air_rate != 0)
 
-        plt.figure(1)
-        plt.title('Ratio of air to ground rates')
-        plt.xlabel('pix_val')
+    xbins = np.arange(256)[nonzero]
+    air_nz = air_rate[nonzero]
+    ground_nz = ground_rate[nonzero]
 
-        bins = np.arange(256)[ground_rate != 0]
-        air_nz = air_rate[ground_rate != 0]
-        ground_nz = ground_rate[ground_rate != 0]
+    ratios = air_nz/ground_nz
+    errorbars = ratios*np.sqrt(1./(air_nz*airtime) + 1./(ground_nz*groundtime))
 
-        plt.errorbar(bins, air_nz/ground_nz, yerr=air_nz/ground_nz*np.sqrt(1./np.sqrt(air_nz) + 1./np.sqrt(ground_nz)))
-    
-        cutoff = raw_input('Select a signal cutoff')
+    plt.errorbar(xbins, air_nz/ground_nz, yerr=errorbars)
+    plt.show()
 
-        print "Sea level rate: {}".format(ground_rate[cutoff:])
-        print "Airplane rate: {}".format(air_rate[cutoff:])
+    cutoff = int(raw_input('Select a signal cutoff: '))
+
+    print "Sea level rate: {} hits/min".format(np.sum(ground_rate[cutoff:]))
+    print "Airplane rate: {} hits/min".format(np.sum(air_rate[cutoff:]))
+
+    fair.Close()
+    fground.Close()
 
