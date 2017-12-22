@@ -15,7 +15,7 @@ def get_hist(values, bins=None):
 
 def get_pix_val_rate(t, bins=None):
     runtime = find_runtime([evt.timestamp for evt in t])
-    print "Runtime: %f" % runtime
+    print "Runtime: %f min" % runtime
     hist = get_hist([max(evt.pix_val) for evt in t], bins)
     hist.resize(256)
     return hist/runtime, runtime
@@ -90,8 +90,14 @@ if __name__ == "__main__":
 
     cutoff = int(raw_input('Select a signal cutoff: '))
 
-    print "Sea level rate: {} hits/min".format(np.sum(ground_rate[cutoff:]))
-    print "Airplane rate: {} hits/min".format(np.sum(air_rate[cutoff:]))
+    sea_rate_tot = np.sum(ground_rate[cutoff:])
+    sea_rate_err = (sea_rate_tot/groundtime)**0.5
+    air_rate_tot = np.sum(air_rate[cutoff:])
+    air_rate_err = (air_rate_tot/airtime)**0.5
+
+    print "Sea level rate: {} +/- {} hit/min".format(sea_rate_tot, sea_rate_err)
+    print "Airplane rate: {} +/- {} hit/min".format(air_rate_tot, air_rate_err)
+    print "Average multiplier: {} +/- {}".format(air_rate_tot/sea_rate_tot, air_rate_tot/sea_rate_tot*((sea_rate_err/sea_rate_tot)**2 + (air_rate_err/air_rate_tot)**2)**0.5)
 
     fair.Close()
     fground.Close()
