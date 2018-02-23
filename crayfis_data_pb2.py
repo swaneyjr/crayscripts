@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='crayfis_data.proto',
   package='crayfis',
   syntax='proto2',
-  serialized_pb=_b('\n\x12\x63rayfis_data.proto\x12\x07\x63rayfis\"\xdd\x01\n\tDataChunk\x12\'\n\x0brun_configs\x18\x01 \x03(\x0b\x32\x12.crayfis.RunConfig\x12/\n\x0f\x65xposure_blocks\x18\x02 \x03(\x0b\x32\x16.crayfis.ExposureBlock\x12\x37\n\x13\x63\x61libration_results\x18\x03 \x03(\x0b\x32\x1a.crayfis.CalibrationResult\x12=\n\x16precalibration_results\x18\x04 \x03(\x0b\x32\x1d.crayfis.PreCalibrationResult\"\xa4\x01\n\tRunConfig\x12\r\n\x05id_hi\x18\x01 \x01(\x04\x12\r\n\x05id_lo\x18\x02 \x01(\x04\x12\x12\n\nstart_time\x18\x03 \x01(\x04\x12\x15\n\rcrayfis_build\x18\x04 \x01(\t\x12\x11\n\thw_params\x18\x05 \x01(\t\x12\x11\n\tos_params\x18\x06 \x01(\t\x12\x15\n\rcamera_params\x18\x07 \x01(\t\x12\x11\n\tcamera_id\x18\x08 \x01(\r\"\xcf\x07\n\rExposureBlock\x12\x0e\n\x06run_id\x18\x01 \x01(\x04\x12\x11\n\trun_id_hi\x18% \x01(\x04\x12\x11\n\tprecal_id\x18! \x01(\x04\x12\x14\n\x0cprecal_id_hi\x18& \x01(\x04\x12\x12\n\nstart_time\x18\x02 \x01(\x04\x12\x10\n\x08\x65nd_time\x18\x03 \x01(\x04\x12\x17\n\x0fstart_time_nano\x18\x16 \x01(\x04\x12\x15\n\rend_time_nano\x18\x17 \x01(\x04\x12\x16\n\x0estart_time_ntp\x18\x18 \x01(\x04\x12\x14\n\x0c\x65nd_time_ntp\x18\x19 \x01(\x04\x12\x0f\n\x07gps_lat\x18\x04 \x01(\x01\x12\x0f\n\x07gps_lon\x18\x05 \x01(\x01\x12\x14\n\x0cgps_altitude\x18\x13 \x01(\x01\x12\x14\n\x0cgps_accuracy\x18\x14 \x01(\x02\x12\x13\n\x0bgps_fixtime\x18\x15 \x01(\x04\x12\x18\n\x10gps_fixtime_nano\x18\x1c \x01(\x04\x12\x14\n\x0c\x62\x61ttery_temp\x18  \x01(\r\x12\x18\n\x10\x62\x61ttery_end_temp\x18\" \x01(\r\x12/\n\tdaq_state\x18\x06 \x01(\x0e\x32\x1c.crayfis.ExposureBlock.State\x12\r\n\x05res_x\x18\x1a \x01(\r\x12\r\n\x05res_y\x18\x1b \x01(\r\x12\x1e\n\x06\x65vents\x18\x07 \x03(\x0b\x32\x0e.crayfis.Event\x12\x11\n\tL1_thresh\x18\x08 \x01(\x05\x12\x11\n\tL2_thresh\x18\t \x01(\x05\x12\x0f\n\x07L0_conf\x18$ \x01(\t\x12\x0f\n\x07L1_conf\x18\x1d \x01(\t\x12\x0f\n\x07L2_conf\x18\x1e \x01(\t\x12\x14\n\x0cL0_processed\x18\' \x01(\r\x12\x14\n\x0cL1_processed\x18\n \x01(\r\x12\x14\n\x0cL2_processed\x18\x0b \x01(\r\x12\x0f\n\x07L0_pass\x18( \x01(\r\x12\x0f\n\x07L1_pass\x18\r \x01(\r\x12\x0f\n\x07L2_pass\x18\x0f \x01(\r\x12\x0f\n\x07L0_skip\x18) \x01(\r\x12\x0f\n\x07L1_skip\x18\x0e \x01(\r\x12\x0f\n\x07L2_skip\x18\x10 \x01(\r\x12\x0e\n\x06\x63onfig\x18* \x03(\t\x12\x11\n\tprocessed\x18+ \x03(\r\x12\x0c\n\x04pass\x18, \x03(\r\x12\x0c\n\x04skip\x18- \x03(\r\x12\x16\n\x0e\x66rames_dropped\x18\x0c \x01(\r\x12\x0c\n\x04hist\x18# \x03(\x04\x12\x0b\n\x03xbn\x18\x11 \x01(\r\x12\x0f\n\x07\x61\x62orted\x18\x12 \x01(\x08\"@\n\x05State\x12\x08\n\x04INIT\x10\x00\x12\x0f\n\x0b\x43\x41LIBRATION\x10\x01\x12\x08\n\x04\x44\x41TA\x10\x02\x12\x12\n\x0ePRECALIBRATION\x10\x03J\x04\x08\x1f\x10 R\x06\x62g_avg\"\xe5\x03\n\x05\x45vent\x12\x11\n\ttimestamp\x18\x01 \x01(\x04\x12\x16\n\x0etimestamp_nano\x18\x0e \x01(\x04\x12\x15\n\rtimestamp_ntp\x18\x0f \x01(\x04\x12\x18\n\x10timestamp_target\x18\x13 \x01(\x04\x12\x0f\n\x07gps_lat\x18\x02 \x01(\x01\x12\x0f\n\x07gps_lon\x18\x03 \x01(\x01\x12\x14\n\x0cgps_altitude\x18\x0b \x01(\x01\x12\x14\n\x0cgps_accuracy\x18\x0c \x01(\x02\x12\x13\n\x0bgps_fixtime\x18\r \x01(\x04\x12\x18\n\x10gps_fixtime_nano\x18\x10 \x01(\x04\x12*\n\tzero_bias\x18\x15 \x01(\x0b\x32\x17.crayfis.ZeroBiasSquare\x12\x1e\n\x06pixels\x18\x04 \x03(\x0b\x32\x0e.crayfis.Pixel\x12&\n\nbyte_block\x18\x16 \x01(\x0b\x32\x12.crayfis.ByteBlock\x12\x0b\n\x03\x61vg\x18\x05 \x01(\x01\x12\x0b\n\x03std\x18\x06 \x01(\x01\x12\x0c\n\x04hist\x18\x14 \x03(\r\x12\x0b\n\x03xbn\x18\x07 \x01(\r\x12\x10\n\x08orient_x\x18\x08 \x01(\x02\x12\x10\n\x08orient_y\x18\t \x01(\x02\x12\x10\n\x08orient_z\x18\n \x01(\x02\x12\x10\n\x08pressure\x18\x12 \x01(\x02J\x04\x08\x11\x10\x12R\x0c\x62\x61ttery_temp\"p\n\x05Pixel\x12\t\n\x01x\x18\x01 \x01(\r\x12\t\n\x01y\x18\x02 \x01(\r\x12\x0b\n\x03val\x18\x03 \x01(\r\x12\x14\n\x0c\x61\x64justed_val\x18\x07 \x01(\r\x12\x10\n\x08near_max\x18\x04 \x01(\r\x12\r\n\x05\x61vg_3\x18\x05 \x01(\x02\x12\r\n\x05\x61vg_5\x18\x06 \x01(\x02\"C\n\tByteBlock\x12\t\n\x01x\x18\x01 \x03(\r\x12\t\n\x01y\x18\x02 \x03(\r\x12\x0b\n\x03val\x18\x03 \x03(\r\x12\x13\n\x0bside_length\x18\x04 \x01(\r\"Q\n\x0eZeroBiasSquare\x12\r\n\x05x_min\x18\x01 \x01(\r\x12\r\n\x05y_min\x18\x02 \x01(\r\x12\x0b\n\x03val\x18\x03 \x03(\r\x12\x14\n\x0c\x66rame_number\x18\x04 \x01(\r\"\xb4\x01\n\x11\x43\x61librationResult\x12\x0e\n\x06run_id\x18\x01 \x01(\x04\x12\x11\n\trun_id_hi\x18\x08 \x01(\x04\x12\x12\n\nstart_time\x18\x02 \x01(\x04\x12\x10\n\x08\x65nd_time\x18\x03 \x01(\x04\x12\x12\n\nhist_pixel\x18\x04 \x03(\r\x12\x14\n\x0chist_l2pixel\x18\x05 \x03(\r\x12\x15\n\rhist_maxpixel\x18\x06 \x03(\r\x12\x15\n\rhist_numpixel\x18\x07 \x03(\r\"\x81\x03\n\x14PreCalibrationResult\x12\x0e\n\x06run_id\x18\x01 \x01(\x04\x12\x11\n\trun_id_hi\x18\x12 \x01(\x04\x12\x11\n\tprecal_id\x18\x13 \x01(\x04\x12\x14\n\x0cprecal_id_hi\x18\x14 \x01(\x04\x12\x12\n\nstart_time\x18\x02 \x01(\x04\x12\x10\n\x08\x65nd_time\x18\x03 \x01(\x04\x12\x0f\n\x07weights\x18\x06 \x03(\x02\x12\x14\n\x0csample_res_x\x18\x07 \x01(\r\x12\x14\n\x0csample_res_y\x18\x08 \x01(\r\x12\x15\n\rinterpolation\x18\x0b \x01(\r\x12\x14\n\x0c\x62\x61ttery_temp\x18\x0c \x01(\r\x12\x1a\n\x12\x63ompressed_weights\x18\r \x01(\x0c\x12\x19\n\x11\x63ompressed_format\x18\x0e \x01(\t\x12\x13\n\x0bsecond_hist\x18\x0f \x03(\r\x12\x0f\n\x07hotcell\x18\x10 \x03(\r\x12\r\n\x05res_x\x18\x11 \x01(\r\x12\x15\n\rprecal_config\x18\x15 \x01(\tJ\x04\x08\x04\x10\x05J\x04\x08\x05\x10\x06\"\x90\x01\n\rCrayonMessage\x12\x0f\n\x07payload\x18\x01 \x01(\x0c\x12\x0e\n\x06run_id\x18\x02 \x01(\t\x12\x11\n\tdevice_id\x18\x03 \x01(\t\x12\x0f\n\x07user_id\x18\x04 \x01(\r\x12\x10\n\x08\x61pp_code\x18\x05 \x01(\t\x12\x13\n\x0bremote_addr\x18\x06 \x01(\t\x12\x13\n\x0bsubmit_time\x18\x07 \x01(\rB \n\x12io.crayfis.androidB\nDataProtos')
+  serialized_pb=_b('\n\x12\x63rayfis_data.proto\x12\x07\x63rayfis\"\xdd\x01\n\tDataChunk\x12\'\n\x0brun_configs\x18\x01 \x03(\x0b\x32\x12.crayfis.RunConfig\x12/\n\x0f\x65xposure_blocks\x18\x02 \x03(\x0b\x32\x16.crayfis.ExposureBlock\x12\x37\n\x13\x63\x61libration_results\x18\x03 \x03(\x0b\x32\x1a.crayfis.CalibrationResult\x12=\n\x16precalibration_results\x18\x04 \x03(\x0b\x32\x1d.crayfis.PreCalibrationResult\"\xa4\x01\n\tRunConfig\x12\r\n\x05id_hi\x18\x01 \x01(\x04\x12\r\n\x05id_lo\x18\x02 \x01(\x04\x12\x12\n\nstart_time\x18\x03 \x01(\x04\x12\x15\n\rcrayfis_build\x18\x04 \x01(\t\x12\x11\n\thw_params\x18\x05 \x01(\t\x12\x11\n\tos_params\x18\x06 \x01(\t\x12\x15\n\rcamera_params\x18\x07 \x01(\t\x12\x11\n\tcamera_id\x18\x08 \x01(\r\"\xcf\x07\n\rExposureBlock\x12\x0e\n\x06run_id\x18\x01 \x01(\x04\x12\x11\n\trun_id_hi\x18% \x01(\x04\x12\x11\n\tprecal_id\x18! \x01(\x04\x12\x14\n\x0cprecal_id_hi\x18& \x01(\x04\x12\x12\n\nstart_time\x18\x02 \x01(\x04\x12\x10\n\x08\x65nd_time\x18\x03 \x01(\x04\x12\x17\n\x0fstart_time_nano\x18\x16 \x01(\x04\x12\x15\n\rend_time_nano\x18\x17 \x01(\x04\x12\x16\n\x0estart_time_ntp\x18\x18 \x01(\x04\x12\x14\n\x0c\x65nd_time_ntp\x18\x19 \x01(\x04\x12\x0f\n\x07gps_lat\x18\x04 \x01(\x01\x12\x0f\n\x07gps_lon\x18\x05 \x01(\x01\x12\x14\n\x0cgps_altitude\x18\x13 \x01(\x01\x12\x14\n\x0cgps_accuracy\x18\x14 \x01(\x02\x12\x13\n\x0bgps_fixtime\x18\x15 \x01(\x04\x12\x18\n\x10gps_fixtime_nano\x18\x1c \x01(\x04\x12\x14\n\x0c\x62\x61ttery_temp\x18  \x01(\r\x12\x18\n\x10\x62\x61ttery_end_temp\x18\" \x01(\r\x12/\n\tdaq_state\x18\x06 \x01(\x0e\x32\x1c.crayfis.ExposureBlock.State\x12\r\n\x05res_x\x18\x1a \x01(\r\x12\r\n\x05res_y\x18\x1b \x01(\r\x12\x1e\n\x06\x65vents\x18\x07 \x03(\x0b\x32\x0e.crayfis.Event\x12\x11\n\tL1_thresh\x18\x08 \x01(\x05\x12\x11\n\tL2_thresh\x18\t \x01(\x05\x12\x0f\n\x07L0_conf\x18$ \x01(\t\x12\x0f\n\x07L1_conf\x18\x1d \x01(\t\x12\x0f\n\x07L2_conf\x18\x1e \x01(\t\x12\x14\n\x0cL0_processed\x18\' \x01(\r\x12\x14\n\x0cL1_processed\x18\n \x01(\r\x12\x14\n\x0cL2_processed\x18\x0b \x01(\r\x12\x0f\n\x07L0_pass\x18( \x01(\r\x12\x0f\n\x07L1_pass\x18\r \x01(\r\x12\x0f\n\x07L2_pass\x18\x0f \x01(\r\x12\x0f\n\x07L0_skip\x18) \x01(\r\x12\x0f\n\x07L1_skip\x18\x0e \x01(\r\x12\x0f\n\x07L2_skip\x18\x10 \x01(\r\x12\x0e\n\x06\x63onfig\x18* \x03(\t\x12\x11\n\tprocessed\x18+ \x03(\r\x12\x0c\n\x04pass\x18, \x03(\r\x12\x0c\n\x04skip\x18- \x03(\r\x12\x16\n\x0e\x66rames_dropped\x18\x0c \x01(\r\x12\x0c\n\x04hist\x18# \x03(\x04\x12\x0b\n\x03xbn\x18\x11 \x01(\r\x12\x0f\n\x07\x61\x62orted\x18\x12 \x01(\x08\"@\n\x05State\x12\x08\n\x04INIT\x10\x00\x12\x0f\n\x0b\x43\x41LIBRATION\x10\x01\x12\x08\n\x04\x44\x41TA\x10\x02\x12\x12\n\x0ePRECALIBRATION\x10\x03J\x04\x08\x1f\x10 R\x06\x62g_avg\"\xfc\x03\n\x05\x45vent\x12\x11\n\ttimestamp\x18\x01 \x01(\x04\x12\x16\n\x0etimestamp_nano\x18\x0e \x01(\x04\x12\x15\n\rtimestamp_ntp\x18\x0f \x01(\x04\x12\x18\n\x10timestamp_target\x18\x13 \x01(\x04\x12\x15\n\rexposure_time\x18\x17 \x01(\x04\x12\x0f\n\x07gps_lat\x18\x02 \x01(\x01\x12\x0f\n\x07gps_lon\x18\x03 \x01(\x01\x12\x14\n\x0cgps_altitude\x18\x0b \x01(\x01\x12\x14\n\x0cgps_accuracy\x18\x0c \x01(\x02\x12\x13\n\x0bgps_fixtime\x18\r \x01(\x04\x12\x18\n\x10gps_fixtime_nano\x18\x10 \x01(\x04\x12*\n\tzero_bias\x18\x15 \x01(\x0b\x32\x17.crayfis.ZeroBiasSquare\x12\x1e\n\x06pixels\x18\x04 \x03(\x0b\x32\x0e.crayfis.Pixel\x12&\n\nbyte_block\x18\x16 \x01(\x0b\x32\x12.crayfis.ByteBlock\x12\x0b\n\x03\x61vg\x18\x05 \x01(\x01\x12\x0b\n\x03std\x18\x06 \x01(\x01\x12\x0c\n\x04hist\x18\x14 \x03(\r\x12\x0b\n\x03xbn\x18\x07 \x01(\r\x12\x10\n\x08orient_x\x18\x08 \x01(\x02\x12\x10\n\x08orient_y\x18\t \x01(\x02\x12\x10\n\x08orient_z\x18\n \x01(\x02\x12\x10\n\x08pressure\x18\x12 \x01(\x02J\x04\x08\x11\x10\x12R\x0c\x62\x61ttery_temp\"p\n\x05Pixel\x12\t\n\x01x\x18\x01 \x01(\r\x12\t\n\x01y\x18\x02 \x01(\r\x12\x0b\n\x03val\x18\x03 \x01(\r\x12\x14\n\x0c\x61\x64justed_val\x18\x07 \x01(\r\x12\x10\n\x08near_max\x18\x04 \x01(\r\x12\r\n\x05\x61vg_3\x18\x05 \x01(\x02\x12\r\n\x05\x61vg_5\x18\x06 \x01(\x02\"C\n\tByteBlock\x12\t\n\x01x\x18\x01 \x03(\r\x12\t\n\x01y\x18\x02 \x03(\r\x12\x0b\n\x03val\x18\x03 \x03(\r\x12\x13\n\x0bside_length\x18\x04 \x01(\r\"Q\n\x0eZeroBiasSquare\x12\r\n\x05x_min\x18\x01 \x01(\r\x12\r\n\x05y_min\x18\x02 \x01(\r\x12\x0b\n\x03val\x18\x03 \x03(\r\x12\x14\n\x0c\x66rame_number\x18\x04 \x01(\r\"\xb4\x01\n\x11\x43\x61librationResult\x12\x0e\n\x06run_id\x18\x01 \x01(\x04\x12\x11\n\trun_id_hi\x18\x08 \x01(\x04\x12\x12\n\nstart_time\x18\x02 \x01(\x04\x12\x10\n\x08\x65nd_time\x18\x03 \x01(\x04\x12\x12\n\nhist_pixel\x18\x04 \x03(\r\x12\x14\n\x0chist_l2pixel\x18\x05 \x03(\r\x12\x15\n\rhist_maxpixel\x18\x06 \x03(\r\x12\x15\n\rhist_numpixel\x18\x07 \x03(\r\"\x81\x03\n\x14PreCalibrationResult\x12\x0e\n\x06run_id\x18\x01 \x01(\x04\x12\x11\n\trun_id_hi\x18\x12 \x01(\x04\x12\x11\n\tprecal_id\x18\x13 \x01(\x04\x12\x14\n\x0cprecal_id_hi\x18\x14 \x01(\x04\x12\x12\n\nstart_time\x18\x02 \x01(\x04\x12\x10\n\x08\x65nd_time\x18\x03 \x01(\x04\x12\x0f\n\x07weights\x18\x06 \x03(\x02\x12\x14\n\x0csample_res_x\x18\x07 \x01(\r\x12\x14\n\x0csample_res_y\x18\x08 \x01(\r\x12\x15\n\rinterpolation\x18\x0b \x01(\r\x12\x14\n\x0c\x62\x61ttery_temp\x18\x0c \x01(\r\x12\x1a\n\x12\x63ompressed_weights\x18\r \x01(\x0c\x12\x19\n\x11\x63ompressed_format\x18\x0e \x01(\t\x12\x13\n\x0bsecond_hist\x18\x0f \x03(\r\x12\x0f\n\x07hotcell\x18\x10 \x03(\r\x12\r\n\x05res_x\x18\x11 \x01(\r\x12\x15\n\rprecal_config\x18\x15 \x01(\tJ\x04\x08\x04\x10\x05J\x04\x08\x05\x10\x06\"\x90\x01\n\rCrayonMessage\x12\x0f\n\x07payload\x18\x01 \x01(\x0c\x12\x0e\n\x06run_id\x18\x02 \x01(\t\x12\x11\n\tdevice_id\x18\x03 \x01(\t\x12\x0f\n\x07user_id\x18\x04 \x01(\r\x12\x10\n\x08\x61pp_code\x18\x05 \x01(\t\x12\x13\n\x0bremote_addr\x18\x06 \x01(\t\x12\x13\n\x0bsubmit_time\x18\x07 \x01(\rB \n\x12io.crayfis.androidB\nDataProtos')
 )
 
 
@@ -556,119 +556,126 @@ _EVENT = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='gps_lat', full_name='crayfis.Event.gps_lat', index=4,
+      name='exposure_time', full_name='crayfis.Event.exposure_time', index=4,
+      number=23, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='gps_lat', full_name='crayfis.Event.gps_lat', index=5,
       number=2, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='gps_lon', full_name='crayfis.Event.gps_lon', index=5,
+      name='gps_lon', full_name='crayfis.Event.gps_lon', index=6,
       number=3, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='gps_altitude', full_name='crayfis.Event.gps_altitude', index=6,
+      name='gps_altitude', full_name='crayfis.Event.gps_altitude', index=7,
       number=11, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='gps_accuracy', full_name='crayfis.Event.gps_accuracy', index=7,
+      name='gps_accuracy', full_name='crayfis.Event.gps_accuracy', index=8,
       number=12, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='gps_fixtime', full_name='crayfis.Event.gps_fixtime', index=8,
+      name='gps_fixtime', full_name='crayfis.Event.gps_fixtime', index=9,
       number=13, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='gps_fixtime_nano', full_name='crayfis.Event.gps_fixtime_nano', index=9,
+      name='gps_fixtime_nano', full_name='crayfis.Event.gps_fixtime_nano', index=10,
       number=16, type=4, cpp_type=4, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='zero_bias', full_name='crayfis.Event.zero_bias', index=10,
+      name='zero_bias', full_name='crayfis.Event.zero_bias', index=11,
       number=21, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='pixels', full_name='crayfis.Event.pixels', index=11,
+      name='pixels', full_name='crayfis.Event.pixels', index=12,
       number=4, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='byte_block', full_name='crayfis.Event.byte_block', index=12,
+      name='byte_block', full_name='crayfis.Event.byte_block', index=13,
       number=22, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='avg', full_name='crayfis.Event.avg', index=13,
+      name='avg', full_name='crayfis.Event.avg', index=14,
       number=5, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='std', full_name='crayfis.Event.std', index=14,
+      name='std', full_name='crayfis.Event.std', index=15,
       number=6, type=1, cpp_type=5, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='hist', full_name='crayfis.Event.hist', index=15,
+      name='hist', full_name='crayfis.Event.hist', index=16,
       number=20, type=13, cpp_type=3, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='xbn', full_name='crayfis.Event.xbn', index=16,
+      name='xbn', full_name='crayfis.Event.xbn', index=17,
       number=7, type=13, cpp_type=3, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='orient_x', full_name='crayfis.Event.orient_x', index=17,
+      name='orient_x', full_name='crayfis.Event.orient_x', index=18,
       number=8, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='orient_y', full_name='crayfis.Event.orient_y', index=18,
+      name='orient_y', full_name='crayfis.Event.orient_y', index=19,
       number=9, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='orient_z', full_name='crayfis.Event.orient_z', index=19,
+      name='orient_z', full_name='crayfis.Event.orient_z', index=20,
       number=10, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='pressure', full_name='crayfis.Event.pressure', index=20,
+      name='pressure', full_name='crayfis.Event.pressure', index=21,
       number=18, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -687,7 +694,7 @@ _EVENT = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=1401,
-  serialized_end=1886,
+  serialized_end=1909,
 )
 
 
@@ -759,8 +766,8 @@ _PIXEL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1888,
-  serialized_end=2000,
+  serialized_start=1911,
+  serialized_end=2023,
 )
 
 
@@ -811,8 +818,8 @@ _BYTEBLOCK = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2002,
-  serialized_end=2069,
+  serialized_start=2025,
+  serialized_end=2092,
 )
 
 
@@ -863,8 +870,8 @@ _ZEROBIASSQUARE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2071,
-  serialized_end=2152,
+  serialized_start=2094,
+  serialized_end=2175,
 )
 
 
@@ -943,8 +950,8 @@ _CALIBRATIONRESULT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2155,
-  serialized_end=2335,
+  serialized_start=2178,
+  serialized_end=2358,
 )
 
 
@@ -1086,8 +1093,8 @@ _PRECALIBRATIONRESULT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2338,
-  serialized_end=2723,
+  serialized_start=2361,
+  serialized_end=2746,
 )
 
 
@@ -1159,8 +1166,8 @@ _CRAYONMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2726,
-  serialized_end=2870,
+  serialized_start=2749,
+  serialized_end=2893,
 )
 
 _DATACHUNK.fields_by_name['run_configs'].message_type = _RUNCONFIG

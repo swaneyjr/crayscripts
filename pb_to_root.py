@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import crayfis_data_pb2 as pb
 import ROOT as r

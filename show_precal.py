@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 import crayfis_data_pb2 as pb
 import numpy as np
@@ -18,7 +18,7 @@ def get_weight_array(precal, size=None, compressed=True):
     res_y = precal.sample_res_y
     
     if compressed:
-	compressed_array = np.array(bytearray(precal.compressed_weights))
+        compressed_array = np.array(bytearray(precal.compressed_weights))
 
         downsample = cv2.imdecode(compressed_array, 0)/255.
     else:

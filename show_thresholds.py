@@ -1,3 +1,5 @@
+#!/usr/bin/env python2
+
 from show_precal import get_precal, get_weight_array
 import numpy as np
 
