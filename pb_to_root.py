@@ -119,7 +119,8 @@ def pb_to_trees(dc):
                 evt_containers[evt_field.name][0] = val
                 if type(val) == unicode:
                     evt_containers[evt_field.name][0] += '\0'
-                
+            
+            evt_containers['timestamp'][0] = xb.start_time
             # reset pixel vectors
             for v in pix_containers.itervalues():
                 v.clear()
@@ -177,7 +178,7 @@ def pb_to_trees(dc):
                 assert ival == len(evt.byte_block.val)
 
             for pix in evt.pixels:
-                pix_n[0] += len(pixels)
+                pix_n[0] += 1
                 for pix_field,val in pix.ListFields():
                     if not pix_field.name in pix_containers.iterkeys():
                         pix_containers[pix_field.name] = r.vector(type_name[type(val)].full)()

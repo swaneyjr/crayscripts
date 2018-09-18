@@ -1,75 +1,72 @@
 #!/usr/bin/env python3
 
+import numpy as np
 import random
-import math
 from scipy.optimize import brentq
 
-cmos_side_x = .454
-cmos_side_y = .352
-paddle_side_x = math.sqrt(10.)
-paddle_side_y = math.sqrt(10.)
-cmos_gap = 1. #distance from first paddle to CMOS
-telescope_gap = 2. #distance from first paddle to last paddle
-muon_flux = 1./60.
+# everything in mm
+cmos_side_x = 5312 * 1.12e-3
+cmos_side_y = 2988 * 1.12e-3
+paddle_side_x = 13
+paddle_side_y = 15
+cmos_gap = 7.5 #distance from first paddle to CMOS
+tel_gap = 15 #distance from first paddle to last paddle
+tel_eff = 0.91
+muon_flux = 1/(60*100)
 
-trials = 1000000
+n = 100000
 
 
 # generates a cos^2 distribution of theta values in [0,2*pi)
-def random_theta():
-    
-    rand = random.random()
-    cdf_minus_rand = lambda theta: 2.0/math.pi*(theta + .5 * \
-        math.sin(2.0 * theta)) - rand
-    return brentq(cdf_minus_rand, 0., math.pi/2.0)
+def random_theta(n):
+    rand = np.random.uniform(0, np.pi / 2, n)
+    cdf = lambda theta, r: theta + np.sin(2.0 * theta) / 2 - r
+    thetas = [brentq(cdf, 0., np.pi/2.0, args=rand[i]) for i in range(n)]
+    return np.array(thetas)
 
 # geometrical acceptance of telescope
-g = 0
-h1 = h2 = 0
+tan_theta = np.tan(random_theta(n))
+phi = np.random.uniform(0, 2.0 * np.pi, n)
+cos_phi = np.cos(phi)
+sin_phi = np.sin(phi)
 
-for i in range(trials):
-    cmos = False
-    theta = random_theta()
-    phi = random.uniform(0, 2.0 * math.pi)
-    x1 = random.uniform(-paddle_side_x/2.0, paddle_side_x/2.0)
-    y1 = random.uniform(-paddle_side_y/2.0, paddle_side_y/2.0)
-    x2 = x1 + cmos_gap * math.tan(theta) * math.cos(phi)
-    y2 = y1 + cmos_gap * math.tan(theta) * math.sin(phi)
-    if abs(x2) < cmos_side_x/2.0 and abs(y2) < cmos_side_y/2.0:
-        cmos = True
-    x3 = x1 + telescope_gap * math.tan(theta) * math.cos(phi)
-    y3 = y1 + telescope_gap * math.tan(theta) * math.sin(phi)
-    if abs(x3) < paddle_side_x/2.0 and abs(y3) < paddle_side_y/2.0:
-        g += 1.0/float(trials)
-        h1 += 1
-        if cmos:
-            h2 += 1
-print("g = ", g)
-print("h = ", h2/float(h1))
+x0 = np.random.uniform(-paddle_side_x/2.0, paddle_side_x/2.0, n)
+y0 = np.random.uniform(-paddle_side_y/2.0, paddle_side_y/2.0, n)
+xcmos = x0 + cmos_gap * tan_theta * cos_phi
+ycmos = y0 + cmos_gap * tan_theta * sin_phi
+cmos = (np.abs(xcmos) < cmos_side_x/2.0) & (np.abs(ycmos) < cmos_side_y/2.0)
+
+xtel = x0 + tel_gap * tan_theta * cos_phi
+ytel = y0 + tel_gap * tan_theta * sin_phi
+tel = (np.abs(xtel) < paddle_side_x/2.0) & (np.abs(ytel) < paddle_side_y/2.0) \
+    & (np.random.rand(n) < tel_eff)
+
+g = tel_eff * tel.sum() / n
+print("P(tel  | 1st) = ", g)
+print("P(cmos | tel) = ", (tel & cmos).sum() / tel.sum())
 
 # fraction of muons through CMOS also passing through paddles
-f = 0
-for i in range(trials):
-    theta = random_theta()
-    phi = random.uniform(0, 2.0 * math.pi)
-    x2 = random.uniform(-cmos_side_x/2.0, cmos_side_x/2.0)
-    y2 = random.uniform(-cmos_side_y/2.0, cmos_side_y/2.0)
-    x1 = x2 - cmos_gap * math.tan(theta) * math.cos(phi)
-    y1 = y2 - cmos_gap * math.tan(theta) * math.sin(phi)
-    x3 = x1 + telescope_gap * math.tan(theta) * math.cos(phi)
-    y3 = y1 + telescope_gap * math.tan(theta) * math.sin(phi)
-    if max(abs(x1), abs(x3)) < paddle_side_x/2.0 \
-        and max(abs(y1), abs(y3)) < paddle_side_y/2.0:
-        f += 1.0
-f /= float(trials)
-print("f = ", f)
+tan_theta = np.tan(random_theta(n))
+phi = np.random.uniform(0, 2.0 * np.pi, n)
+cos_phi = np.cos(phi)
+sin_phi = np.sin(phi)
 
-print("Expected muon candidate rate: ", muon_flux * cmos_side_x \
-      * cmos_side_y, "candidates/s")
-print("Expected LED rate: ", g * muon_flux * paddle_side_x \
-      * paddle_side_y, " LED/s")
-print("Expected rate of muon-LED matches: ", f * muon_flux \
-      * cmos_side_x * cmos_side_y, " matches/s")
+xcmos = np.random.uniform(-cmos_side_x/2.0, cmos_side_x/2.0, n)
+ycmos = np.random.uniform(-cmos_side_y/2.0, cmos_side_y/2.0, n)
+x0 = xcmos - cmos_gap * tan_theta * cos_phi
+y0 = ycmos - cmos_gap * tan_theta * sin_phi
+xtel = x0 + tel_gap * tan_theta * cos_phi
+ytel = y0 + tel_gap * tan_theta * sin_phi
+p0 = (np.abs(x0) < paddle_side_x/2.0) & (np.abs(x0) < paddle_side_y/2.0) \
+        & (np.random.rand(n) < tel_eff)
+ptel = (np.abs(xtel) < paddle_side_x/2.0) & (np.abs(ytel) < paddle_side_y/2.0) \
+        & (np.random.rand(n) < tel_eff)
 
-print("g/f^2 = ", g/f**2)
+f = (p0 & ptel).sum() / n
+
+print("P(tel  | cmos) = ", (p0 & ptel).sum() / n)
+print()
+print("Muon rate:      %.3E Hz" % (muon_flux * cmos_side_x * cmos_side_y))
+print("Telescope rate: %.3E Hz" % (tel_eff * g * muon_flux * paddle_side_x * paddle_side_y))
+print("Match rate:     %.3E Hz" % (f * muon_flux * cmos_side_x * cmos_side_y))
 

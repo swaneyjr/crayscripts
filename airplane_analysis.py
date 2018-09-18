@@ -9,36 +9,38 @@ def find_runtime(times, cutoff=300000):
 
 def get_hist(values, bins=None):
     if not bins:
-        bins = np.arange(min(values), max(values)+1)
-    hist,bins = np.histogram(values, bins)
+        bins = np.arange(256)
+    hist, bins = np.histogram(values, bins)
     return hist
 
-def get_pix_val_rate(t, bins=None):
-    runtime = find_runtime([evt.timestamp for evt in t])
+def get_pix_val_rate(t_tuple, bins=None, gps=False):
+    runtime = 0
+    hist = np.zeros(len(bins)-1) if bins else np.zeros(255)
+    for t in t_tuple:
+        runtime += find_runtime([evt.gps_fixtime if gps else evt.timestamp for evt in t])
+        hist += get_hist([max(evt.pix_val) for evt in t], bins)
     print "Runtime: %f min" % runtime
-    hist = get_hist([max(evt.pix_val) for evt in t], bins)
-    hist.resize(256)
     return hist/runtime, runtime
 
 if __name__ == "__main__":
     from argparse import ArgumentParser
     parser = ArgumentParser(description = '')
-    parser.add_argument('--air', required='true', help='Name of TFile for airplane events')
-    parser.add_argument('--ground', required='true', help='Name of TFile for sea level events')
+    parser.add_argument('--air', required='true', nargs='+', help='Name of TFile for airplane events')
+    parser.add_argument('--ground', required='true', nargs='+', help='Name of TFile for sea level events')
     args = parser.parse_args()
 
-    fair = r.TFile(args.air)
-    fground = r.TFile(args.ground)
+    fair = map(r.TFile, args.air)
+    fground = map(r.TFile, args.ground)
 
-    air = fair.Get('events')
-    ground = fground.Get('events')
+    air = map(lambda f: f.Get('events'), fair)
+    ground = map(lambda f: f.Get('events'), fground)
 
     print "ROOT files successfully loaded"
 
-    bins = range(60)+range(60,90,2)+range(90,150,3)+range(150,256,5)
+    bins = range(40)+range(40,60,2)+range(60,90,3)+range(90,120,5)+range(120,160,20)+[170,256]
 
     air_rate, airtime = get_pix_val_rate(air, bins)
-    ground_rate, groundtime = get_pix_val_rate(ground, bins)
+    ground_rate, groundtime = get_pix_val_rate(ground, bins, gps=True)
 
     air_val = r.TH1F("airhist", "Airplane", 256, 0, 256)
     ground_val = r.TH1F("groundhist", "Sea level", 256, 0, 256)
@@ -53,13 +55,15 @@ if __name__ == "__main__":
     ground_val.SetLineColor(4)
     print "Histograms created"
 
-    for evt in air:
-        for val in evt.pix_val:
-            air_val.Fill(val, 1./airtime)
+    for ta in air:
+        for evt in ta:
+            for val in evt.pix_val:
+                air_val.Fill(val, 1./airtime)
 
-    for evt in ground:
-        for val in evt.pix_val:
-            ground_val.Fill(val, 1./groundtime)
+    for tg in ground:
+        for evt in tg:
+            for val in evt.pix_val:
+                ground_val.Fill(val, 1./groundtime)
 
     ground_val.SetMaximum(10)
     ground_val.Draw()
@@ -71,14 +75,15 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     fig = plt.figure()
-    plt.ylim(1,100)
-    plt.yscale('log')
+    plt.ylim(0,40)
+    #plt.yscale('log')
     plt.title('Ratio of air to ground rates')
     plt.xlabel('pix_val')
+    plt.xscale('log')
 
     nonzero = np.logical_and(ground_rate != 0, air_rate != 0)
 
-    xbins = np.arange(256)[nonzero]
+    xbins = np.array(bins)[:-1][nonzero]
     air_nz = air_rate[nonzero]
     ground_nz = ground_rate[nonzero]
 
@@ -99,6 +104,5 @@ if __name__ == "__main__":
     print "Airplane rate: {} +/- {} hit/min".format(air_rate_tot, air_rate_err)
     print "Average multiplier: {} +/- {}".format(air_rate_tot/sea_rate_tot, air_rate_tot/sea_rate_tot*((sea_rate_err/sea_rate_tot)**2 + (air_rate_err/air_rate_tot)**2)**0.5)
 
-    fair.Close()
-    fground.Close()
+    map(lambda f: f.Close(), fair+fground)
 
