@@ -49,8 +49,11 @@ def map_coords(xp, yp, phi_p, theta_p, zs, phi_s, theta_s, psi_s, xs0, ys0):
     sin_psi = np.sin(psi_s)
 
     sec_theta = 1 / np.cos(theta_s)
+    tan_theta = np.tan(theta_s)
     
-    denom = 1 / np.tan(theta_p) + np.tan(theta_s) * cos_phi
+    denom = 1 / np.tan(theta_p) + tan_theta * cos_phi
+
+    zt = zs - rp * cos_xi * tan_theta
 
     # result
     xs = -xs0 + rp * (cos_xi *cos_psi*sec_theta + sin_xi *sin_psi) \
