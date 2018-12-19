@@ -27,6 +27,7 @@ if __name__ == "__main__":
     parser = ArgumentParser(description = '')
     parser.add_argument('--air', required='true', nargs='+', help='Name of TFile for airplane events')
     parser.add_argument('--ground', required='true', nargs='+', help='Name of TFile for sea level events')
+    parser.add_argument('--expected', type=float, help='Expected ratio of air/ground cosmic rates')
     args = parser.parse_args()
 
     fair = map(r.TFile, args.air)
@@ -37,7 +38,7 @@ if __name__ == "__main__":
 
     print "ROOT files successfully loaded"
 
-    bins = range(40)+range(40,60,2)+range(60,90,3)+range(90,120,5)+range(120,160,20)+[170,256]
+    bins = range(14,40)+range(40,60,2)+range(60,90,3)+range(90,120,5)+range(120,160,20)+[170,256]
 
     air_rate, airtime = get_pix_val_rate(air, bins)
     ground_rate, groundtime = get_pix_val_rate(ground, bins, gps=True)
@@ -89,8 +90,22 @@ if __name__ == "__main__":
 
     ratios = air_nz/ground_nz
     errorbars = ratios*np.sqrt(1./(air_nz*airtime) + 1./(ground_nz*groundtime))
+    plt.figure(1)
+    plt.errorbar(xbins, air_nz/ground_nz, yerr=errorbars, fmt='o')
+    plt.xlabel('pix_val')
+    plt.title('Ratio of air/ground rates by pix_val')
 
-    plt.errorbar(xbins, air_nz/ground_nz, yerr=errorbars)
+    if args.expected:
+        signal_frac = (ratios - 1) / (args.expected - 1)
+        exp_err = 5
+        frac_errors = signal_frac * np.sqrt(exp_err**2 / args.expected**2 + errorbars**2 / ratios**2)
+        plt.figure(2)
+        plt.errorbar(xbins, signal_frac, yerr=frac_errors, fmt='o')
+        plt.xlabel('pix_val')
+        plt.ylabel('signal / total')
+        plt.semilogx()
+        plt.title('Signal rate as a fraction of total rate')
+
     plt.show()
 
     cutoff = int(raw_input('Select a signal cutoff: '))
