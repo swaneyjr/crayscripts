@@ -15,24 +15,25 @@ PIX_SIZE = .00112 # mm
 RES_X = 4656
 RES_Y = 3492
 
-def map_coords(xp, yp, phi_p, theta_p, zs, phi_s, theta_s, psi_s, xs0, ys0):
+def map_coords(xp, yp, phi_p, theta_p, xs, ys, zs, phi_s, theta_s, psi_s):
     """
     Parameters:
 
     xp, yp:                 initial position of the particle in the beam frame
     phi_p, theta_p:         trajectory of the particle with respect to the 
                             beam axis
+    xs, ys:                 Coordinates of the center of the sensor in the
+                            lab frame, relative to its intersection with
+                            the beam axis
     zs:                     distance from particle's starting coordinates to 
                             the plane of the beam, as measured along the beam 
                             axis
     phi_s, theta_s, psi_s:  Euler angles of the sensor plane
-    xs0, ys0:                 Coordinates of the center of the sensor in the
-                            sensor plane, relative to its intersection with
-                            the beam axis
+   
 
     Returns:
     
-    xs, ys:                 coordinates of the particle hit relative to the
+    x_hit, y_hit:           coordinates of the particle hit relative to the
                             center of the sensor
     """
 
@@ -40,9 +41,16 @@ def map_coords(xp, yp, phi_p, theta_p, zs, phi_s, theta_s, psi_s, xs0, ys0):
     rp = np.sqrt(xp**2 + yp**2)
     xi_p = np.arctan2(yp, xp)
 
+    # convert sensor positions to polar coords
+    rs = np.sqrt(xs**2 + ys**2).reshape(-1,1)
+    xi_s = np.arctan2(ys, xs).reshape(-1,1)
+
     # calculate trig functions
-    cos_xi = np.cos(xi_p - phi_s.reshape(-1,1))
-    sin_xi = np.sin(xi_p -phi_s.reshape(-1,1))
+    cos_xi_p = np.cos(xi_p - phi_s.reshape(-1,1))
+    sin_xi_p = np.sin(xi_p - phi_s.reshape(-1,1))
+    
+    cos_xi_s = np.cos(xi_s - phi_s.reshape(-1,1))
+    sin_xi_s = np.sin(xi_s - phi_s.reshape(-1,1))
 
     cos_phi = np.cos(phi_p - phi_s.reshape(-1,1))
     sin_phi = np.sin(phi_p - phi_s.reshape(-1,1))
@@ -53,19 +61,19 @@ def map_coords(xp, yp, phi_p, theta_p, zs, phi_s, theta_s, psi_s, xs0, ys0):
     sec_theta = 1 / np.cos(theta_s).reshape(-1,1)
     tan_theta = np.tan(theta_s).reshape(-1,1)
     
-    denom = 1 / np.tan(theta_p) + tan_theta * cos_phi
+    denom = 1 / np.tan(theta_p) - tan_theta * sin_phi
 
-    zt = zs.reshape(-1,1) - rp * cos_xi * tan_theta
-    xr = -xs0.reshape(-1,1)
-    yr = -ys0.reshape(-1,1)
+    zt = zs.reshape(-1,1) - rp*cos_xi_p*tan_theta + rs*cos_xi_s*tan_theta
 
     # result
-    xs = -xr + rp * (cos_xi *cos_psi*sec_theta + sin_xi *sin_psi) \
-             + zt * (cos_phi*cos_psi*sec_theta + sin_phi*sin_psi) / denom
-    ys = -yr + rp * (sin_xi *cos_psi - cos_xi *sec_theta*sin_psi) \
-             + zt * (sin_phi*cos_psi - cos_phi*sec_theta*sin_psi) / denom
+    x_hit = rp * (cos_xi_p*cos_psi*sec_theta + sin_xi_p*sin_psi) \
+          - rs * (cos_xi_s*cos_psi*sec_theta + sin_xi_s*sin_psi) \
+          + zt * (sin_phi *sin_psi*sec_theta + cos_phi *cos_psi) / denom
+    y_hit = rp * (sin_xi_p *cos_psi - cos_xi_p *sec_theta*sin_psi) \
+          - rs * (sin_xi_s *cos_psi - cos_xi_s *sec_theta*sin_psi) \
+          + zt * (sin_phi*cos_psi*sec_theta - cos_phi*sin_psi) / denom
 
-    return xs, ys
+    return x_hit, y_hit
 
 
 def visualize(spot_size, n_particles, x_s, y_s, phi_s, theta_s, psi_s):
@@ -100,9 +108,6 @@ def visualize(spot_size, n_particles, x_s, y_s, phi_s, theta_s, psi_s):
             [lim_x, lim_y],
             [-lim_x, lim_y]]]), n_phones, axis=0)
 
-    # apply translation
-    rects += np.dstack([x_s, y_s]).reshape(n_phones,1,2)
-
     # do rotations
 
     cos_phi = np.cos(phi_s)
@@ -127,7 +132,7 @@ def visualize(spot_size, n_particles, x_s, y_s, phi_s, theta_s, psi_s):
             psi_rot = np.matmul(psi_mat[:,:,iphone], rects[iphone][corner])
             theta_rot = np.matmul(theta_mat[:,:,iphone], psi_rot)
             phi_rot = np.matmul(phi_mat[:,:,iphone], theta_rot)
-            rects[iphone][corner] = phi_rot
+            rects[iphone][corner] = phi_rot + np.array([x_s, y_s])[:,iphone]
 
 
     polygons = [Polygon(rects[iphone]) for iphone in range(n_phones)]
@@ -150,13 +155,14 @@ if __name__ == '__main__':
     parser.add_argument('--gap_stdev', default=.05, type=float, help='Standard deviation applied to phone_gap')
     parser.add_argument('--theta_dev', default=.05, type=float, help='Standard deviation in Eulerian theta for phone rotations')
     parser.add_argument('--psi_dev', default=.05, type=float, help='Standard deviation of Eulerian psi (about -phi) for phone rotations')
-    parser.add_argument('--xy_dev', default=0.7, type=float, help='Standard deviation of phone positions in rotated plane with respect to apparatus')
-    parser.add_argument('--xy_offset', default=1.0, type=float, help='Standard deviation of phone apparatus position with respect to the beam')
+    parser.add_argument('--xy_dev', default=0.5, type=float, help='Standard deviation of phone positions in rotated plane with respect to apparatus')
+    parser.add_argument('--xy_offset', default=1.0, type=float, help='Standard deviation of the phone holder position with respect to the beam')
+    parser.add_argument('--theta_offset', default=.03, type=float, help='Standard deviation of the phone holder rotation')
 
     parser.add_argument('--n_spills', default=1, type=int, help='Number of beam spills')
     parser.add_argument('--spill_size', default=5e5, type=int, help='Number of particles in each beam spill')
     parser.add_argument('--spot_size', default=6., type=float, help='Diameter of beam in mm')
-    parser.add_argument('--collimation', default=.001, type=float, help='Angular variation of beam particles in radians')
+    parser.add_argument('--collimation', default=3e-5, type=float, help='Angular variation of beam particles in radians')
 
     parser.add_argument('--visualize', action='store_true', help='Create a visualization of the phone positions')
     args = parser.parse_args()
@@ -174,15 +180,46 @@ if __name__ == '__main__':
 
     phone_hwid = [uuid.uuid4().hex[:16] for _ in range(n)]
 
-    phone_z = np.arange(args.n_phones).reshape(n) * args.phone_gap \
+    phone_x0 = np.random.normal(0, args.xy_dev, n)
+    phone_y0 = np.random.normal(0, args.xy_dev, n)
+    phone_z0 = np.arange(n) * args.phone_gap \
             + np.random.normal(0, args.gap_stdev, n)
-    phone_phi = np.random.uniform(0, 2*np.pi, n)
-    phone_psi = -phone_phi + np.random.normal(0, args.psi_dev, n)
-    phone_theta = np.abs(np.random.normal(0, args.theta_dev, n))
+    
+    # now move the holder about its center
+    holder_xy = np.random.normal(0, args.xy_offset, 2)
+    holder_theta = np.random.normal(0, args.theta_offset, 1)
 
-    offset_xy = np.random.normal(0, args.xy_offset, 2)
-    phone_x = np.random.normal(offset_xy[0], args.xy_dev, n)
-    phone_y = np.random.normal(offset_xy[1], args.xy_dev, n)
+    z_av = (n-1)/2 * args.phone_gap
+
+    # N.B. while we are rotating the phone (and thus passively rotating
+    # the coordinate system) the shift in phone positions looks like
+    # an active rotation
+    phone_x = phone_x0 * np.cos(holder_theta) - (phone_z0 - z_av) * np.sin(holder_theta) + holder_xy[0]
+    phone_y = phone_y0 + holder_xy[1]
+    phone_z = z_av + phone_x0 * np.sin(holder_theta) + (phone_z0 - z_av) * np.cos(holder_theta) 
+
+    # create the angles within the holder
+    phone_theta0 = np.abs(np.random.normal(0, args.theta_dev, n))
+    phone_phi0 = np.random.uniform(-np.pi, np.pi, n)
+    phone_psi0 = -phone_phi0 + np.random.normal(0, args.psi_dev, n) 
+    
+    # now find the angles after the holder rotation
+    sth = np.sin(phone_theta0)
+    cth = np.cos(phone_theta0)
+    sps = np.sin(phone_psi0)
+    cps = np.cos(phone_psi0)
+    sph = np.sin(phone_phi0)
+    cph = np.cos(phone_phi0)
+    sho = np.sin(holder_theta)
+    cho = np.cos(holder_theta)
+    
+    phone_theta = np.arccos(sth*sph*sho + cth*cho)
+    phone_phi = np.where(np.logical_or(sth, sho), \
+            np.arctan2(sth*sph*cho - cth*sho, sth*cph), phone_phi0)
+    phone_psi = np.where(np.logical_or(sth, sho), \
+            np.arctan2(cps*cph*sho - cth*sph*sps*sho + sps*sth*cho, \
+            cps*sth*cho - sps*cph*sho - cth*sph*cps*sho), \
+            phone_psi0)
 
     np.savez(os.path.join(dirname, f_truth_name), hwid=phone_hwid, x=phone_x, \
             y=phone_y, phi=phone_phi, theta=phone_theta, psi=phone_psi)
@@ -206,14 +243,14 @@ if __name__ == '__main__':
         phi = np.random.uniform(0, 2*np.pi, n_particles)
         theta = np.abs(np.random.normal(0, args.collimation, n_particles))
 
-        xs, ys = map_coords(x0, y0, phi, theta, phone_z, phone_phi, \
-                phone_theta, phone_psi, phone_x, phone_y)
+        xs, ys = map_coords(x0, y0, phi, theta, phone_x, phone_y, phone_z, \
+                phone_phi, phone_theta, phone_psi)
 
         pix_x = xs / PIX_SIZE
         pix_y = ys / PIX_SIZE
 
         # determine the phone response
-        offsets = np.random.uniform(0, 1/args.fps, args.n_phones)
+        offsets = np.random.uniform(0, 1/args.fps, n)
 
         for iphone in range(args.n_phones):
             
