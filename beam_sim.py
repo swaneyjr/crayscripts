@@ -149,20 +149,22 @@ if __name__ == '__main__':
 
     parser.add_argument('--n_phones', default=3, type=int, help='Number of phones')
     parser.add_argument('--fps', default=1., type=float, help='Frame rate')
-    parser.add_argument('--phone_gap', default=10., type=float, help='Average distance between planes of phone sensors')
+    parser.add_argument('--drift', default=0, type=float, help='Standard deviation of drift (dt / t)')
+    parser.add_argument('--phone_gap', default=9.2, type=float, help='Average distance between planes of phone sensors')
     parser.add_argument('--eff', default=1., type=float, help='Efficiency of phones')
+    parser.add_argument('--upload_frac', default=1., type=float, help='Likelihood that a frame will successfully upload')
 
     parser.add_argument('--gap_stdev', default=.05, type=float, help='Standard deviation applied to phone_gap')
-    parser.add_argument('--theta_dev', default=.05, type=float, help='Standard deviation in Eulerian theta for phone rotations')
-    parser.add_argument('--psi_dev', default=.05, type=float, help='Standard deviation of Eulerian psi (about -phi) for phone rotations')
+    parser.add_argument('--theta_dev', default=.06, type=float, help='Standard deviation in Eulerian theta for phone rotations')
+    parser.add_argument('--psi_dev', default=.1, type=float, help='Standard deviation of Eulerian psi (about -phi) for phone rotations')
     parser.add_argument('--xy_dev', default=0.5, type=float, help='Standard deviation of phone positions in rotated plane with respect to apparatus')
-    parser.add_argument('--xy_offset', default=1.0, type=float, help='Standard deviation of the phone holder position with respect to the beam')
-    parser.add_argument('--theta_offset', default=.03, type=float, help='Standard deviation of the phone holder rotation')
+    parser.add_argument('--xy_offset', default=0.8, type=float, help='Standard deviation of the phone holder position with respect to the beam')
+    parser.add_argument('--theta_offset', default=.1, type=float, help='Standard deviation of the phone holder rotation')
 
     parser.add_argument('--n_spills', default=1, type=int, help='Number of beam spills')
     parser.add_argument('--spill_size', default=5e5, type=int, help='Number of particles in each beam spill')
     parser.add_argument('--spot_size', default=6., type=float, help='Diameter of beam in mm')
-    parser.add_argument('--collimation', default=3e-5, type=float, help='Angular variation of beam particles in radians')
+    parser.add_argument('--collimation', default=5e-5, type=float, help='Angular variation of beam particles in radians')
 
     parser.add_argument('--visualize', action='store_true', help='Create a visualization of the phone positions')
     args = parser.parse_args()
@@ -221,14 +223,25 @@ if __name__ == '__main__':
             cps*sth*cho - sps*cph*sho - cth*sph*cps*sho), \
             phone_psi0)
 
+    drifts = np.random.normal(loc=0, scale=args.drift, size=n)
+    offsets = np.random.uniform(0, 1/args.fps, n)
+
     np.savez(os.path.join(dirname, f_truth_name), hwid=phone_hwid, x=phone_x, \
-            y=phone_y, phi=phone_phi, theta=phone_theta, psi=phone_psi)
+            y=phone_y, phi=phone_phi, theta=phone_theta, psi=phone_psi, \
+            t_drifts=drifts, t_offsets=offsets, eff=args.eff)
 
     if args.visualize:
         visualize(args.spot_size, args.spill_size, phone_x, phone_y, \
                 phone_phi, phone_theta, phone_psi)
         
     # now create the beam spill
+
+    # create the beam times with an offset relative to the phones
+    dt_spl = np.repeat(BEAM_PERIOD, args.n_spills - 1) + np.random.normal(0, 5)
+    spl_times = np.insert(np.cumsum(dt_spl), 0, 0) \
+            + np.random.uniform(0, BEAM_PERIOD)
+ 
+    phone_times = offsets.copy()
     for ispill in range(args.n_spills):
 
         print('Spill {}/{}'.format(ispill+1, args.n_spills))
@@ -236,7 +249,7 @@ if __name__ == '__main__':
         n_particles = np.random.poisson(args.spill_size)
         dt_avg = BEAM_TIME / n_particles 
         dt = np.random.exponential(dt_avg, n_particles - 1)
-        times = np.insert(np.cumsum(dt), 0, 0)
+        particle_times = np.insert(np.cumsum(dt), 0, 0) + spl_times[ispill]
 
         x0 = np.random.normal(0, args.spot_size/2, n_particles)
         y0 = np.random.normal(0, args.spot_size/2, n_particles)
@@ -249,16 +262,17 @@ if __name__ == '__main__':
         pix_x = xs / PIX_SIZE
         pix_y = ys / PIX_SIZE
 
-        # determine the phone response
-        offsets = np.random.uniform(0, 1/args.fps, n)
+        # determine the phone response  
 
         for iphone in range(args.n_phones):
             
-            tmin = 0
-            tmax = offsets[iphone]
+            tmin = phone_times[iphone] - 1/args.fps
+            while phone_times[iphone] < particle_times[0]:
+                tmin = phone_times[iphone]
+                phone_times[iphone] += 1/args.fps
 
-            while tmin < times[-1]: 
-                frame_particles = (times > tmin) & (times < tmax)
+            while tmin < particle_times[-1]: 
+                frame_particles = (particle_times > tmin) & (particle_times < phone_times[iphone])
 
                 xframe = pix_x[iphone, frame_particles]
                 yframe = pix_y[iphone, frame_particles]
@@ -269,17 +283,15 @@ if __name__ == '__main__':
 
                 xhits = (xframe[hits] + RES_X/2).astype(int)
                 yhits = (yframe[hits] + RES_Y/2).astype(int)
-                data = np.ones(xhits.shape, dtype=bool)
-
-
-                sparse_hits = coo_matrix((data, (yhits, xhits)), \
-                        shape=(RES_Y, RES_X))
 
                 # save output 
-                t_abs = millis + int(1000*(BEAM_PERIOD*ispill + tmax))
-                f_spill_name = spill_template.format(phone_hwid[iphone], t_abs)
-                save_npz(os.path.join(dirname, 'raw', f_spill_name), sparse_hits)
+                if np.random.random(0) > args.upload_frac: continue
+                t_out = millis + int(1000 * (phone_times[iphone] + \
+                        (phone_times[iphone]-offsets[iphone]) * drifts[iphone]))
+                f_spill_name = spill_template.format(phone_hwid[iphone], t_out)
+                fname = os.path.join(dirname, 'raw', f_spill_name)
+                np.savez(fname, x=xhits, y=yhits, t=t_out, shape=np.array([RES_X, RES_Y]))
 
-                tmin = tmax
-                tmax += 1 / args.fps
+                tmin = phone_times[iphone]
+                phone_times[iphone] += 1 / args.fps
 
