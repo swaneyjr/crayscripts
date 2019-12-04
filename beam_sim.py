@@ -6,6 +6,7 @@ import uuid
 
 import numpy as np
 from scipy.stats import multivariate_normal
+from sklearn.cluster import DBSCAN
 
 BEAM_TIME = 4.2 # seconds
 BEAM_PERIOD = 60 # seconds
@@ -102,7 +103,7 @@ def gen_noise(n_avg):
     return x_noise[:n_noise], y_noise[:n_noise]
 
 
-def visualize(spot_size, n_particles, x_s, y_s, phi_s, theta_s, psi_s):
+def visualize(spot_type, spot_size, n_particles, x_s, y_s, phi_s, theta_s, psi_s):
 
     global RES_X, RES_Y, PIX_SIZE
 
@@ -113,13 +114,20 @@ def visualize(spot_size, n_particles, x_s, y_s, phi_s, theta_s, psi_s):
     fig = plt.figure()
     ax = fig.gca()
 
-    # first draw beam profile
-    beam_xy = multivariate_normal(mean=[0,0], cov=args.spot_size/2)
+    # first draw beam profile 
     sz = 1.5*spot_size
     x = np.linspace(-sz/2, sz/2, 100)
     y = np.linspace(-sz/2, sz/2, 100)
-    pos = np.dstack(np.meshgrid(x,y))
-    intensity = n_particles*beam_xy.pdf(pos)
+    if spot_type == 'gaussian':
+        pos = np.dstack(np.meshgrid(x,y))
+        beam_xy = multivariate_normal(mean=[0,0], cov=spot_size/2)
+        intensity = n_particles*beam_xy.pdf(pos)
+    elif spot_type == 'uniform':
+        xx, yy = np.meshgrid(x,y)
+        intensity = n_particles / (np.pi * spot_size**2 / 4) *  (xx**2 + yy**2 < spot_size**2 / 4)
+    elif spot_type == 'square':
+        xx, yy = np.meshgrid(x,y)
+        intensity = 4 * n_particles / spot_size**2 * (np.maximum(np.abs(xx), np.abs(yy)) < spot_size / 2)
     plt.imshow(intensity, extent=2*[-sz/2, sz/2], cmap='plasma')
     plt.colorbar()
 
@@ -171,38 +179,55 @@ def visualize(spot_size, n_particles, x_s, y_s, phi_s, theta_s, psi_s):
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser(description='')
-    parser.add_argument('--out', default='beam_sim.npz', help='Base file name, with a .npz extension')
+    parser.add_argument('--out', required=True, help='Base file name, with a .npz extension')
 
     parser.add_argument('--n_phones', default=3, type=int, help='Number of phones')
     parser.add_argument('--fps', default=1., type=float, help='Frame rate')
     parser.add_argument('--drift', default=0, type=float, help='Standard deviation of drift (dt / t)')
     parser.add_argument('--noise', default=0, type=float, help='Average number of background pixels per image')
     parser.add_argument('--bgfiles', default=250, type=int, help='Number of files per phone generated with background noise only')
-    parser.add_argument('--phone_gap', default=9.2, type=float, help='Average distance between planes of phone sensors')
-    parser.add_argument('--eff', default=1., type=float, nargs='+', help='Efficiency of phones.  Either a float, or a tuple of length n_phones')
+    parser.add_argument('--phone_gap', default=9.7, type=float, help='Average distance between planes of phone sensors')
+    parser.add_argument('--particles', default=[1.], type=float, nargs='+', help='Abundances of different particle species in the beam spill.  Arguments should add to 1')
+    parser.add_argument('--eff', default=[1.], type=float, nargs='+', help='Efficiency of phones to different particle species.  Number of arguments should be the same as n_particles.')
     parser.add_argument('--upload_frac', default=1., type=float, help='Likelihood that a frame will successfully upload')
 
 
 
-    parser.add_argument('--gap_stdev', default=.05, type=float, help='Standard deviation applied to phone_gap')
-    parser.add_argument('--theta_dev', default=.06, type=float, help='Standard deviation in Eulerian theta for phone rotations')
+    parser.add_argument('--gap_stdev', default=0.5, type=float, help='Standard deviation applied to phone_gap')
+    parser.add_argument('--theta_dev', default=.05, type=float, help='Standard deviation in Eulerian theta for phone rotations')
     parser.add_argument('--psi_dev', default=.05, type=float, help='Standard deviation of Eulerian psi (about -phi) for phone rotations')
-    parser.add_argument('--xy_dev', default=0.5, type=float, help='Standard deviation of phone positions in rotated plane with respect to apparatus')
-    parser.add_argument('--xy_offset', default=0.8, type=float, help='Standard deviation of the phone holder position with respect to the beam')
-    parser.add_argument('--theta_offset', default=.1, type=float, help='Standard deviation of the phone holder rotation')
+    parser.add_argument('--xy_dev', default=0.5, type=float, help='Standard deviation of phone positions (in mm) in rotated plane with respect to apparatus')
+    parser.add_argument('--xy_offset', default=0.8, type=float, help='Standard deviation of the phone holder position (in mm) with respect to the beam')
+    parser.add_argument('--theta_offset', default=.05, type=float, help='Standard deviation of the phone holder rotation')
 
     parser.add_argument('--n_spills', default=1, type=int, help='Number of beam spills')
-    parser.add_argument('--spill_size', default=5e5, type=int, help='Number of particles in each beam spill')
-    parser.add_argument('--spot_size', default=6., type=float, help='Diameter of beam in mm')
+    parser.add_argument('--spill_size', default=1e6, type=int, help='Number of particles in each beam spill')
+    parser.add_argument('--spot_size', default=10., type=float, help='Diameter of beam in mm')
+    parser.add_argument('--spot_type', choices=('gaussian', 'uniform', 'square'), default='gaussian', help='Distribution of beam profile')
     parser.add_argument('--collimation', default=5e-5, type=float, help='Angular variation of beam particles in radians')
 
     parser.add_argument('--visualize', action='store_true', help='Create a visualization of the phone positions')
+    parser.add_argument('--clustering', type=float, default=-1, help='Maximum pixel separation to be considered a cluster.  Default of -1, in which case, pixel multiplicities are included.')
+    
     args = parser.parse_args()
+
+    if np.abs(sum(args.particles) - 1) > 1e-5:
+        print('ERROR: relative particle abundances not normalized.')
+        resp = input('Fix normalization? (y/n) ')
+        if resp.strip().lower() == 'y':
+            args.particles /= sum(args.particles)
+        else:
+            print('Exiting')
+            exit(0)
+
+    if not len(args.eff) == len(args.particles):
+        print('ERROR: Invalid number of entries for --eff: must be equal to n_particles')
+        exit(1)
 
     basename = os.path.basename(args.out)
     dirname = os.path.dirname(args.out)
     
-    os.makedirs(os.path.join(dirname, 'raw'), exist_ok=True)
+    os.makedirs(os.path.join(dirname, 'cluster'), exist_ok=True)
     os.makedirs(os.path.join(dirname, 'bg'), exist_ok=True)
 
     f_truth_name = basename.replace('.npz', '_truth.npz')
@@ -211,15 +236,7 @@ if __name__ == '__main__':
     millis = int(time.time() * 1000)
 
     # create the phone geometries
-    n = args.n_phones
-
-    if len(args.eff) == 1:
-        efficiencies = np.repeat(args.eff, n)
-    elif len(args.eff) == n:
-        efficiencies = np.array(args.eff)
-    else:
-        print('ERROR: Invalid number of entries for --eff: must be either 1 or n_phones')
-        exit(1)
+    n = args.n_phones 
 
     phone_hwid = [uuid.uuid4().hex[:16] for _ in range(n)]
 
@@ -264,20 +281,27 @@ if __name__ == '__main__':
             cps*sth*cho - sps*cph*sho - cth*sph*cps*sho), \
             phone_psi0)
 
+
+    if args.visualize:
+        visualize(args.spot_type, args.spot_size, args.spill_size, \
+                phone_x, phone_y, phone_phi, phone_theta, phone_psi)
+        if not input('Continue? y/n: ') == 'y': exit(0)
+
+    
     drifts = np.random.normal(loc=0, scale=args.drift, size=n)
     offsets = np.random.uniform(0, 1/args.fps, n)
 
+    # handle particle species and efficiencies
+    particle_cumsum = np.cumsum(args.particles).reshape(-1,1)
+    efficiencies = np.array(args.eff)
+
     # save the config and truth files
     np.savez(os.path.join(dirname, f_config_name), fps=args.fps, \
-            res=np.array([RES_X, RES_Y]))
+            res=np.array([RES_X, RES_Y]), particles=args.particles)
 
     np.savez(os.path.join(dirname, f_truth_name), hwid=phone_hwid, x=phone_x, \
             y=phone_y, phi=phone_phi, theta=phone_theta, psi=phone_psi, \
             t_drifts=drifts, t_offsets=offsets, eff=efficiencies)
-
-    if args.visualize:
-        visualize(args.spot_size, args.spill_size, phone_x, phone_y, \
-                phone_phi, phone_theta, phone_psi)
     
     # generate noise-only files
     print('Generating background files')
@@ -304,8 +328,21 @@ if __name__ == '__main__':
         dt = np.random.exponential(dt_avg, n_particles - 1)
         particle_times = np.insert(np.cumsum(dt), 0, 0) + spl_times[ispill]
 
-        x0 = np.random.normal(0, args.spot_size/2, n_particles)
-        y0 = np.random.normal(0, args.spot_size/2, n_particles)
+        if args.spot_type == 'gaussian':
+            x0 = np.random.normal(0, args.spot_size/2, n_particles)
+            y0 = np.random.normal(0, args.spot_size/2, n_particles)
+        elif args.spot_type == 'uniform':
+            r = np.random.triangular(0, args.spot_size/2, args.spot_size/2, n_particles)
+            phi = np.random.uniform(0, 2 * np.pi, n_particles)
+            x0 = r * np.cos(phi)
+            y0 = r * np.sin(phi)
+        elif args.spot_type == 'square':
+            x0 = np.random.uniform(-args.spot_size/2, args.spot_size/2, n_particles)
+            y0 = np.random.uniform(-args.spot_size/2, args.spot_size/2, n_particles)
+        else:
+            print('Unrecognized beam profile. Exiting.')
+            exit()
+
         phi = np.random.uniform(0, 2*np.pi, n_particles)
         theta = np.abs(np.random.normal(0, args.collimation, n_particles))
 
@@ -315,10 +352,12 @@ if __name__ == '__main__':
         pix_x = xs / PIX_SIZE
         pix_y = ys / PIX_SIZE
 
+        particle_eff = efficiencies[np.argmin(particle_cumsum < np.random.random(n_particles), axis=0)]
+
         # determine the phone response
 
         for iphone in range(args.n_phones):
-            
+
             tmin = phone_times[iphone] - 1/args.fps
             while phone_times[iphone] < particle_times[0]:
                 tmin = phone_times[iphone]
@@ -332,7 +371,7 @@ if __name__ == '__main__':
 
                 hits = (np.abs(xframe) < RES_X/2) \
                         & (np.abs(yframe) < RES_Y/2) \
-                        & (np.random.random(xframe.shape) < efficiencies[iphone])
+                        & (np.random.random(xframe.shape) < particle_eff[frame_particles])
 
                 x_hits = (xframe[hits] + RES_X/2).astype(int)
                 y_hits = (yframe[hits] + RES_Y/2).astype(int)
@@ -343,13 +382,40 @@ if __name__ == '__main__':
                 xtot = np.hstack([x_hits, x_noise])
                 ytot = np.hstack([y_hits, y_noise])
 
+                if args.clustering == 0:
+                    # just get rid of duplicates
+                    itot = np.unique(xtot + RES_X * ytot)
+                
+                    xtot = itot % RES_X
+                    ytot = itot // RES_X
+                
+                if args.clustering > 0:
+                    # use an actual clustering algorithm
+                    xy = np.column_stack((xtot,ytot))
+                    clustering = DBSCAN(eps=args.clustering, min_samples=1)
+                    clustering.fit(xy)
+                    
+                    n_groups = clustering.labels_.max() + 1
+                    group_indices = np.array([np.argmax(clustering.labels_ == i) for i in range(n_groups)])
+                    
+                    xtot = xtot[group_indices]
+                    ytot = ytot[group_indices]
+                    
+
                 # save output 
-                if np.random.random(0) > args.upload_frac: continue
-                t_out = millis + int(1000 * (phone_times[iphone] + \
-                        (phone_times[iphone]-offsets[iphone]) * drifts[iphone]))
-                f_spill_name = spill_template.format(phone_hwid[iphone], t_out)
-                fname = os.path.join(dirname, 'raw', f_spill_name)
-                np.savez(fname, x=xtot, y=ytot, t=t_out)
+                if np.random.random() > args.upload_frac: continue
+                t_out = millis + 1000 * (phone_times[iphone] + \
+                        (phone_times[iphone]-offsets[iphone]) * drifts[iphone])
+                f_spill_name = spill_template.format(phone_hwid[iphone], int(t_out))
+                fname = os.path.join(dirname, 'cluster', f_spill_name)
+                np.savez(fname, 
+                        x=xtot, 
+                        y=ytot, 
+                        t=t_out, 
+                        # truth information
+                        particles=np.arange(n_particles)[frame_particles][hits],
+                        #ptimes=1000*particle_times[frame_particles][hits] + millis,
+                        )
 
                 tmin = phone_times[iphone]
                 phone_times[iphone] += 1 / args.fps
