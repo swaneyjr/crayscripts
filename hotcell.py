@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import ROOT as r
 import numpy as np
-from itertools import starmap, product, izip
+from itertools import product
 from collections import namedtuple
 import sys
 
@@ -33,7 +33,7 @@ def draw_pix_stats(stats):
     map(htemp.Fill, np.log10(stats).flat)
     htemp.Draw()
     r.gROOT.FindObject("c1").Update()
-    raw_input("Press enter")
+    input("Press enter")
 
 def vbranch(t, bname, btype=float):
     btype_name = {float: 'double', int: 'int'}[btype]
@@ -43,9 +43,9 @@ def vbranch(t, bname, btype=float):
 
 def clean_pix(t0, thresh, mask=None, stats=None, keep_empty=False, bad_regions=None, drop_source=False, l2thresh=None, res=(1280,720)):
     if stats is None:
-        print "Calculating pixel stats..."
+        print("Calculating pixel stats...")
         stats = pix_stats(t0, res)
-        print "stats finished."
+        print("stats finished.")
 
     def in_mask(x,y):
         if mask == None: return False
@@ -63,9 +63,9 @@ def clean_pix(t0, thresh, mask=None, stats=None, keep_empty=False, bad_regions=N
 
     existing_branches = [b.GetName() for b in t0.GetListOfBranches()]
     pix_n = np.array([0], dtype=int)
-    print "calling clonetree()"
+    print("calling clonetree()")
     t1 = t0.CloneTree(0)
-    print "clonetree done"
+    print("clonetree done")
     vbranch(t1, 'pix_freq')
     t1.Branch('pix_n_clean', pix_n, 'pix_n_clean/i')
     if 'pix_masked' in existing_branches:
@@ -77,22 +77,22 @@ def clean_pix(t0, thresh, mask=None, stats=None, keep_empty=False, bad_regions=N
     total_pix = 0
     saved_pix = 0
     input_events = t0.GetEntries()
-    print 'starting loop.'
+    print('starting loop.')
     sys.stdout.flush()
     for ievt,evt in enumerate(t0):
         if ievt%(input_events/10) == 0:
-            print "%d/%d  %.1f%%" % (ievt, input_events, 100.*ievt/input_events)
+            print("{:d}/{:d}  {:.1f}%" % (ievt, input_events, 100.*ievt/input_events))
         t1._pix_freq.clear()
         t1._pix_masked.clear()
 
         # first, load the pixel data out of the TTree vectors
-        pixels = list(starmap(Pixel, izip(evt.pix_x, evt.pix_y, evt.pix_val, evt.pix_adjusted_val, evt.pix_avg_3, evt.pix_avg_5)))
+        pixels = list(map(Pixel, zip(evt.pix_x, evt.pix_y, evt.pix_val, evt.pix_adjusted_val, evt.pix_avg_3, evt.pix_avg_5)))
 
         # now clear the vectors so we can re-write them
         t1.pix_x.clear()
         t1.pix_y.clear()
         t1.pix_val.clear()
-	t1.pix_adjusted_val.clear()
+        t1.pix_adjusted_val.clear()
         t1.pix_avg_3.clear()
         t1.pix_avg_5.clear()
 
@@ -113,7 +113,7 @@ def clean_pix(t0, thresh, mask=None, stats=None, keep_empty=False, bad_regions=N
             t1.pix_x.push_back(p.x)
             t1.pix_y.push_back(p.y)
             t1.pix_val.push_back(p.val)
-	    t1.pix_adjusted_val.push_back(p.adjusted_val)
+            t1.pix_adjusted_val.push_back(p.adjusted_val)
             t1.pix_avg_3.push_back(p.avg_3)
             t1.pix_avg_5.push_back(p.avg_5)
 
@@ -123,12 +123,12 @@ def clean_pix(t0, thresh, mask=None, stats=None, keep_empty=False, bad_regions=N
 
         t1.Fill()
 
-    print "Done!"
-    print
-    print "Input events:    %d" % input_events
-    print "Output events:   %d\t(%.2f%%)" % (t1.GetEntries(), 100.*t1.GetEntries()/input_events)
-    print "Pixels removed:  %d\t(%.2f%%)" % ((total_pix-saved_pix), 100.*(total_pix-saved_pix)/total_pix)
-    print "Pixels saved:    %d\t(%.2f%%)" % (saved_pix, 100.*saved_pix/total_pix)
+    print("Done!")
+    print()
+    print("Input events:    {}".format(input_events))
+    print("Output events:   {}\t({:.2f%})".format(t1.GetEntries(), 100.*t1.GetEntries()/input_events))
+    print("Pixels removed:  {}\t({:.2f%})".format((total_pix-saved_pix), 100.*(total_pix-saved_pix)/total_pix))
+    print("Pixels saved:    {}\t({:.2f%})".format(saved_pix, 100.*saved_pix/total_pix))
 
     return t1
 
@@ -163,8 +163,8 @@ if __name__ == "__main__":
 
     outfile = r.TFile(args.out, "recreate")
 
-    print "Filtering pixels..."
+    print("Filtering pixels...")
     t1 = clean_pix(t0, args.thresh, args.source_mask, bad_regions=args.bad_region, drop_source=args.drop_source, l2thresh=args.L2, res=args.res)
     outfile.Write()
     outfile.Close()
-    print "Done! Wrote to %s." % args.out
+    print("Done! Wrote to %s." % args.out)
