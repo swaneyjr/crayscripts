@@ -224,21 +224,22 @@ if __name__ == '__main__':
         print('ERROR: Invalid number of entries for --eff: must be equal to n_particles')
         exit(1)
 
-    basename = os.path.basename(args.out)
+    basename = os.splitext(os.path.basename(args.out))[0]
     dirname = os.path.dirname(args.out)
-    
-    os.makedirs(os.path.join(dirname, 'cluster'), exist_ok=True)
-    os.makedirs(os.path.join(dirname, 'bg'), exist_ok=True)
-
-    f_truth_name = basename.replace('.npz', '_truth.npz')
-    f_config_name = basename.replace('.npz', '_config.npz')
-    spill_template = basename.replace('.npz', '_p{}_t{}.npz')
+     
+    f_truth_name = basename + '_truth.npz'
+    f_config_name = basename + '_config.npz'
     millis = int(time.time() * 1000)
 
     # create the phone geometries
     n = args.n_phones 
 
     phone_hwid = [uuid.uuid4().hex[:16] for _ in range(n)]
+
+    for hwid in phone_hwid:
+        os.makedirs(os.path.join(dirname, hwid, 'cluster'), exist_ok=True)
+        os.makedirs(os.path.join(dirname, hwid, 'bg'), exist_ok=True)
+
 
     phone_x0 = np.random.normal(0, args.xy_dev, n)
     phone_y0 = np.random.normal(0, args.xy_dev, n)
@@ -308,7 +309,7 @@ if __name__ == '__main__':
     for hwid in phone_hwid:
         for i in range(args.bgfiles):
             x_noise, y_noise = gen_noise(args.noise)
-            np.savez(os.path.join(dirname, 'bg', '{}_{}'.format(hwid, i)), \
+            np.savez(os.path.join(dirname, hwid, 'bg', '{}.npz'.format(i)), \
                     x=x_noise, y=y_noise)
 
     # now create the beam spills
@@ -406,8 +407,12 @@ if __name__ == '__main__':
                 if np.random.random() > args.upload_frac: continue
                 t_out = millis + 1000 * (phone_times[iphone] + \
                         (phone_times[iphone]-offsets[iphone]) * drifts[iphone])
-                f_spill_name = spill_template.format(phone_hwid[iphone], int(t_out))
-                fname = os.path.join(dirname, 'cluster', f_spill_name)
+                fname = os.path.join(dirname, 
+                        basename,
+                        phone_hwid[iphone], 
+                        'cluster', 
+                        '{}.npz'.format(t_out))
+
                 np.savez(fname, 
                         x=xtot, 
                         y=ytot, 
