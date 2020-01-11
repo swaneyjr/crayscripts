@@ -387,10 +387,10 @@ if __name__ == '__main__':
                     # just get rid of duplicates
                     itot = np.unique(xtot + RES_X * ytot)
                 
-                    xtot = itot % RES_X
-                    ytot = itot // RES_X
+                    x_cluster = itot % RES_X
+                    y_cluster = itot // RES_X
                 
-                if args.clustering > 0:
+                elif args.clustering > 0:
                     # use an actual clustering algorithm
                     xy = np.column_stack((xtot,ytot))
                     clustering = DBSCAN(eps=args.clustering, min_samples=1)
@@ -399,8 +399,12 @@ if __name__ == '__main__':
                     n_groups = clustering.labels_.max() + 1
                     group_indices = np.array([np.argmax(clustering.labels_ == i) for i in range(n_groups)])
                     
-                    xtot = xtot[group_indices]
-                    ytot = ytot[group_indices]
+                    x_cluster = xtot[group_indices]
+                    y_cluster = ytot[group_indices]
+                
+                else:
+                    x_cluster = xtot
+                    y_cluster = ytot
                     
 
                 # save output 
@@ -414,11 +418,15 @@ if __name__ == '__main__':
                         '{}.npz'.format(t_out))
 
                 np.savez(fname, 
-                        x=xtot, 
-                        y=ytot, 
+                        x=x_cluster, 
+                        y=y_cluster, 
                         t=t_out, 
+                        max_val=np.random.randint(1, 10, x_cluster.size),
+                        tot_val=np.random.randint(1, 10, x_cluster.size),
+                        n_clusters=x_cluster.size,
+                        n_pix=xtot.size,
                         # truth information
-                        particles=np.arange(n_particles)[frame_particles][hits],
+                        #particles=np.arange(n_particles)[frame_particles][hits],
                         #ptimes=1000*particle_times[frame_particles][hits] + millis,
                         )
 
