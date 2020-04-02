@@ -189,7 +189,8 @@ if __name__ == '__main__':
     parser.add_argument('--phone_gap', default=9.7, type=float, help='Average distance between planes of phone sensors')
     parser.add_argument('--particles', default=[1.], type=float, nargs='+', help='Abundances of different particle species in the beam spill.  Arguments should add to 1')
     parser.add_argument('--eff', default=[1.], type=float, nargs='+', help='Efficiency of phones to different particle species.  Number of arguments should be the same as n_particles.')
-    parser.add_argument('--upload_frac', default=1., type=float, help='Likelihood that a frame will successfully upload')
+    parser.add_argument('--spill_tail', type=float, default=10)
+    parser.add_argument('--save_intensity', type=float, default=0)
 
 
 
@@ -224,7 +225,7 @@ if __name__ == '__main__':
         print('ERROR: Invalid number of entries for --eff: must be equal to n_particles')
         exit(1)
 
-    basename = os.splitext(os.path.basename(args.out))[0]
+    basename = os.path.splitext(os.path.basename(args.out))[0]
     dirname = os.path.dirname(args.out)
      
     f_truth_name = basename + '_truth.npz'
@@ -234,13 +235,8 @@ if __name__ == '__main__':
     # create the phone geometries
     n = args.n_phones 
 
-    phone_hwid = [uuid.uuid4().hex[:16] for _ in range(n)]
-
-    for hwid in phone_hwid:
-        os.makedirs(os.path.join(dirname, hwid, 'cluster'), exist_ok=True)
-        os.makedirs(os.path.join(dirname, hwid, 'bg'), exist_ok=True)
-
-
+    phone_hwid = sorted([uuid.uuid4().hex[:16] for _ in range(n)])
+ 
     phone_x0 = np.random.normal(0, args.xy_dev, n)
     phone_y0 = np.random.normal(0, args.xy_dev, n)
     phone_z0 = np.arange(n) * args.phone_gap \
@@ -288,6 +284,11 @@ if __name__ == '__main__':
                 phone_x, phone_y, phone_phi, phone_theta, phone_psi)
         if not input('Continue? y/n: ') == 'y': exit(0)
 
+
+    for hwid in phone_hwid:
+        os.makedirs(os.path.join(dirname, basename, hwid, 'cluster'), exist_ok=True)
+        os.makedirs(os.path.join(dirname, basename, hwid, 'bg'), exist_ok=True)
+
     
     drifts = np.random.normal(loc=0, scale=args.drift, size=n)
     offsets = np.random.uniform(0, 1/args.fps, n)
@@ -309,13 +310,14 @@ if __name__ == '__main__':
     for hwid in phone_hwid:
         for i in range(args.bgfiles):
             x_noise, y_noise = gen_noise(args.noise)
-            np.savez(os.path.join(dirname, hwid, 'bg', '{}.npz'.format(i)), \
+            np.savez(os.path.join(dirname, basename, hwid, 'bg', '{}.npz'.format(i)), \
                     x=x_noise, y=y_noise)
 
     # now create the beam spills
 
     # create the beam times with an offset relative to the phones
-    dt_spl = np.repeat(BEAM_PERIOD, args.n_spills - 1) + np.random.normal(0, 5)
+    dt_spl = np.repeat(BEAM_PERIOD, args.n_spills - 1) \
+            + np.random.normal(0, 3, args.n_spills - 1)
     spl_times = np.insert(np.cumsum(dt_spl), 0, 0) \
             + np.random.uniform(0, BEAM_PERIOD)
 
@@ -323,11 +325,16 @@ if __name__ == '__main__':
     for ispill in range(args.n_spills):
 
         print('Spill {}/{}'.format(ispill+1, args.n_spills), end="\r")
-
         n_particles = np.random.poisson(args.spill_size)
-        dt_avg = BEAM_TIME / n_particles 
-        dt = np.random.exponential(dt_avg, n_particles - 1)
-        particle_times = np.insert(np.cumsum(dt), 0, 0) + spl_times[ispill]
+        
+        t_options = np.linspace(-1.5, 1.5, 301)
+        cdf = np.exp(-np.abs(t_options)**args.spill_tail)
+        particle_times = np.sort(np.random.choice(t_options, n_particles, p=cdf/cdf.sum()))
+        particle_times = (particle_times + 1) /2 * BEAM_TIME + spl_times[ispill]
+
+        #dt_avg = BEAM_TIME / n_particles
+        #dt = np.random.exponential(dt_avg, n_particles - 1)
+        #particle_times = np.insert(np.cumsum(dt), 0, 0) + spl_times[ispill]
 
         if args.spot_type == 'gaussian':
             x0 = np.random.normal(0, args.spot_size/2, n_particles)
@@ -358,6 +365,7 @@ if __name__ == '__main__':
         # determine the phone response
 
         for iphone in range(args.n_phones):
+            #print(iphone)
 
             tmin = phone_times[iphone] - 1/args.fps
             while phone_times[iphone] < particle_times[0]:
@@ -366,6 +374,13 @@ if __name__ == '__main__':
 
             while tmin < particle_times[-1]: 
                 frame_particles = (particle_times > tmin) & (particle_times < phone_times[iphone])
+
+                # ignore low-intensity frames that don't trigger
+                if frame_particles.sum() / n_particles < args.save_intensity / args.fps / BEAM_TIME: 
+                    #print('No trigger')
+                    tmin = phone_times[iphone]
+                    phone_times[iphone] += 1 / args.fps
+                    continue
 
                 xframe = pix_x[iphone, frame_particles]
                 yframe = pix_y[iphone, frame_particles]
@@ -407,15 +422,14 @@ if __name__ == '__main__':
                     y_cluster = ytot
                     
 
-                # save output 
-                if np.random.random() > args.upload_frac: continue
+                # save output  
                 t_out = millis + 1000 * (phone_times[iphone] + \
                         (phone_times[iphone]-offsets[iphone]) * drifts[iphone])
                 fname = os.path.join(dirname, 
                         basename,
                         phone_hwid[iphone], 
                         'cluster', 
-                        '{}.npz'.format(t_out))
+                        '{}.npz'.format(int(t_out)))
 
                 np.savez(fname, 
                         x=x_cluster, 
@@ -424,7 +438,7 @@ if __name__ == '__main__':
                         max_val=np.random.randint(1, 10, x_cluster.size),
                         tot_val=np.random.randint(1, 10, x_cluster.size),
                         n_clusters=x_cluster.size,
-                        n_pix=xtot.size,
+                        n_pix=np.ones(x_cluster.size),
                         # truth information
                         #particles=np.arange(n_particles)[frame_particles][hits],
                         #ptimes=1000*particle_times[frame_particles][hits] + millis,
