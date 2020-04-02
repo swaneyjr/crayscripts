@@ -20,7 +20,7 @@ def pix_stats(t0, res):
     h.Scale(1./t0.GetEntries())
 
     arr = np.zeros(res, dtype=float)
-    for x,y in product(xrange(rx), xrange(ry)):
+    for x,y in product(range(rx), range(ry)):
         i = h.GetBin(x+1,y+1)
         arr[x,y] = h.GetBinContent(i)
     return arr
@@ -80,13 +80,13 @@ def clean_pix(t0, thresh, mask=None, stats=None, keep_empty=False, bad_regions=N
     print('starting loop.')
     sys.stdout.flush()
     for ievt,evt in enumerate(t0):
-        if ievt%(input_events/10) == 0:
-            print("{:d}/{:d}  {:.1f}%" % (ievt, input_events, 100.*ievt/input_events))
+        if ievt%(input_events//10) == 0:
+            print("{:d}/{:d}  {:.1f}%".format(ievt, input_events, 100.*ievt/input_events))
         t1._pix_freq.clear()
         t1._pix_masked.clear()
 
         # first, load the pixel data out of the TTree vectors
-        pixels = list(map(Pixel, zip(evt.pix_x, evt.pix_y, evt.pix_val, evt.pix_adjusted_val, evt.pix_avg_3, evt.pix_avg_5)))
+        pixels = [Pixel(*z) for z in zip(evt.pix_x, evt.pix_y, evt.pix_val, evt.pix_adjusted_val, evt.pix_avg_3, evt.pix_avg_5)]
 
         # now clear the vectors so we can re-write them
         t1.pix_x.clear()
@@ -126,9 +126,9 @@ def clean_pix(t0, thresh, mask=None, stats=None, keep_empty=False, bad_regions=N
     print("Done!")
     print()
     print("Input events:    {}".format(input_events))
-    print("Output events:   {}\t({:.2f%})".format(t1.GetEntries(), 100.*t1.GetEntries()/input_events))
-    print("Pixels removed:  {}\t({:.2f%})".format((total_pix-saved_pix), 100.*(total_pix-saved_pix)/total_pix))
-    print("Pixels saved:    {}\t({:.2f%})".format(saved_pix, 100.*saved_pix/total_pix))
+    print("Output events:   {}\t({:.2f}%)".format(t1.GetEntries(), 100.*t1.GetEntries()/input_events))
+    print("Pixels removed:  {}\t({:.2f}%)".format((total_pix-saved_pix), 100.*(total_pix-saved_pix)/total_pix))
+    print("Pixels saved:    {}\t({:.2f}%)".format(saved_pix, 100.*saved_pix/total_pix))
 
     return t1
 
@@ -152,18 +152,20 @@ if __name__ == "__main__":
     if args.bad_region:
         args.bad_region = [map(int, br.split(',')) for br in args.bad_region]
 
-    args.res = map(int, args.res.split(','))
+    args.res = tuple(map(int, args.res.split(',')))
     
     t0 = r.TChain("events")
-    map(t0.Add, args.infiles)
+    for infile in args.infiles:
+        t0.Add(infile)
 
     if args.sel:
         t0_pre = t0
+        r.gROOT.cd()
         t0 = t0_pre.CopyTree(args.sel)
 
     outfile = r.TFile(args.out, "recreate")
 
-    print("Filtering pixels...")
+    print("Filtering {} pixels...".format(t0.GetEntries()))
     t1 = clean_pix(t0, args.thresh, args.source_mask, bad_regions=args.bad_region, drop_source=args.drop_source, l2thresh=args.L2, res=args.res)
     outfile.Write()
     outfile.Close()

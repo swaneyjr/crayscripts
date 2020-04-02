@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import ROOT as r
 import numpy as np
@@ -7,7 +7,7 @@ FRAME_RATE = 15.
 BINS_PER_FRAME = 20
 
 def cleaned_diffs(times):
-    diffs = sorted(list(np.diff(np.array(sorted(times)))))
+    diffs = np.sort(np.diff(np.sort(times)))
     i = len(diffs) - 1
     while diffs[i] > 1.5 * diffs[i-9]:
         diffs.remove(diffs[i])
@@ -27,25 +27,25 @@ def find_rate(times, max_time = None):
 
 def frame_sort(diffs, n_frames):
     frames = np.zeros(2*n_frames+1)
-    for i in xrange(len(diffs)):
+    for i in range(len(diffs)):
         frames[i/BINS_PER_FRAME] += diffs[i]
     return frames
     
 
 
-class TelData(object):
-    def __init__(self, m_times = [], l_times = []):
-        self.muon_times = m_times
-        self.led_times = l_times
+class TelData:
+    def __init__(self, m_times = np.array([]), l_times = np.array([])):
+        self.t_mu = np.sort(m_times)
+        self.t_led = np.sort(l_times)
     
     # removes muon data when LED is turned off
     def remove_off_time(self):
         t_cutoff = 1000 #gap above which LED is considered off
-        led_array = np.array(sorted(self.led_times))
-        muon_list = [m for m in self.muon_times if m > led_array[0] \
-                      and m < led_array[len(led_array)-1]]
-        m = 0
-        l = 0
+        muon_array = self.t_mu[(self.t_mu > min(led_array)) \
+                      & (self.t_mu < max(led_array))]
+        
+        ldiffs = np.diffs(self.t_led)
+        ldiffs
         while m < len(muon_list) and l < len(led_array)-1:
             if muon_list[m] > led_array[l] and muon_list[m] < led_array[l+1]:
                 if led_array[l+1] - led_array[l] > t_cutoff:
@@ -54,20 +54,17 @@ class TelData(object):
                     m += 1
             else:
                 l += 1
-        self.muon_times = muon_list
-        self.led_times = list(led_array)
-        return self
+        self.t_mu = muon_list
+        self.t_led = led_array
 
-    # gets rid hits less than t_shutter after a previous one
+    # gets rid of hits less than t_shutter after a previous one
     def remove_shutter_effect(self, t_shutter = 0.15):
         # clears closeby muon hits
-        muon_array = np.array(sorted(self.muon_times))
-        mdiffs = np.diff(muon_array)
-        muon_array = muon_array[np.concatenate((mdiffs > t_shutter, np.array([True])))]
+        mdiffs = np.diff(self.t_mu)
+        muon_array = self.t_mu[np.concatenate((mdiffs > t_shutter, np.array([True])))]
         # clears closeby led hits
-        led_array = np.array(sorted(self.led_times))
-        ldiffs = np.diff(led_array)
-        led_array = led_array[np.concatenate((ldiffs > t_shutter, np.array([True])))]
+        ldiffs = np.diff(self.t_led)
+        led_array = self.t_led[np.concatenate((ldiffs > t_shutter, np.array([True])))]
         # clears muons from closeby muon/led pairs
         m = 0
         l = 0
@@ -83,12 +80,11 @@ class TelData(object):
                 m += 1
         
         muon_array = muon_array[muon_array > 0]
-        return TelData(list(muon_array),list(led_array))
+        return TelData(muon_array, led_array)
         
     def append(self, tel_data):
-        self.muon_times += tel_data.muon_times
-        self.led_times += tel_data.led_times
-        return self
+        self.t_mu = np.sort(np.hstack(self.t_mu, tel_data.t_led)
+        self.t_led = np.sort(np.hstack(self.t_led, tel_data.t_led))
 
     # appends cleaned .root event trees to TelData
     def add_file(self, muon_name, led_name, t_shutter = 0):
@@ -102,11 +98,9 @@ class TelData(object):
             file_data.remove_shutter_effect(t_shutter)
         self.append(file_data)
 
-        return self
-
     def time_slice(self, t_i, t_f = float('inf')):
-        return TelData([m for m in self.muon_times if m > t_i and m < t_f], \
-                       [l for l in self.led_times if l > t_i and l < t_f])
+        return TelData(self.t_mu[(self.t_mu >= t_i) & (self.t_mu <= t_f)], \
+                       self.t_led[(self.t_led >= t_i) & (self.t_led <= t_f)])
     
     # subtracts time when experiment was off and returns the remaining time gap
     def t_tot(self):
