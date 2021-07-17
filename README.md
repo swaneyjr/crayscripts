@@ -1,3 +1,3 @@
 # CRAYFIS
 
-This is where all my CRAYFIS code goes.
+Unstructured ensemble of personal utility scripts/notebooks for CRAYFIS
